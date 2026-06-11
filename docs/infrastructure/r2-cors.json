@@ -1,0 +1,14 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://carlink.sa",
+      "https://www.carlink.sa",
+      "https://app.carlink.sa",
+      "https://*.carlink.sa"
+    ],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
