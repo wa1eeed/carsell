@@ -93,19 +93,30 @@ Already configured in Dockerfile (`/api/health`). Coolify uses it for zero-downt
 
 ## Database Migrations
 
-Migrations are NOT run automatically by the container. Run them via Coolify's
-"Execute Command" or a post-deploy hook:
+Migrations run **automatically** on every deploy via the container entrypoint
+(`docker-entrypoint.sh` runs `prisma migrate deploy` before starting the server).
+No manual step needed — the app won't start if migrations fail.
+
+### First deploy — seed essential data
+
+After the first successful deploy, seed the **plans + catalog** (one time).
+The seed auto-detects production and seeds ONLY plans + catalog — it does
+**NOT** create any demo accounts (no known-password users in production).
+
+Run via Coolify → your app → "Execute Command" (inside the running container):
 
 ```bash
-npx prisma migrate deploy
+node node_modules/prisma/build/index.js db seed
 ```
 
-For the **first deploy**, also seed the plans:
-```bash
-npx prisma db seed
-```
+This is idempotent (uses upsert) — safe to re-run. It creates:
+- 4 plans (Starter, Growth, Pro, Enterprise)
+- Car catalog (brands → categories → models)
 
-⚠️ Never run `migrate dev` or `db push` against production. Only `migrate deploy`.
+To also seed demo data (dev/staging only), set `SEED_DEMO=true` before running.
+
+⚠️ Never run `migrate dev` or `db push` against production. Only `migrate deploy`
+(which the entrypoint handles automatically).
 
 ---
 

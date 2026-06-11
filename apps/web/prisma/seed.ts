@@ -3,7 +3,14 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
+// In production we seed ONLY essential data (plans + catalog).
+// Demo showroom / demo user / demo cars are skipped — no known-password
+// accounts in production. Set SEED_DEMO=true to force demo data anywhere.
+const SEED_DEMO = process.env.SEED_DEMO === 'true' || process.env.NODE_ENV !== 'production'
+
 async function main() {
+  console.log(`Seeding (demo data: ${SEED_DEMO ? 'YES' : 'NO — production'})`)
+
   // ── Platform config (singleton) ──
   await prisma.platformConfig.upsert({
     where: { id: 'platform' },
@@ -63,69 +70,6 @@ async function main() {
     console.log(`  Plan: ${p.nameAr} (${p.slug})`)
   }
 
-  // ── Showroom (tenant) ──
-  const showroom = await prisma.showroom.upsert({
-    where: { slug: 'al-fahad' },
-    update: {},
-    create: {
-      slug: 'al-fahad',
-      name: 'معرض الفهد للسيارات',
-      ownerName: 'فهد العتيبي',
-      showroomNumber: 1001,
-      city: 'الرياض',
-      tagline: 'أفضل السيارات بأفضل الأسعار',
-      whatsapp: '0501234567',
-      phone: '0112345678',
-      showPrices: true,
-      profitMarginApproved: true,
-      marketplaceEnabled: true,
-      commissionPct: 2.5,
-    },
-  })
-
-  // ── Subscription for demo showroom ──
-  const growthPlanId = planMap['growth']
-  if (growthPlanId) {
-    await prisma.subscription.upsert({
-      where: { showroomId: showroom.id },
-      update: {},
-      create: {
-        showroomId: showroom.id,
-        planId: growthPlanId,
-        status: 'ACTIVE',
-        billingPeriod: 'MONTHLY',
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      },
-    })
-    console.log('  Demo subscription: Growth plan (ACTIVE)')
-  }
-
-  // ── Owner user ──
-  const password = await bcrypt.hash('password123', 12)
-  const user = await prisma.showroomUser.upsert({
-    where: { email: 'demo@carsell.one' },
-    update: {},
-    create: {
-      showroomId: showroom.id,
-      name: 'فهد العتيبي',
-      email: 'demo@carsell.one',
-      password,
-      phone: '0501234567',
-      role: 'SHOWROOM_OWNER',
-      accountType: 'SHOWROOM',
-      isActive: true,
-      completedSteps: ['personalInfo', 'identity', 'showroomInfo'],
-      nationalId: '1012345678',
-      idType: 'CITIZEN',
-      nafathVerified: true,
-      nafathVerifiedAt: new Date(),
-      kycStatus: 'APPROVED',
-      city: 'الرياض',
-    },
-  })
-
   // ── Catalog: brands → categories → models ──
   const catalog: { ar: string; en: string; cats: { ar: string; en: string; body: 'SUV' | 'SEDAN' | 'PICKUP'; models: string[] }[] }[] = [
     {
@@ -176,15 +120,93 @@ async function main() {
     }
   }
 
-  // ── Cars ──
+  console.log('✓ Plans + catalog seeded.')
+
+  // ════════════════════════════════════════════════════════════
+  // DEMO DATA — skipped in production (no known-password accounts)
+  // ════════════════════════════════════════════════════════════
+  if (!SEED_DEMO) {
+    console.log('✓ Production seed complete (plans + catalog only).')
+    return
+  }
+
+  // ── Demo Showroom (tenant) ──
+  const showroom = await prisma.showroom.upsert({
+    where: { slug: 'al-fahad' },
+    update: {},
+    create: {
+      slug: 'al-fahad',
+      name: 'معرض الفهد للسيارات',
+      ownerName: 'فهد العتيبي',
+      showroomNumber: 1001,
+      city: 'الرياض',
+      tagline: 'أفضل السيارات بأفضل الأسعار',
+      whatsapp: '0501234567',
+      phone: '0112345678',
+      showPrices: true,
+      profitMarginApproved: true,
+      marketplaceEnabled: true,
+      commissionPct: 2.5,
+    },
+  })
+
+  const growthPlanId = planMap['growth']
+  if (growthPlanId) {
+    await prisma.subscription.upsert({
+      where: { showroomId: showroom.id },
+      update: {},
+      create: {
+        showroomId: showroom.id,
+        planId: growthPlanId,
+        status: 'ACTIVE',
+        billingPeriod: 'MONTHLY',
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      },
+    })
+  }
+
+  const password = await bcrypt.hash('password123', 12)
+  const user = await prisma.showroomUser.upsert({
+    where: { email: 'demo@carsell.one' },
+    update: {},
+    create: {
+      showroomId: showroom.id,
+      name: 'فهد العتيبي',
+      email: 'demo@carsell.one',
+      password,
+      phone: '0501234567',
+      role: 'SHOWROOM_OWNER',
+      accountType: 'SHOWROOM',
+      isActive: true,
+      completedSteps: ['personalInfo', 'identity', 'showroomInfo'],
+      nationalId: '1012345678',
+      idType: 'CITIZEN',
+      nafathVerified: true,
+      nafathVerifiedAt: new Date(),
+      kycStatus: 'APPROVED',
+      city: 'الرياض',
+    },
+  })
+
+  // ── Demo Cars ──
   const colors = ['أبيض لؤلؤي', 'أسود', 'رمادي', 'فضي', 'أزرق']
   const statuses = ['FOR_SALE', 'FOR_SALE', 'FOR_SALE', 'AUCTION', 'RESERVED', 'DRAFT', 'SOLD'] as const
   const fuels = ['PETROL', 'HYBRID', 'DIESEL'] as const
   const carTypes = ['NEW', 'USED', 'USED_QUALIFIED'] as const
 
-  // clear previous seed cars for idempotency
+  // clear previous seed data for idempotency (dependency order)
+  await prisma.salePayment.deleteMany({ where: { sale: { showroomId: showroom.id } } })
+  await prisma.tradeIn.deleteMany({ where: { showroomId: showroom.id } })
+  await prisma.paymentTransaction.deleteMany({ where: { showroomId: showroom.id } })
+  await prisma.sale.deleteMany({ where: { showroomId: showroom.id } })
+  await prisma.deposit.deleteMany({ where: { showroomId: showroom.id } })
+  await prisma.bid.deleteMany({ where: { car: { showroomId: showroom.id } } })
   await prisma.carTimeline.deleteMany({ where: { car: { showroomId: showroom.id } } })
   await prisma.carImage.deleteMany({ where: { car: { showroomId: showroom.id } } })
+  await prisma.carDocument.deleteMany({ where: { car: { showroomId: showroom.id } } })
+  await prisma.carExpense.deleteMany({ where: { car: { showroomId: showroom.id } } })
   await prisma.car.deleteMany({ where: { showroomId: showroom.id } })
 
   for (let i = 0; i < 14; i++) {
@@ -195,6 +217,7 @@ async function main() {
     const car = await prisma.car.create({
       data: {
         showroomId: showroom.id,
+        carRefNumber: i + 1,
         brandId: pick.brandId,
         categoryId: pick.categoryId,
         modelId: pick.modelId,
