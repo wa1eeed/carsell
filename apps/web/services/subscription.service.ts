@@ -14,7 +14,7 @@ import {
 } from '@/repositories/plan.repository'
 import type { BillingPeriod } from '@prisma/client'
 
-const APP_URL = process.env.NEXTAUTH_URL ?? 'https://app.carlink.sa'
+const APP_URL = process.env.NEXTAUTH_URL ?? 'https://app.carsell.one'
 
 // ── Start Trial ────────────────────────────────────────────────────────────
 
@@ -76,7 +76,7 @@ export async function initiateCheckout(params: {
     : Number(sub.plan.priceMonthly)
 
   const period = isYearly ? 'سنوية' : 'شهرية'
-  const description = `اشتراك CarLink — ${sub.plan.nameAr} (${period})`
+  const description = `اشتراك CarSell — ${sub.plan.nameAr} (${period})`
 
   const charge = await createCheckoutCharge({
     amount,

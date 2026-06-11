@@ -7,11 +7,11 @@
 ## الطبقات الأربع
 
 ```
-الطبقة ١  carlink.sa                  ← تسويقية — Landing Page
-الطبقة ٢  app.carlink.sa              ← لوحة البائع — SaaS Dashboard
-الطبقة ٣  {slug}.carlink.sa           ← معرض البائع الإلكتروني (subdomain)
+الطبقة ١  carsell.one                  ← تسويقية — Landing Page
+الطبقة ٢  app.carsell.one              ← لوحة البائع — SaaS Dashboard
+الطبقة ٣  {slug}.carsell.one           ← معرض البائع الإلكتروني (subdomain)
            أو custom domain            ← مثل fahadcars.com (للباقات المدفوعة)
-الطبقة ٤  carlink.sa/market           ← CarLink Market (اختياري)
+الطبقة ٤  carsell.one/market           ← CarSell Live (اختياري)
 ```
 
 ---
@@ -22,12 +22,12 @@
 apps/
 ├── web/                          ← Next.js app — يخدم الطبقات الأربعة
 │   ├── app/
-│   │   ├── (marketing)/          ← طبقة ١: carlink.sa
+│   │   ├── (marketing)/          ← طبقة ١: carsell.one
 │   │   │   ├── page.tsx          ← الصفحة الرئيسية
 │   │   │   ├── pricing/          ← صفحة الباقات
 │   │   │   └── features/
 │   │   │
-│   │   ├── (dashboard)/          ← طبقة ٢: app.carlink.sa
+│   │   ├── (dashboard)/          ← طبقة ٢: app.carsell.one
 │   │   │   ├── layout.tsx        ← sidebar + auth guard
 │   │   │   ├── dashboard/
 │   │   │   ├── inventory/
@@ -39,13 +39,13 @@ apps/
 │   │   │   └── settings/
 │   │   │       └── showroom/     ← إعدادات الواجهة العامة
 │   │   │
-│   │   ├── (showroom)/           ← طبقة ٣: {slug}.carlink.sa
+│   │   ├── (showroom)/           ← طبقة ٣: {slug}.carsell.one
 │   │   │   ├── layout.tsx        ← header المعرض + theme البائع
 │   │   │   ├── page.tsx          ← كل السيارات + فلاتر
 │   │   │   └── cars/
 │   │   │       └── [carId]/      ← صفحة سيارة واحدة
 │   │   │
-│   │   ├── (market)/             ← طبقة ٤: carlink.sa/market
+│   │   ├── (market)/             ← طبقة ٤: carsell.one/market
 │   │   │   ├── page.tsx          ← سوق عام
 │   │   │   └── cars/[id]/
 │   │   │
@@ -72,7 +72,7 @@ export function middleware(req: NextRequest) {
   const hostname = req.headers.get('host') ?? ''
   const { pathname } = req.nextUrl
 
-  // ── app.carlink.sa → لوحة التحكم ────────────
+  // ── app.carsell.one → لوحة التحكم ────────────
   if (hostname.startsWith('app.')) {
     // rewrite لـ route group (dashboard)
     return NextResponse.rewrite(
@@ -80,8 +80,8 @@ export function middleware(req: NextRequest) {
     )
   }
 
-  // ── {slug}.carlink.sa → واجهة المعرض ─────────
-  const rootDomain = process.env.ROOT_DOMAIN ?? 'carlink.sa'
+  // ── {slug}.carsell.one → واجهة المعرض ─────────
+  const rootDomain = process.env.ROOT_DOMAIN ?? 'carsell.one'
   const isSubdomain =
     hostname !== rootDomain &&
     hostname !== `www.${rootDomain}` &&
@@ -103,7 +103,7 @@ export function middleware(req: NextRequest) {
   // يتم عبر Edge middleware + KV cache لتجنب DB call في كل request
   // (يُطبَّق لاحقاً — Pro+ فقط)
 
-  // ── carlink.sa العادي ← تسويقي أو /market ────
+  // ── carsell.one العادي ← تسويقي أو /market ────
   return NextResponse.next()
 }
 
@@ -124,7 +124,7 @@ export const config = {
 | فلاتر | براند، فئة، موديل، سنة، سعر (من/إلى)، الحالة |
 | كروت السيارات | صورة رئيسية، الاسم، المواصفات، السعر، badge الحالة |
 | تفاصيل سيارة | معرض صور، مواصفات كاملة، لوحة، زر واتساب/اتصال |
-| Footer | بيانات المعرض + "مدعوم بـ CarLink" |
+| Footer | بيانات المعرض + "مدعوم بـ CarSell" |
 
 ### الفلاتر
 
@@ -135,9 +135,9 @@ export const config = {
 ### URL Structure
 
 ```
-fahad-cars.carlink.sa/                     ← كل السيارات
-fahad-cars.carlink.sa/?brand=toyota        ← فلتر براند
-fahad-cars.carlink.sa/cars/abc123          ← سيارة محددة
+fahad-cars.carsell.one/                     ← كل السيارات
+fahad-cars.carsell.one/?brand=toyota        ← فلتر براند
+fahad-cars.carsell.one/cars/abc123          ← سيارة محددة
 ```
 
 ---
@@ -146,7 +146,7 @@ fahad-cars.carlink.sa/cars/abc123          ← سيارة محددة
 
 | الميزة | Subdomain | Custom Domain |
 |---|---|---|
-| المثال | fahad.carlink.sa | fahadcars.com |
+| المثال | fahad.carsell.one | fahadcars.com |
 | الباقة | Basic فأعلى | Pro+ |
 | الإعداد | تلقائي عند إنشاء الحساب | البائع يضيف CNAME يدوياً |
 | SSL | تلقائي (Wildcard) | عبر Cloudflare Proxy |
@@ -156,9 +156,9 @@ fahad-cars.carlink.sa/cars/abc123          ← سيارة محددة
 
 ```
 # DNS Records
-*.carlink.sa    A    → IP_VPS
-carlink.sa      A    → IP_VPS
-app.carlink.sa  A    → IP_VPS
+*.carsell.one    A    → IP_VPS
+carsell.one      A    → IP_VPS
+app.carsell.one  A    → IP_VPS
 ```
 
 ### Custom Domain في DB
@@ -175,7 +175,7 @@ model Showroom {
 
 ## إعدادات المعرض الإلكتروني (من لوحة التحكم)
 
-البائع يتحكم في واجهته من `app.carlink.sa/settings/showroom`:
+البائع يتحكم في واجهته من `app.carsell.one/settings/showroom`:
 
 ```typescript
 interface ShowroomPageSettings {
@@ -196,7 +196,7 @@ interface ShowroomPageSettings {
   showPrices: boolean      // إخفاء الأسعار وإظهار "تواصل للسعر"
 
   // Subdomain
-  slug: string             // fahad-cars ← يظهر في carlink.sa/fahad-cars
+  slug: string             // fahad-cars ← يظهر في carsell.one/fahad-cars
   customDomain?: string    // Pro+
 }
 ```

@@ -289,7 +289,7 @@ function SuccessScreen({
   const locale = useLocale()
   const [copied, setCopied] = useState(false)
 
-  const origin          = typeof window !== 'undefined' ? window.location.origin : 'https://carlink.sa'
+  const origin          = typeof window !== 'undefined' ? window.location.origin : 'https://carsell.one'
   const marketUrl       = `${origin}/${locale}/market`
   const showroomUrl     = showroomSlug ? `${origin}/${showroomSlug}` : null
 
@@ -328,7 +328,7 @@ function SuccessScreen({
             <Store size={14} className="text-[#0F3460] shrink-0" />
             <div className="flex-1 min-w-0">
               <div className="text-xs font-medium text-gray-700">صفحة معرضك</div>
-              <div className="text-[10px] text-gray-400 font-mono ltr truncate">carlink.sa/{showroomSlug}</div>
+              <div className="text-[10px] text-gray-400 font-mono ltr truncate">carsell.one/{showroomSlug}</div>
             </div>
             <a href={showroomUrl} target="_blank" rel="noopener noreferrer"
               className="p-1 text-gray-400 hover:text-[#0F3460]" title="فتح">
@@ -342,7 +342,7 @@ function SuccessScreen({
           <Globe size={14} className="text-[#C9A84C] shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-xs font-medium text-gray-700">CarSell Live</div>
-            <div className="text-[10px] text-gray-400 font-mono ltr">carlink.sa/market</div>
+            <div className="text-[10px] text-gray-400 font-mono ltr">carsell.one/market</div>
           </div>
           <a href={marketUrl} target="_blank" rel="noopener noreferrer"
             className="p-1 text-gray-400 hover:text-[#C9A84C]" title="فتح">

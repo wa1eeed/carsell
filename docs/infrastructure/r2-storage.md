@@ -20,7 +20,7 @@
 ## هيكل الـ Buckets
 
 ```
-carlink-prod/
+carsell-prod/
 ├── cars/
 │   ├── {showroom_id}/
 │   │   └── {car_id}/
@@ -47,7 +47,7 @@ carlink-prod/
 ## إعدادات الـ Bucket
 
 ```
-Bucket name:     carlink-prod
+Bucket name:     carsell-prod
 Region:          WEUR (Western Europe — أقرب للخليج)
 Public access:   مغلق ← presigned URLs فقط
 CORS:            مفعّل للدومين فقط
@@ -98,8 +98,8 @@ const EXPIRY = {
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=carlink-prod
-R2_PUBLIC_DOMAIN=cdn.carlink.com   # Custom domain على R2
+R2_BUCKET_NAME=carsell-prod
+R2_PUBLIC_DOMAIN=cdn.carsell.one   # Custom domain على R2
 ```
 
 ---

@@ -25,8 +25,8 @@ export async function POST() {
     return apiResponse.ok({ verified: true, alreadyVerified: true })
   }
 
-  // Look up TXT record at _carlink.{domain}
-  const txtName = `_carlink.${settings.customDomain}`
+  // Look up TXT record at _carsell.{domain}
+  const txtName = `_carsell.${settings.customDomain}`
   try {
     const records = await resolveTxt(txtName)
     const flat    = records.flat()  // TXT can be split into chunks

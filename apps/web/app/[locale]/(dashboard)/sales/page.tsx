@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { formatCarRef } from '@/lib/format'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'المبيعات — CarLink' }
+export const metadata = { title: 'المبيعات — CarSell' }
 
 const PAYMENT_AR: Record<string, string> = {
   CASH: 'نقدي', BANK_TRANSFER: 'تحويل', FINANCING: 'تمويل', TRADE_IN: 'استبدال', MIXED: 'مختلط',

@@ -1,10 +1,10 @@
 [
   {
     "AllowedOrigins": [
-      "https://carlink.sa",
-      "https://www.carlink.sa",
-      "https://app.carlink.sa",
-      "https://*.carlink.sa"
+      "https://carsell.one",
+      "https://www.carsell.one",
+      "https://app.carsell.one",
+      "https://*.carsell.one"
     ],
     "AllowedMethods": ["GET", "PUT", "HEAD"],
     "AllowedHeaders": ["*"],

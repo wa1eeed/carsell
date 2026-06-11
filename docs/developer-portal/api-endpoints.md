@@ -1,6 +1,6 @@
-# CarLink API Endpoints Reference
+# CarSell API Endpoints Reference
 
-**Base URL:** `https://app.carlink.sa/api/v1`
+**Base URL:** `https://app.carsell.one/api/v1`
 **Auth:** `Authorization: Bearer <jwt_token>`
 
 ---

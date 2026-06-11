@@ -105,12 +105,12 @@ async function main() {
   // ── Owner user ──
   const password = await bcrypt.hash('password123', 12)
   const user = await prisma.showroomUser.upsert({
-    where: { email: 'demo@carlink.sa' },
+    where: { email: 'demo@carsell.one' },
     update: {},
     create: {
       showroomId: showroom.id,
       name: 'فهد العتيبي',
-      email: 'demo@carlink.sa',
+      email: 'demo@carsell.one',
       password,
       phone: '0501234567',
       role: 'SHOWROOM_OWNER',
@@ -236,7 +236,7 @@ async function main() {
 
   console.log('✓ Seed complete:')
   console.log('  Showroom:', showroom.name, `(slug: ${showroom.slug})`)
-  console.log('  Login:    demo@carlink.sa / password123')
+  console.log('  Login:    demo@carsell.one / password123')
 }
 
 main()

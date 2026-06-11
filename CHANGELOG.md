@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to CarLink are documented here.  
+All notable changes to CarSell are documented here.  
 Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://keepachangelog.com)
 
 ---
@@ -18,7 +18,7 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 - `repositories/kyc.repository.ts` + `PATCH /api/v1/admin/kyc/[id]`
 
 ### Fixed
-- **Hydration mismatch** — `window.location.origin` differed between SSR (carlink.sa)
+- **Hydration mismatch** — `window.location.origin` differed between SSR (carsell.one)
   and client (localhost). Added `useOrigin()` hook (lib/hooks/use-origin.ts)
 - **HTTP status codes** — client errors now 400/409 instead of 500
   (reserved slug → 400, taken slug/domain → 409, DNS-not-found → 400)
@@ -35,7 +35,7 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 ## [0.5.0] — 2026-06-11 · Pretty URLs + Custom Domains
 
 ### Added
-- **Pretty root URLs** — `carlink.sa/{slug}` resolves to showroom storefront
+- **Pretty root URLs** — `carsell.one/{slug}` resolves to showroom storefront
   - Reserved-words guard distinguishes slugs from platform routes
   - middleware rewrites via intl middleware (handles as-needed locale prefix)
 - **Custom domain** — dealers connect their own domain (e.g. mydealership.com)
@@ -54,7 +54,7 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 - **Showroom landing pages** + car detail with gallery + WhatsApp CTA
 - **Share button** — native Web Share + WhatsApp + copy-link from dashboard/showroom/market
 - **Print slip + QR** (`/inventory/[id]/print`) — A4 + label formats for physical showroom
-- **Separate Super Admin** (`admin.carlink.sa`) — distinct layout from showroom dashboard
+- **Separate Super Admin** (`admin.carsell.one`) — distinct layout from showroom dashboard
 - **Multi-tenant ID hardening** — `showroomNumber` (CL-1001) + `carRefNumber` (#47 per tenant)
 - **Security** — CSP/HSTS headers, rate limiting, addImages/addDocument ownership checks,
   JWT re-validation every 5min
@@ -111,7 +111,7 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 - **Private Auction** — generates unique `auctionSlug`, shareable link
 - **Sale Registration** — buyer info, payment methods (Cash/Financing/TradeIn/Mixed)
 - **VAT Calculation** — server-side: `USED_QUALIFIED` margin method, others full price
-- **Showroom Public Page** — `{slug}.carlink.sa` with SSR, filters, SEO metadata
+- **Showroom Public Page** — `{slug}.carsell.one` with SSR, filters, SEO metadata
 - **Car Detail Public Page** — gallery, specs, Saudi plate, VIN (LTR), contact buttons
 - **CarTimeline** — all status changes and actions recorded (append-only)
 - **API `/api/v1/cars/:id/publish`** — validates and publishes car
@@ -134,7 +134,7 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 - **Design System** — Navy/Gold palette, IBM Plex Sans Arabic, RTL/LTR support
 - **i18n** — next-intl with `ar` (default) + `en`, all strings in `messages/*.json`
 - **CSS Variables** — all `--cl-*` design tokens in `globals.css`
-- **Domain Routing** — middleware for app.carlink.sa / {slug}.carlink.sa / carlink.sa
+- **Domain Routing** — middleware for app.carsell.one / {slug}.carsell.one / carsell.one
 - **Database Schema** — 20+ models: Showroom, Car, Sale, Subscription, Bid, etc.
 - **Auth System** — NextAuth JWT (15min access, 7d refresh)
 - **Login Page** — email/password + Nafath button

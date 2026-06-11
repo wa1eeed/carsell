@@ -6,7 +6,7 @@
  *
  * Schedule: daily at 03:00 KSA (00:00 UTC)
  * Example cron command:
- *   curl -X POST https://app.carlink.sa/api/v1/admin/cleanup/media \
+ *   curl -X POST https://app.carsell.one/api/v1/admin/cleanup/media \
  *     -H "Authorization: Bearer $CRON_SECRET"
  */
 

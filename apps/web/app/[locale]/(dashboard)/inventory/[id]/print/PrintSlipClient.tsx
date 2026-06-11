@@ -251,8 +251,8 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
         </div>
         <div className="text-left text-sm text-gray-400">
           <div className="text-xs">منصة</div>
-          <div className="font-bold text-[#0F3460] text-lg">CarLink</div>
-          <div className="text-xs">carlink.sa</div>
+          <div className="font-bold text-[#0F3460] text-lg">CarSell</div>
+          <div className="text-xs">carsell.one</div>
         </div>
       </div>
     </div>

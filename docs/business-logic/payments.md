@@ -16,7 +16,7 @@
                           +
 ┌─────────────────────────────────────────────────────────┐
 │  الطبقة ٢: Marketplace Commission (اختياري)             │
-│  فقط عند تفعيل "عرض السيارة في CarLink Market"           │
+│  فقط عند تفعيل "عرض السيارة في CarSell Live"           │
 │  عمولة % من سعر البيع — قابلة للضبط من لوحة الأدمن     │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -37,7 +37,7 @@
 
 ---
 
-### الحالة ب — معرض فعّل CarLink Market
+### الحالة ب — معرض فعّل CarSell Live
 
 ```
 المشتري يدفع عبر المنصة
@@ -114,10 +114,10 @@ interface MarketplaceSettings {
 
 ---
 
-## flow تفعيل CarLink Market لمعرض جديد
+## flow تفعيل CarSell Live لمعرض جديد
 
 ```
-١. صاحب المعرض يضغط "تفعيل CarLink Market" في الإعدادات
+١. صاحب المعرض يضغط "تفعيل CarSell Live" في الإعدادات
       ↓
 ٢. المنصة تُوجّهه لصفحة Onboarding بوابة الدفع
    (Hosted Page — ليست صفحتنا)
@@ -128,12 +128,12 @@ interface MarketplaceSettings {
       ↓
 ٥. المنصة تحفظ: onboardingStatus = 'active'
       ↓
-٦. السيارات المُفعَّلة للسوق تظهر في CarLink Market
+٦. السيارات المُفعَّلة للسوق تظهر في CarSell Live
 ```
 
 ---
 
-## flow الدفع عبر CarLink Market
+## flow الدفع عبر CarSell Live
 
 ```
 المشتري يختار سيارة → يضغط "اشتري الآن"
@@ -194,7 +194,7 @@ model PaymentTransaction {
 // إضافة على Car
 model Car {
   // ... الحقول الحالية ...
-  listedOnMarket  Boolean  @default(false)  // هل السيارة معروضة في CarLink Market
+  listedOnMarket  Boolean  @default(false)  // هل السيارة معروضة في CarSell Live
   marketPrice     Decimal? @db.Decimal(12, 2)
 }
 ```

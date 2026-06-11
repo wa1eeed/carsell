@@ -124,7 +124,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "img-src 'self' data: blob: *.r2.cloudflarestorage.com *.carlink.sa",
+      "img-src 'self' data: blob: *.r2.cloudflarestorage.com *.carsell.one",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline'",  // Next.js يحتاجها
       "connect-src 'self' *.r2.cloudflarestorage.com",
     ].join('; '),

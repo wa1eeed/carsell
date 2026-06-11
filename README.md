@@ -1,9 +1,9 @@
-# CarLink 🚗
+# CarSell 🚗
 
 **سوق السيارات في السعودية والخليج**  
 SaaS platform for car showrooms — bilingual (Arabic primary / English secondary).
 
-**Domain:** carlink.sa | app.carlink.sa | {slug}.carlink.sa
+**Domain:** carsell.one | app.carsell.one | {slug}.carsell.one
 
 ---
 
@@ -23,7 +23,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000)
 
 **Demo credentials:**
-- Email: `demo@carlink.sa`
+- Email: `demo@carsell.one`
 - Password: `password123`
 
 ---
@@ -52,13 +52,13 @@ carlink/
 │   ├── app/
 │   │   ├── [locale]/
 │   │   │   ├── (auth)/         ← Login, Register, Onboarding
-│   │   │   ├── (dashboard)/    ← app.carlink.sa (protected)
+│   │   │   ├── (dashboard)/    ← app.carsell.one (protected)
 │   │   │   │   ├── admin/      ← Super Admin panel
 │   │   │   │   ├── billing/    ← Subscription management
 │   │   │   │   ├── inventory/  ← Car management
 │   │   │   │   └── sales/      ← Sale registration
 │   │   │   ├── (marketing)/    ← Public pages (pricing, etc.)
-│   │   │   └── showroom/       ← {slug}.carlink.sa public pages
+│   │   │   └── showroom/       ← {slug}.carsell.one public pages
 │   │   └── api/v1/             ← REST API routes
 │   ├── components/
 │   │   ├── features/           ← Domain components (cars, billing, auth)
@@ -106,7 +106,7 @@ All plans include 14-day free trial. Plans and pricing are fully managed by Supe
 
 ## API Overview
 
-Base URL: `https://app.carlink.sa/api/v1`  
+Base URL: `https://app.carsell.one/api/v1`  
 Authentication: `Authorization: Bearer <jwt>`
 
 | Endpoint | Description |
@@ -130,7 +130,7 @@ Full API reference: `docs/developer-portal/api-reference.md`
 
 | | Dev | Staging | Production |
 |---|---|---|---|
-| Domain | localhost:3000 | staging.carlink.sa | carlink.sa |
+| Domain | localhost:3000 | staging.carsell.one | carsell.one |
 | Branch | feature/* | main | release tag |
 | DB | carlink_dev | staging DB | prod DB |
 | Tap | test keys | test keys | live keys |
@@ -150,10 +150,10 @@ Full API reference: `docs/developer-portal/api-reference.md`
 
 ## Developer Portal
 
-`developers.carlink.sa` — API docs, authentication, sandbox environment.
+`developers.carsell.one` — API docs, authentication, sandbox environment.
 
 ---
 
 ## License
 
-Proprietary — CarLink © 2025
+Proprietary — CarSell © 2025

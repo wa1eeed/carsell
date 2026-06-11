@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'نظرة عامة — CarLink Admin' }
+export const metadata = { title: 'نظرة عامة — CarSell Admin' }
 
 async function getStats() {
   const [
@@ -48,7 +48,7 @@ export default async function AdminOverviewPage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">نظرة عامة على المنصة</h1>
-        <p className="text-gray-500 text-sm mt-1">إحصائيات CarLink في الوقت الفعلي</p>
+        <p className="text-gray-500 text-sm mt-1">إحصائيات CarSell في الوقت الفعلي</p>
       </div>
 
       {/* KPI grid */}

@@ -21,7 +21,7 @@ interface NavSection { titleKey: string; items: NavItem[] }
 
 /**
  * Showroom sidebar — for showroom owners/staff only.
- * Super Admin has a completely separate layout (AdminShell) at admin.carlink.sa
+ * Super Admin has a completely separate layout (AdminShell) at admin.carsell.one
  */
 const SECTIONS: NavSection[] = [
   {
@@ -67,7 +67,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   return (
     <aside className="w-60 shrink-0 min-h-screen flex flex-col" style={{ background: '#0F3460' }}>
       <div className="px-6 py-5">
-        <span className="text-xl font-semibold text-white">CarLink</span>
+        <span className="text-xl font-semibold text-white">CarSell</span>
       </div>
 
       <nav className="flex-1 px-3 py-2 space-y-6">

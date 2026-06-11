@@ -1,4 +1,4 @@
-# Deployment Guide — CarLink
+# Deployment Guide — CarSell
 
 Target: **VPS via Coolify** (per CLAUDE.md). Docker-based, Next.js standalone.
 
@@ -9,7 +9,7 @@ Target: **VPS via Coolify** (per CLAUDE.md). Docker-based, Next.js standalone.
 1. A VPS (2GB+ RAM) with Coolify installed
 2. A PostgreSQL database (Coolify can provision one, or managed e.g. Supabase/Neon)
 3. Cloudflare R2 bucket + API tokens
-4. Domain `carlink.sa` with DNS managed (Cloudflare recommended)
+4. Domain `carsell.one` with DNS managed (Cloudflare recommended)
 5. Tap.company account (test + live keys)
 
 ---
@@ -20,16 +20,16 @@ Point these at your VPS IP:
 
 | Record | Name | Value | Purpose |
 |---|---|---|---|
-| A | `@` | `<VPS_IP>` | Root domain (carlink.sa) |
-| A | `app` | `<VPS_IP>` | Dashboard (app.carlink.sa) |
-| A | `admin` | `<VPS_IP>` | Super Admin (admin.carlink.sa) |
-| A | `*` | `<VPS_IP>` | Wildcard for {slug}.carlink.sa showrooms |
+| A | `@` | `<VPS_IP>` | Root domain (carsell.one) |
+| A | `app` | `<VPS_IP>` | Dashboard (app.carsell.one) |
+| A | `admin` | `<VPS_IP>` | Super Admin (admin.carsell.one) |
+| A | `*` | `<VPS_IP>` | Wildcard for {slug}.carsell.one showrooms |
 
-The wildcard `*.carlink.sa` is **essential** — it makes every showroom subdomain
+The wildcard `*.carsell.one` is **essential** — it makes every showroom subdomain
 resolve without per-showroom DNS changes.
 
 For **custom domains** (dealers' own domains), they point their A record at `<VPS_IP>`
-and add a TXT record for verification — see `app.carlink.sa/settings`.
+and add a TXT record for verification — see `app.carsell.one/settings`.
 
 ---
 
@@ -46,10 +46,10 @@ and add a TXT record for verification — see `app.carlink.sa/settings`.
 Set these in Coolify's Environment tab (NOT in the repo):
 
 ```
-DATABASE_URL=postgresql://user:pass@host:5432/carlink_prod
+DATABASE_URL=postgresql://user:pass@host:5432/carsell_prod
 NEXTAUTH_SECRET=<openssl rand -base64 32>
-NEXTAUTH_URL=https://app.carlink.sa
-ROOT_DOMAIN=carlink.sa
+NEXTAUTH_URL=https://app.carsell.one
+ROOT_DOMAIN=carsell.one
 NODE_ENV=production
 
 # Storage (Cloudflare R2)
@@ -57,8 +57,8 @@ STORAGE_PROVIDER=r2
 R2_ACCOUNT_ID=...
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
-R2_BUCKET_NAME=carlink-prod
-R2_PUBLIC_URL=https://media.carlink.sa
+R2_BUCKET_NAME=carsell-prod
+R2_PUBLIC_URL=https://media.carsell.one
 
 # Tap.company — set these from Super Admin Settings after first deploy,
 # OR seed them here as fallback
@@ -68,7 +68,7 @@ TAP_ENV=live
 
 # Custom domain DNS targets
 PLATFORM_IP=<VPS_IP>
-PLATFORM_CNAME=cname.carlink.sa
+PLATFORM_CNAME=cname.carsell.one
 
 # Cron secret (for media cleanup)
 CRON_SECRET=<openssl rand -hex 32>
@@ -79,10 +79,10 @@ MEDIA_DELETE_AFTER_DAYS=30
 
 ### 3. Domains
 Add all four domains in Coolify, all pointing to this app:
-- `carlink.sa`, `www.carlink.sa`
-- `app.carlink.sa`
-- `admin.carlink.sa`
-- `*.carlink.sa` (wildcard — Coolify supports wildcard certs via DNS challenge)
+- `carsell.one`, `www.carsell.one`
+- `app.carsell.one`
+- `admin.carsell.one`
+- `*.carsell.one` (wildcard — Coolify supports wildcard certs via DNS challenge)
 
 Coolify auto-provisions Let's Encrypt SSL.
 
@@ -115,7 +115,7 @@ Set up a daily cron (Coolify Scheduled Tasks or external) to clean expired car m
 
 ```bash
 # Daily at 03:00 KSA (00:00 UTC)
-curl -X POST https://app.carlink.sa/api/v1/admin/cleanup/media \
+curl -X POST https://app.carsell.one/api/v1/admin/cleanup/media \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
@@ -123,10 +123,10 @@ curl -X POST https://app.carlink.sa/api/v1/admin/cleanup/media \
 
 ## Post-Deploy Checklist
 
-- [ ] `https://app.carlink.sa/api/health` returns `{"ok":true}`
-- [ ] Login works at `app.carlink.sa/login`
-- [ ] A showroom resolves at `carlink.sa/{slug}` and `{slug}.carlink.sa`
-- [ ] Super Admin loads at `admin.carlink.sa` (PLATFORM_ADMIN only)
+- [ ] `https://app.carsell.one/api/health` returns `{"ok":true}`
+- [ ] Login works at `app.carsell.one/login`
+- [ ] A showroom resolves at `carsell.one/{slug}` and `{slug}.carsell.one`
+- [ ] Super Admin loads at `admin.carsell.one` (PLATFORM_ADMIN only)
 - [ ] Tap test payment completes end-to-end
 - [ ] R2 image upload works (add a car with photos)
 - [ ] Set production Tap keys in Super Admin → Settings (switch env to "live")
@@ -137,7 +137,7 @@ curl -X POST https://app.carlink.sa/api/v1/admin/cleanup/media \
 
 | | Dev | Staging | Production |
 |---|---|---|---|
-| Domain | localhost:3000 | staging.carlink.sa | carlink.sa |
+| Domain | localhost:3000 | staging.carsell.one | carsell.one |
 | Branch | feature/* | main | release tag |
 | Tap | test keys | test keys | **live keys** |
 | Deploy | manual | auto on push | manual + approval |

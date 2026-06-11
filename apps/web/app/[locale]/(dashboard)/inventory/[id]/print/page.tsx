@@ -53,7 +53,7 @@ export default async function PrintSlipPage({ params }: Props) {
     select: { url: true },
   })
 
-  const publicUrl = `${process.env.NEXTAUTH_URL ?? 'https://carlink.sa'}/${params.locale}/market/cars/${car.id}`
+  const publicUrl = `${process.env.NEXTAUTH_URL ?? 'https://carsell.one'}/${params.locale}/market/cars/${car.id}`
 
   return (
     <PrintSlipClient

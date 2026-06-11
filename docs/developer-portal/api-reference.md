@@ -1,7 +1,7 @@
 # Developer Portal — بوابة المطوّرين
 
-> الرابط: developers.carlink.sa
-> الهدف: تمكين المطوّرين وأصحاب المنصات من الربط مع CarLink API
+> الرابط: developers.carsell.one
+> الهدف: تمكين المطوّرين وأصحاب المنصات من الربط مع CarSell API
 
 ---
 
@@ -18,7 +18,7 @@
 ## الصفحات الرئيسية للـ Portal
 
 ```
-developers.carlink.sa/
+developers.carsell.one/
 ├── /                        ← نظرة عامة + Quick Start
 ├── /authentication          ← OAuth2 + API Keys
 ├── /reference               ← API Reference الكامل
@@ -74,8 +74,8 @@ webhooks:manage    ← إدارة الـ webhooks
 
 ### Base URL
 ```
-Production:  https://api.carlink.sa/v1
-Sandbox:     https://sandbox-api.carlink.sa/v1
+Production:  https://api.carsell.one/v1
+Sandbox:     https://sandbox-api.carsell.one/v1
 ```
 
 ### Response Format الموحّد
@@ -120,7 +120,7 @@ Sandbox:     https://sandbox-api.carlink.sa/v1
 | `minPrice` | number | — | سعر أدنى |
 | `maxPrice` | number | — | سعر أعلى |
 | `year` | integer | — | سنة الصنع |
-| `listedOnMarket` | boolean | — | معروضة في CarLink Market |
+| `listedOnMarket` | boolean | — | معروضة في CarSell Live |
 
 **Response:**
 ```json
@@ -140,7 +140,7 @@ Sandbox:     https://sandbox-api.carlink.sa/v1
       "sellPrice": 345000,
       "plateNumber": "ح ن ط 7653",
       "plateType": "private",
-      "coverImageUrl": "https://cdn.carlink.sa/...",
+      "coverImageUrl": "https://cdn.carsell.one/...",
       "createdAt": "2026-06-02T09:14:00Z"
     }
   ],
@@ -327,7 +327,7 @@ sale.created          ← صفقة بيع جديدة
 
 **التحقق من الـ signature:**
 ```javascript
-const signature = req.headers['x-carlink-signature']
+const signature = req.headers['x-carsell-signature']
 const expected = crypto
   .createHmac('sha256', webhookSecret)
   .update(JSON.stringify(req.body))
@@ -350,7 +350,7 @@ if (signature !== expected) return res.status(401).send('Invalid signature')
 
 ## بيئة الـ Sandbox
 
-- Base URL: `https://sandbox-api.carlink.sa/v1`
+- Base URL: `https://sandbox-api.carsell.one/v1`
 - بيانات تجريبية مُعبَّأة مسبقاً (20 سيارة نموذجية)
 - لا تأثير على بيانات حقيقية
 - Reset تلقائي كل 24 ساعة
@@ -370,7 +370,7 @@ if (signature !== expected) return res.status(401).send('Invalid signature')
 ## إعدادات في لوحة التحكم
 
 البائع يدير API Keys الخاصة به من:
-`app.carlink.sa/settings/developer`
+`app.carsell.one/settings/developer`
 
 - إنشاء API Keys (live + test)
 - تحديد الـ scopes لكل key

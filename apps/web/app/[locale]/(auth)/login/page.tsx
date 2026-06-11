@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold text-cl-primary">CarLink</h1>
+        <h1 className="text-2xl font-semibold text-cl-primary">CarSell</h1>
         <p className="text-sm text-cl-gray-600 mt-1">سوق السيارات الخليجي</p>
       </div>
       <div className="cl-card">

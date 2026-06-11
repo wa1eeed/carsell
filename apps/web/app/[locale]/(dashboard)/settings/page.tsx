@@ -4,7 +4,7 @@ import { SettingsClient } from './SettingsClient'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = { title: 'الإعدادات — CarLink' }
+export const metadata = { title: 'الإعدادات — CarSell' }
 
 export default async function SettingsPage() {
   const user     = await requirePageUser()

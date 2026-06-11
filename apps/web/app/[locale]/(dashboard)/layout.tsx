@@ -24,7 +24,7 @@ export default async function DashboardLayout({
     getSubscriptionByShowroom(session.user.showroomId).catch(() => null),
   ])
 
-  const showroomName = showroom?.name ?? 'CarLink'
+  const showroomName = showroom?.name ?? 'CarSell'
 
   return (
     <DashboardShell showroomName={showroomName}>

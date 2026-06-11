@@ -8,7 +8,7 @@ import { ROOT_DOMAIN } from '@/lib/constants'
  *
  * Why: using `window.location.origin` directly during render causes a
  * hydration mismatch, because the server renders the production origin
- * (https://carlink.sa) while the client renders the actual origin
+ * (https://carsell.one) while the client renders the actual origin
  * (e.g. http://localhost:3000). React then errors:
  *   "Text content does not match server-rendered HTML"
  *

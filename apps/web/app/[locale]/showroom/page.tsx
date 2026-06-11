@@ -50,7 +50,7 @@ export async function generateMetadata({
   searchParams: Record<string, string | string[] | undefined>
 }): Promise<Metadata> {
   const showroom = await resolveShowroom(searchParams)
-  if (!showroom) return { title: 'CarLink' }
+  if (!showroom) return { title: 'CarSell' }
   return {
     title: `${showroom.name} — سيارات للبيع`,
     description: `تصفّح سيارات ${showroom.name}${showroom.city ? ` في ${showroom.city}` : ''}`,
@@ -76,7 +76,7 @@ export default async function ShowroomPage({
 
   // Link strategy:
   //   - subdomain/custom-domain → links stay relative on same host
-  //   - root pretty URL (carlink.sa/{slug}) → links go to /{locale}/{slug}/...
+  //   - root pretty URL (carsell.one/{slug}) → links go to /{locale}/{slug}/...
   const onCustomHost = !!headers().get('x-showroom-slug') || !!headers().get('x-showroom-domain')
   const basePath  = onCustomHost && !headers().get('x-showroom-domain')
     ? `/${locale}/showroom`                       // subdomain
@@ -132,7 +132,7 @@ export default async function ShowroomPage({
       </main>
 
       <footer className="border-t border-cl-gray-200 py-6 text-center text-xs text-cl-gray-400">
-        مدعوم بـ <span className="text-cl-primary font-medium">CarLink</span>
+        مدعوم بـ <span className="text-cl-primary font-medium">CarSell</span>
       </footer>
     </div>
   )

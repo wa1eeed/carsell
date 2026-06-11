@@ -5,15 +5,15 @@
 ## البيئات الثلاث
 
 ```
-Developer Machine  →  Dev Branch     → dev.carlink.sa      (تلقائي)
+Developer Machine  →  Dev Branch     → dev.carsell.one      (تلقائي)
                    →  feature/* Branch → [preview URL]     (تلقائي)
-                   →  main Branch    → staging.carlink.sa   (تلقائي)
-                   →  release tag    → carlink.sa           (يدوي)
+                   →  main Branch    → staging.carsell.one   (تلقائي)
+                   →  release tag    → carsell.one           (يدوي)
 ```
 
 | | Dev (local) | Staging | Production |
 |---|---|---|---|
-| الـ Domain | localhost:3000 | staging.carlink.sa | carlink.sa |
+| الـ Domain | localhost:3000 | staging.carsell.one | carsell.one |
 | DB | PostgreSQL local | DB منفصل على VPS | DB منفصل على VPS |
 | Storage | R2 bucket `-dev` | R2 bucket `-staging` | R2 bucket `-prod` |
 | Auth | أي إيميل | حسابات اختبار حقيقية | حسابات حقيقية |
@@ -98,12 +98,12 @@ on_push_to_main:
   - npm run type-check
   - npm run test
   - npm run build
-  - deploy → staging.carlink.sa
+  - deploy → staging.carsell.one
   - run: npx prisma migrate deploy  ← تطبيق migrations
 
 on_release_tag:
   - manual approval required
-  - deploy → carlink.sa
+  - deploy → carsell.one
   - run: npx prisma migrate deploy
   - health check
   - rollback if health check fails

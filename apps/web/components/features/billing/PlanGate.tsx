@@ -24,7 +24,7 @@ interface Props {
 }
 
 const FEATURE_LABELS: Record<Feature, string> = {
-  MARKET:           'CarLink Market',
+  MARKET:           'CarSell Live',
   AUCTIONS:         'المزادات',
   API:              'API Access',
   REPORTS_ADVANCED: 'التقارير المتقدمة',

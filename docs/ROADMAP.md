@@ -1,4 +1,4 @@
-# CarLink — Roadmap & Priorities
+# CarSell — Roadmap & Priorities
 
 Last updated: 2026-06-11
 
@@ -12,7 +12,7 @@ Last updated: 2026-06-11
 - Phase 4: Cars CRUD (inventory, VDM/Absher, Mojaz, accidents)
 - Phase 5: Publish flow (Fixed/SOUM/Auction public+private)
 - Phase 6: Sale registration + server-side VAT
-- Phase 7: Showroom public pages ({slug}.carlink.sa)
+- Phase 7: Showroom public pages ({slug}.carsell.one)
 - Phase 8: Health check, skeletons, error boundaries
 - **Subscription System** — dynamic plans, Tap.company integration
 - **Feature Gating** — plan-based access control in API + UI
@@ -30,10 +30,10 @@ Last updated: 2026-06-11
 - DB: `Notification` model + mark-as-read
 - **Effort:** Medium | **Impact:** Very High
 
-### 2. Developer Portal (developers.carlink.sa)
+### 2. Developer Portal (developers.carsell.one)
 **Why:** Showrooms need to integrate their systems. Also required for B2B sales.
 - Quick Start guide
-- API key management (create/revoke from `app.carlink.sa/settings/developer`)
+- API key management (create/revoke from `app.carsell.one/settings/developer`)
 - Interactive API reference (Swagger/Redoc)
 - Sandbox environment (auto-reset every 24h)
 - Webhook configuration UI
@@ -52,9 +52,9 @@ Last updated: 2026-06-11
 
 ## 🟡 Priority 2 — Important for Growth
 
-### 4. CarLink Market (Public Marketplace)
+### 4. CarSell Live (Public Marketplace)
 **Why:** Core revenue driver and network effect. Buyers find cars from all showrooms.
-- `carlink.sa/market` — public browsable catalog
+- `carsell.one/market` — public browsable catalog
 - Filters: brand, city, price range, year, condition
 - Car detail with showroom contact
 - Featured listings (paid promotion by showroom)
@@ -135,7 +135,7 @@ Last updated: 2026-06-11
 ```
 Now          → Subscription renewal cron + KYC queue + Notifications
 Month 1      → Reports + Developer Portal
-Month 2      → CarLink Market (public marketplace)
+Month 2      → CarSell Live (public marketplace)
 Month 3      → Live Auctions + E2E tests + Sentry
 Month 4      → Customer Portal + Mobile App
 Month 5+     → ZATCA + Insurance + Financing integrations

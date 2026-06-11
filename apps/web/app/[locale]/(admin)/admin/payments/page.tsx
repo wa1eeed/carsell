@@ -3,7 +3,7 @@ import { CreditCard, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-rea
 import { formatShowroomId } from '@/lib/format'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'المدفوعات — CarLink Admin' }
+export const metadata = { title: 'المدفوعات — CarSell Admin' }
 
 const STATUS_STYLE: Record<string, { label: string; cls: string; icon: typeof CheckCircle2 }> = {
   CAPTURED:  { label: 'ناجحة',   cls: 'bg-green-50 text-green-600',  icon: CheckCircle2 },

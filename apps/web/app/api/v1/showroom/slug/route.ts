@@ -1,6 +1,6 @@
 /**
  * PUT /api/v1/showroom/slug — change the showroom's public URL handle
- * The handle is used for: carlink.sa/{slug} AND {slug}.carlink.sa
+ * The handle is used for: carsell.one/{slug} AND {slug}.carsell.one
  */
 
 import { NextRequest } from 'next/server'

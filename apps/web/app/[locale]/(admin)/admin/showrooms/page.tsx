@@ -1,7 +1,7 @@
 import { listSubscriptions } from '@/repositories/plan.repository'
 import AdminShowroomsClient from './AdminShowroomsClient'
 
-export const metadata = { title: 'إدارة المعارض — CarLink Admin' }
+export const metadata = { title: 'إدارة المعارض — CarSell Admin' }
 
 export default async function AdminShowroomsPage({
   searchParams,

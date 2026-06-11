@@ -2,7 +2,7 @@ import { kycRepository } from '@/repositories/kyc.repository'
 import AdminKycClient from './AdminKycClient'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'طلبات التحقق KYC — CarLink Admin' }
+export const metadata = { title: 'طلبات التحقق KYC — CarSell Admin' }
 
 export default async function AdminKycPage({ searchParams }: { searchParams: { status?: string } }) {
   const status = (searchParams.status as 'PENDING' | 'APPROVED' | 'REJECTED') ?? 'PENDING'

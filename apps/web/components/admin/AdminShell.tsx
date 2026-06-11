@@ -27,7 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/settings',  label: 'إعدادات المنصة',   icon: Settings        },
 ]
 // Note: these hrefs resolve to /[locale]/admin/* in the app router
-// On admin.carlink.sa, middleware rewrites the subdomain to these paths
+// On admin.carsell.one, middleware rewrites the subdomain to these paths
 
 export function AdminShell({
   children,
@@ -54,7 +54,7 @@ export function AdminShell({
               <ShieldCheck size={16} className="text-white" />
             </div>
             <div>
-              <div className="font-bold text-gray-900 text-sm">CarLink</div>
+              <div className="font-bold text-gray-900 text-sm">CarSell</div>
               <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Super Admin</div>
             </div>
           </div>
@@ -109,7 +109,7 @@ export function AdminShell({
         {/* Topbar */}
         <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="text-gray-400">admin.carlink.sa</span>
+            <span className="text-gray-400">admin.carsell.one</span>
             <ChevronRight size={12} className="rotate-180" />
             <span className="text-gray-700 font-medium">
               {NAV_ITEMS.find((n) => isActive(n.href))?.label ?? 'لوحة التحكم'}

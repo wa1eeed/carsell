@@ -83,7 +83,7 @@ Polling على POST /api/v1/mfa/request/status
 NAFATH_BASE_URL=https://api.elm.sa/nafath
 NAFATH_APP_ID=
 NAFATH_APP_KEY=
-NAFATH_SERVICE_TYPE=CarLink   # اسم الخدمة كما مُسجَّل في إلم
+NAFATH_SERVICE_TYPE=CarSell   # اسم الخدمة كما مُسجَّل في إلم
 ```
 
 ---

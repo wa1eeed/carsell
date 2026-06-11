@@ -13,7 +13,7 @@ import { AppError } from '@/lib/errors'
 const BASE_URL     = process.env.NAFATH_BASE_URL ?? 'https://api.elm.sa/nafath'
 const APP_ID       = process.env.NAFATH_APP_ID ?? ''
 const APP_KEY      = process.env.NAFATH_APP_KEY ?? ''
-const SERVICE_TYPE = process.env.NAFATH_SERVICE_TYPE ?? 'CarLink'
+const SERVICE_TYPE = process.env.NAFATH_SERVICE_TYPE ?? 'CarSell'
 const TIMEOUT_MS   = 15_000
 
 export type NafathIdType = 'citizen' | 'resident' | 'visitor'

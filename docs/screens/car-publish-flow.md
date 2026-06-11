@@ -60,16 +60,16 @@ car.auctionType  = 'PUBLIC' | 'PRIVATE'
 ```
 car.auctionType = 'PUBLIC'
 ```
-- يظهر في CarLink Market لجميع المستخدمين
+- يظهر في CarSell Live لجميع المستخدمين
 - يظهر في واجهة المعرض أيضاً
 
 #### مزاد خاص (Private)
 ```
 car.auctionType    = 'PRIVATE'
 car.auctionSlug    = uuid قصير — مثال: xK9mP2
-car.auctionUrl     = carlink.sa/auction/private/{slug}
+car.auctionUrl     = carsell.one/auction/private/{slug}
 ```
-- لا يظهر في CarLink Market
+- لا يظهر في CarSell Live
 - لا يظهر في واجهة المعرض العامة
 - البائع يشارك الرابط يدوياً مع عملائه
 - من يملك الرابط يستطيع المزايدة
@@ -107,7 +107,7 @@ enum AuctionType {
 |---|---|
 | سعر مباشر | ✅ تم النشر + السعر + "معرض + Market" |
 | على السوم | ✅ تم النشر + "قابل للتفاوض" |
-| مزاد عام | 🔨 تم إنشاء المزاد + "CarLink Market" + مدة |
+| مزاد عام | 🔨 تم إنشاء المزاد + "CarSell Live" + مدة |
 | مزاد خاص | 🔒 تم إنشاء المزاد + الرابط الخاص للمشاركة |
 
 ---

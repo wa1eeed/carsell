@@ -40,7 +40,7 @@ export const AUTH = {
 export const LOCALES = ['ar', 'en'] as const
 export const DEFAULT_LOCALE = 'ar' as const
 
-export const ROOT_DOMAIN = process.env.ROOT_DOMAIN ?? 'carlink.sa'
+export const ROOT_DOMAIN = process.env.ROOT_DOMAIN ?? 'carsell.one'
 
 /**
  * Reserved path segments — these can NEVER be used as a showroom slug,

@@ -1,5 +1,5 @@
 /**
- * R2 / S3 Storage utilities — CarLink
+ * R2 / S3 Storage utilities — CarSell
  *
  * Bucket structure (two folders per car, strict isolation):
  *

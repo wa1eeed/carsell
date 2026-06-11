@@ -1,10 +1,10 @@
 /**
- * CarLink — Security + Routing Middleware
+ * CarSell — Security + Routing Middleware
  *
  * Layers (in order):
  *   1. Security headers (HSTS, CSP, X-Frame-Options, ...)
  *   2. Rate limiting (in-memory per IP — Redis in production)
- *   3. Domain routing (app.carlink.sa / {slug}.carlink.sa)
+ *   3. Domain routing (app.carsell.one / {slug}.carsell.one)
  *   4. i18n locale detection (next-intl)
  */
 
@@ -152,20 +152,20 @@ export function middleware(req: NextRequest) {
     return res
   }
 
-  // ── 1. Super Admin subdomain — admin.carlink.sa ─────────────────────────
+  // ── 1. Super Admin subdomain — admin.carsell.one ─────────────────────────
   if (hostname.startsWith('admin.')) {
     const url           = req.nextUrl.clone()
     const locale        = DEFAULT_LOCALE
     const matchedLocale = LOCALES.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
     const rest          = matchedLocale ? pathname.slice(`/${matchedLocale}`.length) : pathname
-    // admin.carlink.sa/plans → /{locale}/admin/plans
+    // admin.carsell.one/plans → /{locale}/admin/plans
     url.pathname = `/${locale}/admin${rest === '/' ? '' : rest}`
     const res = NextResponse.rewrite(url)
     applySecurityHeaders(res)
     return res
   }
 
-  // ── 2. Dashboard app subdomain — app.carlink.sa ──────────────────────────
+  // ── 2. Dashboard app subdomain — app.carsell.one ──────────────────────────
   if (hostname.startsWith('app.')) {
     const url      = req.nextUrl.clone()
     url.pathname   = `/dashboard${pathname}`
@@ -179,7 +179,7 @@ export function middleware(req: NextRequest) {
   const isLocalhost = host === 'localhost' || host === '127.0.0.1'
   const isPlatformHost = host === ROOT_DOMAIN || host === `www.${ROOT_DOMAIN}` || isLocalhost
 
-  // ── 3. Showroom subdomain — {slug}.carlink.sa ───────────────────────────
+  // ── 3. Showroom subdomain — {slug}.carsell.one ───────────────────────────
   const isSubdomain =
     !isPlatformHost &&
     host !== ROOT_DOMAIN &&
@@ -191,13 +191,13 @@ export function middleware(req: NextRequest) {
   }
 
   // ── 4. Custom domain — dealer's own domain (e.g. mydealership.com) ───────
-  // Any hostname that is NOT a platform host and NOT a carlink subdomain
+  // Any hostname that is NOT a platform host and NOT a carsell subdomain
   // is treated as a custom domain. The showroom page resolves it by host header.
   if (!isPlatformHost && !host.endsWith(`.${ROOT_DOMAIN}`)) {
     return rewriteToShowroom(req, { customDomain: host })
   }
 
-  // ── 5. Root-domain pretty URL — carlink.sa/{slug} ───────────────────────
+  // ── 5. Root-domain pretty URL — carsell.one/{slug} ───────────────────────
   // If the first path segment is NOT a reserved route, treat it as a showroom slug.
   const matchedLocalePrefix = LOCALES.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
   const pathWithoutLocale   = matchedLocalePrefix ? pathname.slice(`/${matchedLocalePrefix}`.length) : pathname

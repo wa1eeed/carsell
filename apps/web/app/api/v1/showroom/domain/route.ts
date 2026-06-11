@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
 
   const domain = parsed.data.domain.toLowerCase().replace(/^www\./, '')
 
-  // Block carlink.sa subdomains
-  if (domain.endsWith('carlink.sa')) {
-    return apiResponse.badRequest('لا يمكن استخدام دومين carlink.sa كدومين مخصص')
+  // Block carsell.one subdomains
+  if (domain.endsWith('carsell.one')) {
+    return apiResponse.badRequest('لا يمكن استخدام دومين carsell.one كدومين مخصص')
   }
 
   // Check uniqueness
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   // DNS instructions — return both A record (for apex) and CNAME (for subdomain)
   const platformIp = process.env.PLATFORM_IP ?? '76.76.21.21'  // example edge IP
-  const platformCname = process.env.PLATFORM_CNAME ?? 'cname.carlink.sa'
+  const platformCname = process.env.PLATFORM_CNAME ?? 'cname.carsell.one'
 
   return apiResponse.created({
     domain:   updated.customDomain,
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       // Ownership verification
       txtRecord: {
         type:  'TXT',
-        name:  '_carlink',
+        name:  '_carsell',
         value: updated.customDomainToken,
       },
     },

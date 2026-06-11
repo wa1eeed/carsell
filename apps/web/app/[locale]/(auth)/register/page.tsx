@@ -139,7 +139,7 @@ export default function RegisterPage() {
     <div className="w-full max-w-lg" dir="rtl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold text-[#0F3460]">CarLink</h1>
+        <h1 className="text-2xl font-semibold text-[#0F3460]">CarSell</h1>
         <p className="text-sm text-gray-500 mt-1">سوق السيارات الخليجي</p>
       </div>
 

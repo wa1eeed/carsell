@@ -34,7 +34,7 @@ export async function generateMetadata({
   searchParams: Record<string, string | string[] | undefined>
 }): Promise<Metadata> {
   const showroom = await resolveShowroom(searchParams)
-  if (!showroom) return { title: 'CarLink' }
+  if (!showroom) return { title: 'CarSell' }
   const car = await showroomPublicRepository.findCar(showroom.id, params.id).catch(() => null)
   if (!car) return { title: showroom.name }
   return {
@@ -92,7 +92,7 @@ export default async function ShowroomCarPage({
       />
       <PublicCarDetail car={data} whatsapp={showroom.whatsapp} phone={showroom.phone} showPrices={showroom.showPrices} />
       <footer className="border-t border-cl-gray-200 py-6 text-center text-xs text-cl-gray-400">
-        مدعوم بـ <span className="text-cl-primary font-medium">CarLink</span>
+        مدعوم بـ <span className="text-cl-primary font-medium">CarSell</span>
       </footer>
     </div>
   )

@@ -21,7 +21,7 @@ const FEATURE_ICONS: Record<keyof PlanFeatures, React.ReactNode> = {
 }
 
 const FEATURE_LABELS_AR: Record<string, string> = {
-  market:        'CarLink Market',
+  market:        'CarSell Live',
   auctions:      'المزادات',
   api:           'API Access',
   reports:       'التقارير',

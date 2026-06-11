@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
     if ('listedOnMarket' in parsed.data && parsed.data.listedOnMarket) {
       const allowed = await canUseFeature(user.showroomId, 'MARKET')
-      if (!allowed) return fail('FEATURE_LOCKED', 'CarLink Market غير متاح في باقتك الحالية', 403)
+      if (!allowed) return fail('FEATURE_LOCKED', 'CarSell Live غير متاح في باقتك الحالية', 403)
     }
 
     const result = await publishCar(user, params.id, parsed.data)

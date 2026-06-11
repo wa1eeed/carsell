@@ -92,7 +92,7 @@ interface FinancingDetails {
 }
 ```
 
-آلية التحصيل: شركة التمويل تدفع للمنصة، المنصة تحوّل للبائع بعد خصم رسومها (إذا كانت صفقة عبر CarLink Market).
+آلية التحصيل: شركة التمويل تدفع للمنصة، المنصة تحوّل للبائع بعد خصم رسومها (إذا كانت صفقة عبر CarSell Live).
 
 ---
 
@@ -337,5 +337,5 @@ Pipeline البيع:
 ٧. Auction system (المزاد)
 ٨. KYC + Account types
 ٩. Pricing Engine
-١٠. CarLink Market + Payments (اختياري)
+١٠. CarSell Live + Payments (اختياري)
 ```

@@ -5,7 +5,7 @@ import { SessionProvider } from '@/components/providers/SessionProvider'
 import '../globals.css'
 
 export const metadata: Metadata = {
-  title: 'CarLink — سوق السيارات الخليجي',
+  title: 'CarSell — سوق السيارات الخليجي',
   description: 'منصة إدارة معارض السيارات في السعودية والخليج',
 }
 

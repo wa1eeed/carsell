@@ -90,7 +90,7 @@ STORAGE_PROVIDER=r2
 R2_ACCOUNT_ID=xxx
 R2_ACCESS_KEY_ID=xxx
 R2_SECRET_ACCESS_KEY=xxx
-R2_BUCKET_NAME=carlink-prod
+R2_BUCKET_NAME=carsell-prod
 ```
 
 لا يحتاج تغيير في الكود عند نقل المشروع لخادم مختلف.

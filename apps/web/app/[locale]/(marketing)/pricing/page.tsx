@@ -5,7 +5,7 @@ import PricingClient from './PricingClient'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: 'الأسعار — CarLink',
+    title: 'الأسعار — CarSell',
     description: 'اختر الباقة المناسبة لمعرضك',
   }
 }

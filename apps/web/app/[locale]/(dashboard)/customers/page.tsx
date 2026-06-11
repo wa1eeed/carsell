@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { Users, Phone, CreditCard, ShoppingBag } from 'lucide-react'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'العملاء — CarLink' }
+export const metadata = { title: 'العملاء — CarSell' }
 
 export default async function CustomersPage() {
   const user = await requirePageUser()

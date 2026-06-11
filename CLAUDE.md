@@ -1,4 +1,4 @@
-# CarLink — دليل المشروع لـ Claude
+# CarSell — دليل المشروع لـ Claude
 
 > اقرأ هذا الملف كاملاً في بداية كل جلسة تطوير.
 > أي كود يُكتب يجب أن يلتزم بكل ما فيه.
@@ -7,9 +7,9 @@
 
 ## المشروع
 
-**CarLink** — سوق السيارات في السعودية والخليج.
-CarLink — سوق السيارات في السعودية والخليج + سوق عام للبيع والشراء.
-الدومين: **carlink.sa** | carlink.com | @carlink
+**CarSell** — سوق السيارات في السعودية والخليج.
+CarSell — سوق السيارات في السعودية والخليج + سوق عام للبيع والشراء.
+الدومين: **carsell.one** | carsell.one | @carsell
 
 ---
 
@@ -37,10 +37,10 @@ carlink/
 ├── apps/web/
 │   ├── middleware.ts           ← توجيه الدومينات الثلاثة
 │   └── app/
-│       ├── (marketing)/        ← carlink.sa
-│       ├── (dashboard)/        ← app.carlink.sa
-│       ├── (showroom)/         ← {slug}.carlink.sa
-│       └── (market)/           ← carlink.sa/market
+│       ├── (marketing)/        ← carsell.one
+│       ├── (dashboard)/        ← app.carsell.one
+│       ├── (showroom)/         ← {slug}.carsell.one
+│       └── (market)/           ← carsell.one/market
 ├── packages/storage/src/
 │   ├── types/provider.ts       ← StorageProvider interface
 │   ├── providers/factory.ts    ← getStorage() ← نقطة الدخول
@@ -55,7 +55,7 @@ carlink/
     │   └── frontend.md         ← Domain routing
     ├── business-logic/
     │   ├── tax-rules.md        ← VAT — حساس جداً
-    │   ├── payments.md         ← SaaS vs CarLink Market
+    │   ├── payments.md         ← SaaS vs CarSell Live
     │   ├── car-lifecycle.md
     │   └── pricing-model.md
     ├── components/
@@ -102,7 +102,7 @@ const storage = getStorage()  // يقرأ STORAGE_PROVIDER من .env
 ### ٧. VAT في الـ Backend دائماً
 حساب الضريبة server-side فقط — لا نثق بالـ frontend.
 
-### ٨. CarLink Market اختياري
+### ٨. CarSell Live اختياري
 المعرض يدفع اشتراك ثابت. العمولة فقط عند تفعيل Market.
 انظر: `docs/business-logic/payments.md`
 
@@ -112,7 +112,7 @@ const storage = getStorage()  // يقرأ STORAGE_PROVIDER من .env
 
 | | Dev | Staging | Production |
 |---|---|---|---|
-| Domain | localhost:3000 | staging.carlink.sa | carlink.sa |
+| Domain | localhost:3000 | staging.carsell.one | carsell.one |
 | Branch | feature/* | main | release tag |
 | Deploy | يدوي | تلقائي | يدوي + approval |
 
@@ -159,7 +159,7 @@ npm run dev
 ## Developer Portal
 
 ```
-developers.carlink.sa
+developers.carsell.one
 ├── Quick Start
 ├── Authentication (API Key + OAuth2)
 ├── API Reference (/cars, /sales, /catalog, /showrooms, /webhooks)
@@ -169,7 +169,7 @@ developers.carlink.sa
 
 التوثيق الكامل: `docs/developer-portal/api-reference.md`
 
-API Keys يديرها البائع من: `app.carlink.sa/settings/developer`
+API Keys يديرها البائع من: `app.carsell.one/settings/developer`
 
 ---
 

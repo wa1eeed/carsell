@@ -43,7 +43,7 @@ export const showroomRepository = {
 
   /** Set a custom domain (unverified) + generate a DNS verification token */
   async setCustomDomain(showroomId: string, domain: string) {
-    const token = `carlink-verify-${randomBytes(8).toString('hex')}`
+    const token = `carsell-verify-${randomBytes(8).toString('hex')}`
     return prisma.showroom.update({
       where: { id: showroomId },
       data:  { customDomain: domain.toLowerCase(), customDomainVerified: false, customDomainToken: token },

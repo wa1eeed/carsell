@@ -28,11 +28,11 @@ export function ShareButton({ carId, carTitle, price, showroomSlug, source, loca
   const [open,     setOpen]     = useState(false)
 
   function buildUrl(): string {
-    const base = typeof window !== 'undefined' ? window.location.origin : 'https://carlink.sa'
+    const base = typeof window !== 'undefined' ? window.location.origin : 'https://carsell.one'
     switch (source) {
       case 'market':   return `${base}/${locale}/market/cars/${carId}`
       case 'showroom':
-        // Pretty root-level URL when slug is known: carlink.sa/{slug}/cars/{id}
+        // Pretty root-level URL when slug is known: carsell.one/{slug}/cars/{id}
         return showroomSlug
           ? `${base}/${showroomSlug}/cars/${carId}`
           : `${base}/${locale}/market/cars/${carId}`

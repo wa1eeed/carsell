@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { BarChart3, TrendingUp, Package, Clock } from 'lucide-react'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'التقارير — CarLink' }
+export const metadata = { title: 'التقارير — CarSell' }
 
 export default async function ReportsPage() {
   const user = await requirePageUser()

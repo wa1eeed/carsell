@@ -6,7 +6,7 @@ import { getSubscriptionByShowroom } from '@/repositories/plan.repository'
 import { listPublicPlans } from '@/repositories/plan.repository'
 import BillingClient from './BillingClient'
 
-export const metadata: Metadata = { title: 'الاشتراك والفواتير — CarLink' }
+export const metadata: Metadata = { title: 'الاشتراك والفواتير — CarSell' }
 
 export default async function BillingPage() {
   const session = await getServerSession(authOptions)

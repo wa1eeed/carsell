@@ -65,7 +65,7 @@ export async function registerUser(
       data: {
         showroomId:       showroom.id,
         name:             nafath?.nameAr ?? input.name,
-        email:            input.email ?? `${showroom.id}@pending.carlink.sa`,
+        email:            input.email ?? `${showroom.id}@pending.carsell.one`,
         password:         passwordHash,
         phone:            input.phone,
         role:             ROLE_BY_ACCOUNT[input.accountType] ?? 'SHOWROOM_OWNER',

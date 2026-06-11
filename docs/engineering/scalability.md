@@ -105,7 +105,7 @@ async findByShowroom(showroomId: string, page = 1, pageSize = 20) {
 model Car {
   @@index([showroomId, status])           // الاستعلام الأكثر شيوعاً
   @@index([showroomId, createdAt])        // sorting
-  @@index([showroomId, listedOnMarket])   // CarLink Market filter
+  @@index([showroomId, listedOnMarket])   // CarSell Live filter
   @@index([plateNumber])                  // بحث باللوحة
 }
 
