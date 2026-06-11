@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# CarLink — Production Dockerfile (multi-stage, Next.js standalone)
+# CarSell — Production Dockerfile (multi-stage, Next.js standalone)
 # For VPS deployment via Coolify
 # ─────────────────────────────────────────────────────────────
 
@@ -9,18 +9,22 @@ WORKDIR /app
 
 # ── Dependencies ──────────────────────────────────────────────
 FROM base AS deps
+# Force dev dependencies even if Coolify injects NODE_ENV=production at build time.
+# devDependencies (typescript, next build tooling) are REQUIRED to build.
+ENV NODE_ENV=development
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
-RUN npm ci
+RUN npm ci --include=dev
 
 # ── Build ─────────────────────────────────────────────────────
 FROM base AS builder
+# Keep build-time NODE_ENV unset/development so all tooling is available.
+# (next build internally sets production mode for the output regardless.)
+ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Prisma client must be generated before build
 RUN npx prisma generate
-# DATABASE_URL is injected at build time by Coolify (or use a dummy for build)
-ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ── Runtime ───────────────────────────────────────────────────
