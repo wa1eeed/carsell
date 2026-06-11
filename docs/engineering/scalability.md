@@ -200,3 +200,78 @@ it('لا يعيد سيارة معرض آخر', async () => {
 ```
 
 Coverage هدف: 70%+ على Services و Repositories.
+
+---
+
+## أداء قاعدة البيانات — الفهارس (Database Performance)
+
+> **المبدأ الحاكم: المتانة أولاً.** كل query لازم يكون مدعوماً بفهرس.
+
+### القاعدة الذهبية
+
+أي حقل يظهر في `where` أو `orderBy` أو `join` → **يحتاج فهرس**.
+
+```prisma
+// ✗ جدول بدون فهرس على حقل الفلترة
+model Car {
+  showroomId String
+  status     CarStatus
+  // كل query على (showroomId, status) = full table scan لما تكبر
+}
+
+// ✓ فهرس مركّب على مسار الـ query الساخن
+model Car {
+  showroomId String
+  status     CarStatus
+  deletedAt  DateTime?
+  @@index([showroomId, status, deletedAt])  // inventory/dashboard list
+  @@index([status, deletedAt])              // public marketplace
+  @@index([brandId])                        // filters
+}
+```
+
+### الفهارس الحالية (مرجع)
+
+| الجدول | الفهرس | السبب |
+|---|---|---|
+| `cars` | `(showroomId, status, deletedAt)` | قائمة المخزون + الداشبورد |
+| `cars` | `(status, deletedAt)` | السوق العام CarSell Live |
+| `cars` | `brandId`, `categoryId` | فلاتر السوق والمعرض |
+| `cars` | `(mediaScheduledDeleteAt, mediaDeletedAt)` | cron تنظيف الميديا |
+| `car_images`, `car_documents` | `carId` | تحميل المعرض/المستندات |
+| `car_timeline` | `(carId, createdAt)` | تبويب التايملاين |
+| `customers` | `showroomId` | قائمة العملاء |
+| `sales` | `(showroomId, soldAt)` | المبيعات + التقارير |
+
+### قاعدة ترتيب الأعمدة في الفهرس المركّب
+
+الأكثر انتقائية (selectivity) أولاً، ثم حقل الترتيب آخراً:
+```
+(showroomId, status, deletedAt)  ✓  — showroomId يقلّص النتائج كثيراً
+(deletedAt, status, showroomId)  ✗  — deletedAt ضعيف الانتقائية
+```
+
+### كيف تتحقق أن الفهرس يُستخدم
+
+```sql
+EXPLAIN SELECT * FROM cars
+WHERE "showroomId"='...' AND status='FOR_SALE' AND "deletedAt" IS NULL;
+-- ابحث عن "Index Scan" أو "Bitmap Index Scan" (لا "Seq Scan" على جدول كبير)
+```
+
+> ملاحظة: على الجداول الصغيرة (<100 صف) Postgres يختار Seq Scan عمداً — هذا صحيح،
+> والفهرس يُفعَّل تلقائياً عند النمو. للتأكد من وجوده: `SET enable_seqscan=off;` ثم EXPLAIN.
+
+### قبل أي migration جديد — اسأل
+
+- [ ] هل أضفت حقلاً يُستخدم في الفلترة؟ → أضف فهرساً
+- [ ] هل الـ migration يقفل جدولاً كبيراً؟ → استخدم `CREATE INDEX CONCURRENTLY` في الإنتاج
+- [ ] هل يحذف عموداً مفهرساً؟ → تأكد لا يكسر queries أخرى
+
+### ما بعد VPS الواحد (خطة النمو)
+
+| المرحلة | الإجراء |
+|---|---|
+| نمو | فصل القاعدة لـ VPS مستقل |
+| توسّع | Connection pooling (PgBouncer) + read replica للتقارير |
+| كبير | AWS RDS / Alibaba ApsaraDB (تغيير `DATABASE_URL` فقط) |

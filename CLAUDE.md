@@ -5,6 +5,33 @@
 
 ---
 
+## ⚡ المبدأ الأول — المتانة أولاً (Robustness First)
+
+> **هذا المبدأ يعلو على كل ما عداه ويُراعى في كل تطوير أو تحديث أو تحسين — بدون استثناء.**
+
+قبل كتابة أي كود (ميزة جديدة، تحسين، إصلاح)، اسأل نفسك:
+> «هل يصمد هذا لو زاد عدد المعارض ×100 والسيارات ×1000؟»
+
+إذا الجواب لا — أصلح الأساس **أولاً** قبل المتابعة. لا تبنِ ميزة على أساس هش.
+
+**يُطبَّق دائماً عند أي تطوير:**
+1. **فهرس على كل حقل يُستخدم في `where` أو `orderBy`** — خاصة `showroomId`, `status`, `deletedAt`, والـ foreign keys. أي جدول جديد أو query جديد → تحقق من الفهرس.
+2. **لا N+1 queries** — استخدم `include`/`select` بدل حلقات الـ queries.
+3. **Pagination إلزامي** على أي قائمة قد تكبر (لا `findMany` بدون `take`).
+4. **عزل المستأجرين** — `showroomId` في كل query، بلا استثناء.
+5. **الملفات الكبيرة في R2 لا في الـ DB** — صور/فيديو/مستندات عبر `getStorage()`.
+6. **عمليات الكتابة الذرّية** — استخدم `$transaction` عند تعديل أكثر من جدول.
+7. **لا blocking في الـ request** — المهام الثقيلة (تنظيف، إشعارات) عبر cron/background.
+8. **تحقق من الأثر على الأداء** قبل أي migration — هل يحتاج فهرس؟ هل يقفل جدول كبير؟
+
+**عند كل ميزة/تحسين جديد، حدِّث:**
+- الفهارس في `prisma/schema.prisma` إن لزم
+- هذا القسم إن اكتشفت نمطاً جديداً للمتانة
+
+📄 المرجع الكامل: `docs/engineering/scalability.md`
+
+---
+
 ## المشروع
 
 **CarSell** — سوق السيارات في السعودية والخليج.
@@ -122,6 +149,13 @@ const storage = getStorage()  // يقرأ STORAGE_PROVIDER من .env
 
 ## Checklist قبل كل Commit
 
+**المتانة (أولاً):**
+- [ ] فهرس على كل حقل جديد يُستخدم في `where`/`orderBy` (خاصة `showroomId`, `status`, FKs)
+- [ ] لا N+1 — استخدمت `include`/`select`
+- [ ] Pagination على أي قائمة قد تكبر
+- [ ] `$transaction` عند تعديل أكثر من جدول
+
+**الكود والأمن:**
 - [ ] لا `any` في TypeScript
 - [ ] Zod validation على كل API input
 - [ ] `requireAuth` في كل محمية API
@@ -135,10 +169,12 @@ const storage = getStorage()  // يقرأ STORAGE_PROVIDER من .env
 
 ## الملفات الأولى عند استئناف العمل
 
-1. `prisma/schema.prisma` — هيكل البيانات
-2. `docs/engineering/code-standards.md` — معايير الكود
-3. `docs/engineering/security.md` — قواعد الأمن
-4. `docs/business-logic/tax-rules.md` — منطق الضريبة
+1. **قسم «المتانة أولاً» أعلى هذا الملف** — المبدأ الحاكم
+2. `prisma/schema.prisma` — هيكل البيانات + الفهارس
+3. `docs/engineering/scalability.md` — أنماط القابلية للتوسّع
+4. `docs/engineering/code-standards.md` — معايير الكود
+5. `docs/engineering/security.md` — قواعد الأمن
+6. `docs/business-logic/tax-rules.md` — منطق الضريبة
 
 ---
 
