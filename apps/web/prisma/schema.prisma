@@ -429,6 +429,16 @@ model Car {
 
   // Unique car number within its showroom
   @@unique([showroomId, carRefNumber])
+  // ── Performance indexes (hot query paths) ────
+  // Inventory list / dashboard: filter by showroom + status, exclude deleted
+  @@index([showroomId, status, deletedAt])
+  // Public marketplace: browse FOR_SALE/AUCTION cars across showrooms
+  @@index([status, deletedAt])
+  // Filter by brand/category (marketplace + showroom filters)
+  @@index([brandId])
+  @@index([categoryId])
+  // Media cleanup cron: find cars due for deletion
+  @@index([mediaScheduledDeleteAt, mediaDeletedAt])
   @@map("cars")
 }
 
@@ -442,6 +452,8 @@ model CarImage {
 
   car Car @relation(fields: [carId], references: [id])
 
+  // Cars load their images by carId (cover image, gallery)
+  @@index([carId])
   @@map("car_images")
 }
 
@@ -458,6 +470,7 @@ model CarDocument {
   car      Car          @relation(fields: [carId], references: [id])
   uploader ShowroomUser @relation(fields: [uploadedBy], references: [id])
 
+  @@index([carId])
   @@map("car_documents")
 }
 
@@ -484,6 +497,8 @@ model CarTimeline {
   car  Car          @relation(fields: [carId], references: [id])
   user ShowroomUser @relation(fields: [userId], references: [id])
 
+  // Timeline tab loads events for a car, newest first
+  @@index([carId, createdAt])
   @@map("car_timeline")
 }
 
@@ -501,6 +516,8 @@ model Customer {
   sales    Sale[]
   deposits Deposit[]
 
+  // Customers list is scoped to a showroom
+  @@index([showroomId])
   @@map("customers")
 }
 
@@ -528,6 +545,8 @@ model Sale {
   payments           SalePayment[]
   tradeIn            TradeIn?
 
+  // Sales list / reports: scoped to showroom, ordered by date
+  @@index([showroomId, soldAt])
   @@map("sales")
 }
 
