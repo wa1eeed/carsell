@@ -1,0 +1,1084 @@
+openapi: 3.1.1
+info:
+  title: Accident Queries API
+  description: Accidents Reports
+  version: "2.0"
+servers:
+  - url: mock-service.api.elm.sa/basher
+    description: mock server
+paths:
+  /api/v2/accidents/images:
+    get:
+      tags:
+        - accident-controller
+      operationId: getImageByPath
+      parameters:
+        - name: imagePath
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: array
+                items:
+                  type: string
+                  default: null
+                  contentEncoding: base64
+                  contentMediaType: image/png
+                default: null
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  default: null
+                  contentEncoding: base64
+                  contentMediaType: application/json
+                default: null
+  /api/v1/vehicles/{vehicleSequence}/accidents:
+    get:
+      tags:
+        - accident-controller
+      operationId: getAccidentListByVehicleSequence
+      parameters:
+        - name: Operator-ID
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: vehicleSequence
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: year
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            maximum: 5
+            minimum: 1
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccidentSub"
+                default: null
+  /api/v1/persons/{personId}/driving-licenses:
+    get:
+      tags:
+        - person-controller
+      operationId: listPersonDrivingLicenses
+      parameters:
+        - name: Operator-ID
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: license-expiry-date
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: personId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PersonDrivingLicense"
+  /api/v1/persons/{personId}/accidents:
+    get:
+      tags:
+        - accident-controller
+      operationId: getAccidentListByPersonId
+      parameters:
+        - name: Operator-ID
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: personId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: null
+        - name: year
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            maximum: 5
+            minimum: 1
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccidentSub"
+                default: null
+  /api/v1/accidents:
+    get:
+      tags:
+        - accident-controller
+      operationId: getAccidentInfo
+      parameters:
+        - name: operator-id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: accident-number
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            maximum: 6999999999
+            minimum: 4000000000
+            type: integer
+            format: int64
+            default: null
+        - name: person-id
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int64
+            default: null
+        - name: vehicle-sequence
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AccidentInfo"
+  /api/v1/accidents/images:
+    get:
+      tags:
+        - accident-image-controller
+      operationId: getImage
+      parameters:
+        - name: token
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: array
+                items:
+                  type: string
+                  default: null
+                  contentEncoding: base64
+                  contentMediaType: image/png
+                default: null
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  default: null
+                  contentEncoding: base64
+                  contentMediaType: application/json
+                default: null
+  /api/v1/accidents-shared-parties:
+    get:
+      tags:
+        - accident-controller
+      operationId: getSharedAccidents
+      parameters:
+        - name: Operator-ID
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: personIdsDto
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            $ref: "#/components/schemas/PersonIdsDto"
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AccidentParticipant"
+  /api/v1/accidents-count-by-sequence/{vehicleSequence}:
+    get:
+      tags:
+        - accident-controller
+      operationId: accidentsCountBySequence
+      parameters:
+        - name: Operator-id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: vehicleSequence
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+                default: null
+  /api/v1/accidents-by-person/{personId}/{noOfYears}:
+    get:
+      tags:
+        - accident-controller
+      operationId: getPersonAccidentsForLezam
+      parameters:
+        - name: Operator-ID
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: personId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+            default: null
+        - name: noOfYears
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+                default: null
+  /api/v1/accident-reports:
+    get:
+      tags:
+        - accident-controller
+      operationId: getAccidentReport
+      parameters:
+        - name: operator-id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: client-key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: accident-number
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            maximum: 6999999999
+            minimum: 4000000000
+            type: integer
+            format: int64
+            default: null
+        - name: person-id
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int64
+            default: null
+        - name: vehicle-sequence
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+                default: null
+components:
+  schemas:
+    AccidentSub:
+      type: object
+      properties:
+        accidentNumber:
+          type: integer
+          format: int64
+          x-faker: datatype.number
+          default: null
+        accidentDate:
+          type: string
+          x-faker: lorem.words
+          default: null
+      default: null
+    DrivingLicenseDetails:
+      type: object
+      properties:
+        issueDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        expiryDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        type:
+          $ref: "#/components/schemas/ObjectData"
+        status:
+          $ref: "#/components/schemas/ObjectData"
+        objectStatus:
+          $ref: "#/components/schemas/ObjectData"
+        objectType:
+          $ref: "#/components/schemas/ObjectData"
+      default: null
+    ObjectData:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        descAr:
+          type: string
+          x-faker: lorem.words
+          default: null
+        descEn:
+          type: string
+          x-faker: lorem.words
+          default: null
+      default: null
+    PersonDrivingLicense:
+      type: object
+      properties:
+        bloodTypeCode:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        bloodTypeDesc:
+          type: string
+          x-faker: lorem.words
+          default: null
+        id:
+          type: integer
+          format: int64
+          x-faker: datatype.number
+          default: null
+        listOfDrivingLicenses:
+          type: array
+          items:
+            $ref: "#/components/schemas/DrivingLicenseDetails"
+          default: null
+      default: null
+    AccidentAttachment:
+      type: object
+      properties:
+        fileName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        fileDesc:
+          type: string
+          x-faker: lorem.words
+          default: null
+      default: null
+    AccidentInfo:
+      type: object
+      properties:
+        accidentNumber:
+          type: integer
+          format: int64
+          x-faker: datatype.number
+          default: null
+        accidentDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        accidentTime:
+          type: string
+          x-faker: lorem.words
+          default: null
+        trafficBranchName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        accidentCause:
+          type: string
+          x-faker: lorem.words
+          default: null
+        accidentType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        accidentCity:
+          type: string
+          x-faker: lorem.words
+          default: null
+        streetName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        longitude:
+          type: string
+          x-faker: lorem.words
+          default: null
+        latitude:
+          type: string
+          x-faker: lorem.words
+          default: null
+        accidentDescription:
+          type: string
+          x-faker: lorem.words
+          default: null
+        trafficDirection:
+          type: string
+          x-faker: lorem.words
+          default: null
+        weatherCondition:
+          type: string
+          x-faker: lorem.words
+          default: null
+        residentialZone:
+          type: string
+          x-faker: lorem.words
+          default: null
+        lightingCondition:
+          type: string
+          x-faker: lorem.words
+          default: null
+        roadServiceCondition:
+          type: string
+          x-faker: lorem.words
+          default: null
+        roadType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        privateDamages:
+          type: string
+          x-faker: lorem.words
+          default: null
+        publicDamages:
+          type: string
+          x-faker: lorem.words
+          default: null
+        officerName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        numberOfPartiesInvolved:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        numberOfInjuredPersons:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        imagesTokens:
+          type: array
+          items:
+            type: string
+            x-faker: lorem.words
+            default: null
+          default: null
+        involvedPersons:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccidentPerson"
+          default: null
+        involvedVehicles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccidentVehicle"
+          default: null
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccidentAttachment"
+          default: null
+      default: null
+    AccidentPerson:
+      type: object
+      properties:
+        nationalId:
+          type: string
+          x-faker: lorem.words
+          default: null
+        firstName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        fatherName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        grandFatherName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        familyName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        gender:
+          type: string
+          enum:
+            - UNKNOWN
+            - MALE
+            - FEMALE
+          default: null
+        nationality:
+          type: string
+          x-faker: lorem.words
+          default: null
+        involvementType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        responsibilityPercentage:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        mobileNumber:
+          type: string
+          x-faker: lorem.words
+          default: null
+        healthStatus:
+          type: string
+          x-faker: lorem.words
+          default: null
+        hospitalName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        objected:
+          type: boolean
+          x-faker: datatype.boolean
+          default: null
+        involvementSequence:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        birthDate:
+          type: string
+          x-faker: lorem.words
+          default: null
+        drivingLicenseType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        licenseExpiryDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        relatedVehicle:
+          type: string
+          x-faker: lorem.words
+          default: null
+        imagesTokens:
+          type: array
+          items:
+            type: string
+            x-faker: lorem.words
+            default: null
+          default: null
+        drivingLicense:
+          $ref: "#/components/schemas/DrivingLicense"
+      default: null
+    AccidentVehicle:
+      type: object
+      properties:
+        make:
+          type: string
+          x-faker: lorem.words
+          default: null
+        model:
+          type: string
+          x-faker: lorem.words
+          default: null
+        modelYear:
+          type: string
+          x-faker: lorem.words
+          default: null
+        bodyType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        color:
+          type: string
+          x-faker: lorem.words
+          default: null
+        oldPlateNumber:
+          type: string
+          x-faker: lorem.words
+          default: null
+        plate:
+          type: string
+          x-faker: lorem.words
+          default: null
+        registrationType:
+          type: string
+          x-faker: lorem.words
+          default: null
+        chassisNumber:
+          type: string
+          x-faker: lorem.words
+          default: null
+        licenseExpiryDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        insuranceCompany:
+          type: string
+          x-faker: lorem.words
+          default: null
+        sequenceNumber:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        numberOfPreviousOwners:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        involvementSequence:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        insurancePolicyNumber:
+          type: string
+          x-faker: lorem.words
+          default: null
+        insuranceExpiryDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        ownerId:
+          type: string
+          x-faker: lorem.words
+          default: null
+        ownerName:
+          type: string
+          x-faker: lorem.words
+          default: null
+        drivingDirection:
+          type: string
+          x-faker: lorem.words
+          default: null
+        damageStatus:
+          type: string
+          x-faker: lorem.words
+          default: null
+        damagePoint:
+          type: string
+          x-faker: lorem.words
+          default: null
+        damageDescription:
+          type: string
+          x-faker: lorem.words
+          default: null
+        numberOfPassengers:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        imagesTokens:
+          type: array
+          items:
+            type: string
+            x-faker: lorem.words
+            default: null
+          default: null
+      default: null
+    DrivingLicense:
+      type: object
+      properties:
+        licenseExpiryDate:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+        licenseType:
+          type: string
+          x-faker: lorem.words
+          default: null
+      default: null
+    PersonIdsDto:
+      required:
+        - firstPersonId
+        - secondPersonId
+      type: object
+      properties:
+        firstPersonId:
+          type: integer
+          format: int64
+          default: null
+        secondPersonId:
+          type: integer
+          format: int64
+          default: null
+      default: null
+    AccidentParticipant:
+      type: object
+      properties:
+        accidentCaseNumbers:
+          type: array
+          items:
+            type: integer
+            format: int64
+            x-faker: datatype.number
+            default: null
+          default: null
+        totalAccidents:
+          type: integer
+          format: int32
+          x-faker: datatype.number
+          default: null
+      default: null

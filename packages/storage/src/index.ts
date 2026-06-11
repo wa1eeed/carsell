@@ -1,0 +1,5 @@
+export type { StorageProvider, UploadSlot, SignedFile, FilePurpose } from './types/provider'
+export { getStorage, resetStorage } from './providers/factory'
+export { buildCarFileKey, buildShowroomLogoKey, validateFileUpload, getExtFromContentType, getMaxCount } from './utils'
+export { useCarUpload, uploadMultipleImages } from './use-car-upload'
+export type { MultiUploadResult } from './use-car-upload'

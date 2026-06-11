@@ -1,0 +1,352 @@
+openapi: 3.1.1
+info:
+  title: Vehicle & VDM APIs
+  description: The VIN Decoder APIs provide a comprehensive set of services
+    designed to help users retrieve detailed information about vehicles using
+    their Vehicle Identification Numbers (VINs). These APIs allow users to
+    access a variety of vehicle-related data, enhancing their ability to
+    understand and evaluate vehicles.
+  version: 2025-12-17
+servers: []
+tags:
+  - name: Inquire By sequence
+    description: Vehicle decoding and related information
+  - name: Inquire By VIN
+paths:
+  /api/v2/vehicle/basic-info:
+    post:
+      tags:
+        - Inquire By sequence
+      summary: Get vehicle basic info by vehicleSequenceNumber
+      description: >
+        Resolves VIN using vehicleSequenceNumber (via middleware), then returns
+        basic decoded vehicle info.
+
+        Requires client authentication through "client-id" header.
+      operationId: getVehicleBasicInfoV2
+      parameters:
+        - $ref: "#/components/parameters/ClientIdHeader"
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      requestBody:
+        $ref: "#/components/requestBodies/VinDecoderRequest"
+      responses:
+        "200":
+          description: Always returns 200 with ResponseDto wrapper (success or "Data not
+            found").
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ResponseDtoVinDecoderVehicleInfo"
+                  - $ref: "#/components/schemas/ResponseDtoDataNotFoundVinDecoderVehicleInfo"
+                default: null
+              examples:
+                success:
+                  value:
+                    code: 0
+                    message: Success
+                    data:
+                      exampleField: exampleValue
+                notFound:
+                  value:
+                    code: 1
+                    message: Data not found for given vehicleSequenceNumber
+                    data: null
+        "400":
+          description: Validation error on request body (MethodArgumentNotValidException
+            handler).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrors"
+              examples:
+                default:
+                  value:
+                    vehicleSequenceNumber: must not be null
+        "401":
+          description: Unauthorized (authenticateClient may return this).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDtoFailure"
+        "403":
+          description: Forbidden (authenticateClient may return this).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDtoFailure"
+        "500":
+          description: Internal server error (exception thrown while decoding).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDtoFailure"
+              examples:
+                default:
+                  value:
+                    code: 1
+                    message: "Could not decode : <error message>"
+                    data: null
+  /api/v1/vehicles/vehicle-info:
+    get:
+      tags:
+        - Inquire By VIN
+      summary: Get Vehicle Basic Information
+      description: Retrieves Basic information of the vehicle
+      parameters:
+        - name: client-id
+          in: header
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+          examples:
+            default:
+              value: VDM
+        - name: vin
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            default: null
+          examples:
+            default:
+              value: 2LMDJ8JK6FBL27913
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json: {}
+        "500":
+          description: Could not decode + exception message
+          content:
+            application/json: {}
+components:
+  schemas:
+    VinDecoderRequestDto:
+      required:
+        - vehicleSequenceNumber
+      type: object
+      properties:
+        vehicleSequenceNumber:
+          minLength: 1
+          type: string
+          description: Vehicle sequence number used to resolve the VIN via middleware.
+          default: null
+      default: null
+      examples:
+        - vehicleSequenceNumber: "1234567890"
+    ResponseDtoBase:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 0 for success; 1 for not found/failure (based on observed usage).
+          format: int32
+          x-faker: datatype.number
+          default: null
+          examples:
+            - 0
+        message:
+          type: string
+          x-faker: lorem.words
+          default: null
+          examples:
+            - Success
+        data:
+          nullable: true
+          default: null
+      default: null
+    ResponseDtoVinDecoderVehicleInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/VinDecoderVehicleInfo"
+          default: null
+      default: null
+    ResponseDtoVehicleInfoWithTrim:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/VehicleInfoWithTrim"
+          default: null
+      default: null
+    ResponseDtoVehicleSpecificationsInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/VehicleSpecificationsInfo"
+          default: null
+      default: null
+    ResponseDtoVehicleOptionsInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/VehicleOptionsInfo"
+          default: null
+      default: null
+    ResponseDtoVehicleMileageInfoList:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/VehicleMileageInfo"
+              default: null
+          default: null
+      default: null
+    ResponseDtoDataNotFoundVinDecoderVehicleInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoVinDecoderVehicleInfo"
+      default: null
+      examples:
+        - code: 1
+          message: Data not found for given vehicleSequenceNumber
+          data: null
+    ResponseDtoDataNotFoundVehicleInfoWithTrim:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoVehicleInfoWithTrim"
+      default: null
+      examples:
+        - code: 1
+          message: Data not found for given vehicleSequenceNumber
+          data: null
+    ResponseDtoDataNotFoundVehicleSpecificationsInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoVehicleSpecificationsInfo"
+      default: null
+      examples:
+        - code: 1
+          message: Data not found for given vehicleSequenceNumber
+          data: null
+    ResponseDtoDataNotFoundVehicleOptionsInfo:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoVehicleOptionsInfo"
+      default: null
+      examples:
+        - code: 1
+          message: Data not found for given vehicleSequenceNumber
+          data: null
+    ResponseDtoDataNotFoundVehicleMileageInfoList:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoVehicleMileageInfoList"
+      default: null
+      examples:
+        - code: 1
+          message: Data not found for given vehicleSequenceNumber
+          data: null
+    ResponseDtoFailure:
+      allOf:
+        - $ref: "#/components/schemas/ResponseDtoBase"
+      default: null
+      examples:
+        - code: 1
+          message: "Could not decode : <error message>"
+          data: null
+    ValidationErrors:
+      type: object
+      additionalProperties:
+        type: string
+        x-faker: lorem.words
+        default: null
+      description: Map of field -> validation message.
+      default: null
+    VinDecoderVehicleInfo:
+      type: object
+      additionalProperties: true
+      description: Decoded basic vehicle info (define fields based on
+        VinDecoderVehicleInfo).
+      default: null
+    VehicleInfoWithTrim:
+      type: object
+      additionalProperties: true
+      description: Vehicle info including trim details (define fields based on
+        VehicleInfoWithTrim).
+      default: null
+    VehicleSpecificationsInfo:
+      type: object
+      additionalProperties: true
+      description: Vehicle specifications info (define fields based on
+        VehicleSpecificationsInfo).
+      default: null
+    VehicleOptionsInfo:
+      type: object
+      additionalProperties: true
+      description: Vehicle options info (define fields based on VehicleOptionsInfo).
+      default: null
+    VehicleMileageInfo:
+      type: object
+      additionalProperties: true
+      description: Mileage analysis info item (define fields based on VehicleMileageInfo).
+      default: null
+  parameters:
+    ClientIdHeader:
+      name: client-id
+      in: header
+      description: Client identifier used for authentication/authorization.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        minLength: 1
+        type: string
+        default: null
+      examples:
+        default:
+          value: client_123
+  requestBodies:
+    VinDecoderRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/VinDecoderRequestDto"
+          examples:
+            sample:
+              value:
+                vehicleSequenceNumber: "1234567890"
+      required: true

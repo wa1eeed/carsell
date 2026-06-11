@@ -1,0 +1,131 @@
+import { prisma } from '@/lib/prisma'
+import {
+  Building2, CreditCard, Users, TrendingUp,
+  Clock, AlertTriangle, CheckCircle, XCircle
+} from 'lucide-react'
+
+export const dynamic  = 'force-dynamic'
+export const metadata = { title: 'نظرة عامة — CarLink Admin' }
+
+async function getStats() {
+  const [
+    totalShowrooms,
+    activeSubscriptions,
+    trialSubscriptions,
+    pastDueSubscriptions,
+    totalCars,
+    totalSales,
+    pendingKyc,
+  ] = await Promise.all([
+    prisma.showroom.count(),
+    prisma.subscription.count({ where: { status: 'ACTIVE'   } }),
+    prisma.subscription.count({ where: { status: 'TRIAL'    } }),
+    prisma.subscription.count({ where: { status: 'PAST_DUE' } }),
+    prisma.car.count({ where: { deletedAt: null } }),
+    prisma.sale.count(),
+    prisma.showroomUser.count({ where: { kycStatus: 'PENDING' } }),
+  ])
+  return {
+    totalShowrooms, activeSubscriptions, trialSubscriptions,
+    pastDueSubscriptions, totalCars, totalSales, pendingKyc,
+  }
+}
+
+export default async function AdminOverviewPage() {
+  const s = await getStats()
+
+  const kpis = [
+    { label: 'إجمالي المعارض',  value: s.totalShowrooms,         icon: Building2,     color: 'text-blue-600',   bg: 'bg-blue-50'   },
+    { label: 'اشتراكات نشطة',   value: s.activeSubscriptions,    icon: CheckCircle,   color: 'text-green-600',  bg: 'bg-green-50'  },
+    { label: 'في فترة التجربة', value: s.trialSubscriptions,     icon: Clock,         color: 'text-amber-600',  bg: 'bg-amber-50'  },
+    { label: 'دفعات متأخرة',    value: s.pastDueSubscriptions,   icon: AlertTriangle, color: 'text-red-600',    bg: 'bg-red-50'    },
+    { label: 'إجمالي السيارات', value: s.totalCars,              icon: TrendingUp,    color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'إجمالي المبيعات', value: s.totalSales,             icon: CreditCard,    color: 'text-teal-600',   bg: 'bg-teal-50'   },
+    { label: 'KYC قيد المراجعة',value: s.pendingKyc,            icon: Users,         color: 'text-orange-600', bg: 'bg-orange-50' },
+  ]
+
+  return (
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">نظرة عامة على المنصة</h1>
+        <p className="text-gray-500 text-sm mt-1">إحصائيات CarLink في الوقت الفعلي</p>
+      </div>
+
+      {/* KPI grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {kpis.map((k) => {
+          const Icon = k.icon
+          return (
+            <div key={k.label} className="bg-white rounded-[12px] border border-gray-100 p-5">
+              <div className={`w-9 h-9 rounded-[8px] ${k.bg} flex items-center justify-center mb-3`}>
+                <Icon size={18} className={k.color} />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{k.value}</div>
+              <div className="text-sm text-gray-500 mt-0.5">{k.label}</div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Alerts */}
+      {(s.pastDueSubscriptions > 0 || s.pendingKyc > 0) && (
+        <div className="space-y-3">
+          <h2 className="font-semibold text-gray-700">تنبيهات تحتاج تدخل</h2>
+          {s.pastDueSubscriptions > 0 && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-[8px] text-sm">
+              <AlertTriangle size={16} className="text-red-500 shrink-0" />
+              <span className="text-red-700">
+                {s.pastDueSubscriptions} معرض لديه دفعة متأخرة
+              </span>
+              <a href="/admin/showrooms?status=PAST_DUE" className="mr-auto text-red-600 font-medium hover:underline">
+                عرض ←
+              </a>
+            </div>
+          )}
+          {s.pendingKyc > 0 && (
+            <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-[8px] text-sm">
+              <Clock size={16} className="text-amber-500 shrink-0" />
+              <span className="text-amber-700">
+                {s.pendingKyc} طلب تحقق هوية بانتظار المراجعة
+              </span>
+              <a href="/admin/kyc" className="mr-auto text-amber-600 font-medium hover:underline">
+                مراجعة ←
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Platform info */}
+      <div className="bg-white rounded-[12px] border border-gray-100 p-5">
+        <h2 className="font-semibold text-gray-700 mb-4">حالة المنصة</h2>
+        <div className="grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <div className="text-gray-400 mb-1">معدل التحويل للاشتراك</div>
+            <div className="font-bold text-gray-900">
+              {s.totalShowrooms > 0
+                ? `${Math.round((s.activeSubscriptions / s.totalShowrooms) * 100)}%`
+                : '—'}
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-400 mb-1">متوسط السيارات / معرض</div>
+            <div className="font-bold text-gray-900">
+              {s.totalShowrooms > 0
+                ? Math.round(s.totalCars / s.totalShowrooms)
+                : '—'}
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-400 mb-1">معدل إتمام المبيعات</div>
+            <div className="font-bold text-gray-900">
+              {s.totalCars > 0
+                ? `${Math.round((s.totalSales / s.totalCars) * 100)}%`
+                : '—'}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

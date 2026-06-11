@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cl-primary:            #0F3460;
+  --cl-primary-hover:      #0A2540;
+  --cl-primary-light:      #E8F0FE;
+  --cl-accent:             #C9A84C;
+  --cl-accent-hover:       #A8882F;
+  --cl-accent-light:       #FBF3DC;
+  --cl-success:            #1B7A4A;
+  --cl-success-light:      #E6F4ED;
+  --cl-warning:            #B45309;
+  --cl-warning-light:      #FEF3C7;
+  --cl-danger:             #9B1C1C;
+  --cl-danger-light:       #FEE2E2;
+  --cl-gray-50:            #F8FAFC;
+  --cl-gray-100:           #F1F5F9;
+  --cl-gray-200:           #E2E8F0;
+  --cl-gray-400:           #94A3B8;
+  --cl-gray-600:           #475569;
+  --cl-gray-800:           #1E293B;
+  --cl-gray-900:           #0F172A;
+  --cl-bg-page:            #F8FAFC;
+  --cl-bg-card:            #FFFFFF;
+  --cl-bg-sidebar:         #0F3460;
+  --cl-text-primary:       #0F172A;
+  --cl-text-secondary:     #475569;
+  --cl-text-muted:         #94A3B8;
+  --cl-text-on-dark:       #F8FAFC;
+  --cl-text-on-dark-muted: rgba(248,250,252,0.65);
+  --font-primary:          'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  --font-mono:             'IBM Plex Mono', monospace;
+}
+
+@layer base {
+  html[lang="ar"] {
+    font-family: var(--font-primary);
+    direction: rtl;
+  }
+  html[lang="en"] {
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    direction: ltr;
+  }
+  body {
+    background-color: var(--cl-bg-page);
+    color: var(--cl-text-primary);
+  }
+}
+
+@layer components {
+  /* LTR exceptions — always left-to-right regardless of locale */
+  .vin,
+  .plate-number,
+  .price-number,
+  .phone-number,
+  .id-number,
+  .ltr {
+    direction: ltr !important;
+    text-align: left;
+    font-family: var(--font-mono);
+  }
+
+  /* Card */
+  .cl-card {
+    background: var(--cl-bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--cl-gray-200);
+    padding: 16px 20px;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .cl-card:hover {
+    border-color: var(--cl-gray-400);
+    box-shadow: 0 4px 16px rgba(15, 52, 96, 0.08);
+    transform: translateY(-2px);
+  }
+
+  /* Price */
+  .cl-price {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cl-accent);
+    direction: ltr;
+  }
+  .cl-price-sm {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--cl-accent);
+    direction: ltr;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--cl-primary);
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.15s;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--cl-primary-hover); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--cl-primary);
+    border: 1.5px solid var(--cl-primary);
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-secondary:hover { background: var(--cl-primary-light); }
+
+  .btn-gold {
+    background: var(--cl-accent);
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-gold:hover { background: var(--cl-accent-hover); }
+
+  .btn-danger {
+    background: var(--cl-danger);
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-available { background: #E6F4ED; color: #1B7A4A; }
+  .badge-reserved  { background: #FEF3C7; color: #B45309; }
+  .badge-sold      { background: #F1F5F9; color: #475569; }
+  .badge-auction   { background: #EEF2FF; color: #3730A3; }
+  .badge-draft     { background: #F1F5F9; color: #94A3B8; }
+
+  .badge-available::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1B7A4A;
+    animation: pulse 2s infinite;
+  }
+
+  /* Inputs */
+  .cl-input {
+    border: 1.5px solid var(--cl-gray-200);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 14px;
+    font-family: var(--font-primary);
+    width: 100%;
+    transition: border-color 0.15s;
+    background: white;
+    color: var(--cl-text-primary);
+  }
+  .cl-input:focus {
+    border-color: var(--cl-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.08);
+  }
+  .cl-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--cl-text-secondary);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  /* Table */
+  .cl-table { width: 100%; border-collapse: collapse; }
+  .cl-table th {
+    background: var(--cl-gray-50);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cl-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--cl-gray-200);
+    white-space: nowrap;
+  }
+  .cl-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--cl-gray-100);
+    font-size: 13px;
+    color: var(--cl-text-primary);
+  }
+  .cl-table tr:hover td { background: var(--cl-gray-50); }
+
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

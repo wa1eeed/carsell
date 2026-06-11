@@ -1,0 +1,248 @@
+openapi: 3.1.1
+info:
+  title: Mojaz – Partner API
+  description: |
+    Mojaz internal partner API – vehicle lookup and PDF reports
+  contact:
+    email: mialajmi@elm.sa
+  version: 1.0.12
+servers: []
+security:
+  - Client-Key: []
+  - App-id: []
+  - App-key: []
+paths:
+  /api/v1/internal/inquiry/sequence:
+    get:
+      tags:
+        - inquiry
+      summary: Lookup a vehicle by sequence (query)
+      parameters:
+        - name: sequence
+          in: query
+          description: Istimarah sequence number to inquire about
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxLength: 10
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultObject"
+  /api/v1/internal/inquiry/vin:
+    get:
+      tags:
+        - inquiry
+      summary: Lookup a vehicle by VIN
+      parameters:
+        - name: vin
+          in: query
+          description: Vehicle VIN to inquire about
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxLength: 17
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultObject"
+  /api/v1/internal/pdfReportV2/sequence:
+    get:
+      tags:
+        - inquiry
+      summary: Get PDF V2 report by sequence
+      parameters:
+        - name: sequence
+          in: query
+          description: Istimarah sequence number
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxLength: 10
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultObject"
+  /api/v1/internal/pdfReportV2/vin:
+    get:
+      tags:
+        - inquiry
+      summary: Get PDF V2 report by VIN
+      parameters:
+        - name: vin
+          in: query
+          description: Vehicle VIN
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxLength: 17
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultObject"
+  /api/v1/internal/pdfReportV2/request:
+    get:
+      tags:
+        - inquiry
+      summary: Get PDF V2 report by UVR request ID
+      parameters:
+        - name: request
+          in: query
+          description: UVR request ID
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxLength: 10
+            type: string
+            default: null
+        - name: app_id
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+        - name: app_key
+          in: header
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultObject"
+components:
+  schemas:
+    ResultObject:
+      type: object
+      properties:
+        resultCode:
+          type: integer
+          description: Numeric code (0 = success, non-zero = error)
+          format: int32
+          x-faker: datatype.number
+          default: null
+        resultMessage:
+          type: string
+          description: Human-readable status or error message
+          x-faker: lorem.words
+          default: null
+        resultObject:
+          type: object
+          description: The payload
+          default: null
+        requestId:
+          type: string
+          description: result ID for this request, used to get the associated PDF
+          x-faker: lorem.words
+          default: null
+      default: null
+  securitySchemes:
+    Client-Key:
+      type: apiKey
+      name: Client-Key
+      in: header
+    App-id:
+      type: apiKey
+      name: app-id
+      in: header
+    App-key:
+      type: apiKey
+      name: app-secret
+      in: header
