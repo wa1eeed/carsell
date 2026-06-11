@@ -51,7 +51,10 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+# Use 127.0.0.1 (IPv4) — the server binds to 0.0.0.0 (IPv4); 'localhost' would
+# resolve to ::1 (IPv6) and be refused. Generous start-period covers first-deploy
+# migrations (applying all migrations to a fresh DB takes time).
+HEALTHCHECK --interval=15s --timeout=5s --start-period=90s --retries=5 \
+  CMD wget -q --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
