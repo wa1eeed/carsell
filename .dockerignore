@@ -1,0 +1,14 @@
+# Exclude everything heavy/irrelevant from the build context
+**/node_modules
+**/.next
+**/.git
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.log
+**/.DS_Store
+**/coverage
+**/.vscode
+**/.idea
+docs
+*.md
