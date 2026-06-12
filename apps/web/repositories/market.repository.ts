@@ -7,49 +7,55 @@
 import { prisma } from '@/lib/prisma'
 
 export interface MarketFilters {
-  brandId?:    string
-  categoryId?: string
-  modelId?:    string
-  yearMin?:    number
-  yearMax?:    number
-  priceMin?:   number
-  priceMax?:   number
-  city?:       string
-  carType?:    string   // NEW | USED | USED_QUALIFIED
-  fuelType?:   string
+  brandId?:      string
+  categoryId?:   string
+  modelId?:      string
+  yearMin?:      number
+  yearMax?:      number
+  priceMin?:     number
+  priceMax?:     number
+  city?:         string
+  carType?:      string   // NEW | USED | USED_QUALIFIED
+  fuelType?:     string
   transmission?: string
-  search?:     string
-  page?:       number
-  pageSize?:   number
-  sortBy?:     'price_asc' | 'price_desc' | 'year_desc' | 'newest'
+  bodyType?:     string   // SUV | SEDAN | PICKUP | COUPE | HATCHBACK | VAN | CONVERTIBLE | WAGON
+  search?:       string
+  page?:         number
+  pageSize?:     number
+  sortBy?:       'price_asc' | 'price_desc' | 'year_desc' | 'newest' | 'odometer_asc'
 }
 
 export async function listMarketCars(filters: MarketFilters = {}) {
-  const page     = filters.page     ?? 1
-  const pageSize = filters.pageSize ?? 24
+  const page     = Math.max(1, filters.page ?? 1)
+  const pageSize = Math.min(48, filters.pageSize ?? 24)  // cap at 48 per page
   const skip     = (page - 1) * pageSize
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = {
-    deletedAt:     null,
-    status:        { in: ['FOR_SALE', 'AUCTION'] as const },
-    mediaDeletedAt: null,
+  // Prisma where clause — typed as explicit object to avoid `any`
+  type WhereClause = Parameters<typeof prisma.car.findMany>[0]['where']
+
+  const where: WhereClause = {
+    deletedAt: null,
+    status:    { in: ['FOR_SALE', 'AUCTION'] },
     ...(filters.brandId    ? { brandId:    filters.brandId    } : {}),
     ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
     ...(filters.modelId    ? { modelId:    filters.modelId    } : {}),
-    ...(filters.carType    ? { carType:    filters.carType as never } : {}),
-    ...(filters.fuelType   ? { fuelType:   filters.fuelType as never } : {}),
+    ...(filters.carType    ? { carType:    filters.carType    as never } : {}),
+    ...(filters.fuelType   ? { fuelType:   filters.fuelType   as never } : {}),
     ...(filters.transmission ? { transmission: filters.transmission as never } : {}),
+    ...(filters.bodyType   ? {
+      // bodyType lives on the Category, not Car — filter via category relation
+      category: { bodyType: filters.bodyType as never },
+    } : {}),
     ...(filters.yearMin || filters.yearMax ? {
       year: {
         ...(filters.yearMin ? { gte: filters.yearMin } : {}),
         ...(filters.yearMax ? { lte: filters.yearMax } : {}),
       },
     } : {}),
-    ...(filters.priceMin || filters.priceMax ? {
+    ...(filters.priceMin !== undefined || filters.priceMax !== undefined ? {
       sellPrice: {
-        ...(filters.priceMin ? { gte: filters.priceMin } : {}),
-        ...(filters.priceMax ? { lte: filters.priceMax } : {}),
+        ...(filters.priceMin !== undefined ? { gte: filters.priceMin } : {}),
+        ...(filters.priceMax !== undefined ? { lte: filters.priceMax } : {}),
       },
     } : {}),
     ...(filters.city ? {
@@ -67,10 +73,11 @@ export async function listMarketCars(filters: MarketFilters = {}) {
 
   const orderBy = (() => {
     switch (filters.sortBy) {
-      case 'price_asc':  return { sellPrice: 'asc'  as const }
-      case 'price_desc': return { sellPrice: 'desc' as const }
-      case 'year_desc':  return { year:      'desc' as const }
-      default:           return { createdAt: 'desc' as const }
+      case 'price_asc':    return { sellPrice: 'asc'  as const }
+      case 'price_desc':   return { sellPrice: 'desc' as const }
+      case 'year_desc':    return { year:      'desc' as const }
+      case 'odometer_asc': return { odometer:  'asc'  as const }
+      default:             return { createdAt: 'desc' as const }
     }
   })()
 
@@ -80,21 +87,28 @@ export async function listMarketCars(filters: MarketFilters = {}) {
       orderBy,
       skip,
       take: pageSize,
-      include: {
+      select: {
+        id:           true,
+        year:         true,
+        carType:      true,
+        odometer:     true,
+        fuelType:     true,
+        transmission: true,
+        sellPrice:    true,
+        status:       true,
+        displayMode:  true,
         brand:    { select: { nameAr: true, nameEn: true, logoUrl: true } },
         category: { select: { nameAr: true, nameEn: true, bodyType: true } },
         model:    { select: { name: true } },
         images:   { where: { isCover: true }, take: 1, select: { url: true } },
         showroom: {
           select: {
-            id:             true,
-            name:           true,
-            slug:           true,
-            city:           true,
-            logoUrl:        true,
-            showroomNumber: true,
-            whatsapp:       true,
-            phone:          true,
+            id:      true,
+            name:    true,
+            slug:    true,
+            city:    true,
+            logoUrl: true,
+            whatsapp: true,
           },
         },
       },
@@ -139,10 +153,22 @@ export async function getMarketFiltersData() {
     prisma.brand.findMany({
       where:   { isActive: true },
       orderBy: { nameAr: 'asc' },
-      include: {
+      select: {
+        id:     true,
+        nameAr: true,
+        nameEn: true,
         categories: {
-          where:   { isActive: true },
-          include: { models: { where: { isActive: true } } },
+          where:  { isActive: true },
+          select: {
+            id:     true,
+            nameAr: true,
+            models: {
+              where:  { isActive: true },
+              select: { id: true, name: true },
+              orderBy: { name: 'asc' },
+            },
+          },
+          orderBy: { nameAr: 'asc' },
         },
       },
     }),
@@ -153,5 +179,8 @@ export async function getMarketFiltersData() {
       orderBy:  { city: 'asc' },
     }),
   ])
-  return { brands, cities: cities.map((s) => s.city).filter(Boolean) as string[] }
+  return {
+    brands,
+    cities: cities.map((s) => s.city).filter(Boolean) as string[],
+  }
 }

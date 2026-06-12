@@ -9,11 +9,11 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   return handle(async () => {
     await requireAuth()
-    const brandId = req.nextUrl.searchParams.get('brandId')
+    const brandId    = req.nextUrl.searchParams.get('brandId')
     const categoryId = req.nextUrl.searchParams.get('categoryId')
 
     if (categoryId) return ok(await catalogRepository.listModels(categoryId))
-    if (brandId) return ok(await catalogRepository.listCategories(brandId))
+    if (brandId)    return ok(await catalogRepository.listCategories(brandId))
     return ok(await catalogRepository.listBrands())
   })
 }

@@ -315,10 +315,17 @@ model Category {
   bodyType BodyType
   isActive Boolean  @default(true)
 
+  // Default car attributes — auto-fill the dealer's "add car" form.
+  // The admin configures the options a category (e.g. Corolla) ships with,
+  // so the dealer form pre-selects/limits to these for consistent data.
+  fuelTypes     FuelType[]     // e.g. [PETROL, HYBRID]
+  transmissions Transmission[] // e.g. [AUTOMATIC]
+
   brand  Brand   @relation(fields: [brandId], references: [id])
   models Model[]
   cars   Car[]
 
+  @@index([brandId, isActive])
   @@map("categories")
 }
 
@@ -326,11 +333,14 @@ model Model {
   id         String  @id @default(uuid())
   categoryId String
   name       String
+  yearStart  Int?    // first production year (optional)
+  yearEnd    Int?    // last production year (null = still produced)
   isActive   Boolean @default(true)
 
   category Category @relation(fields: [categoryId], references: [id])
   cars     Car[]
 
+  @@index([categoryId, isActive])
   @@map("models")
 }
 

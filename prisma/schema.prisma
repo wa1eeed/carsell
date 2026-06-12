@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════
-// CarLink — Prisma Schema
+// CarLink — Prisma Schema (fixed with all back-relations)
 // ══════════════════════════════════════════════
 
 generator client {
@@ -18,6 +18,19 @@ enum Role {
   SHOWROOM_OWNER
   SHOWROOM_MANAGER
   SHOWROOM_STAFF
+}
+
+enum AccountType {
+  INDIVIDUAL
+  SHOWROOM
+  AGENCY
+  COMPANY
+}
+
+enum IdType {
+  CITIZEN
+  RESIDENT
+  VISITOR
 }
 
 enum SubscriptionStatus {
@@ -78,6 +91,7 @@ enum CarStatus {
 
 enum DisplayMode {
   FIXED_PRICE
+  SOUM
   AUCTION
 }
 
@@ -112,38 +126,118 @@ enum PaymentMethod {
   CASH
   BANK_TRANSFER
   FINANCING
+  TRADE_IN
   MIXED
+}
+
+enum CarDataSource {
+  MANUAL
+  VDM_VIN
+  VDM_ABSHER
+}
+
+enum KycStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AuctionType {
+  NONE
+  PUBLIC
+  PRIVATE
+  SOUM
+}
+
+enum TradeInCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
+
+enum ExpenseCategory {
+  RENT
+  SALARY
+  UTILITIES
+  MARKETING
+  MAINTENANCE
+  INSURANCE
+  OTHER
+}
+
+enum SupplierType {
+  INDIVIDUAL
+  AUCTION
+  DEALER
+  AGENCY
+}
+
+enum ProviderType {
+  WORKSHOP_FIXED
+  WORKSHOP_MOBILE
+  INSPECTION_CENTER
+  TRANSPORT
+  FINANCING_PROVIDER
 }
 
 // ─── Platform / Tenants ───────────────────────
 
 model Showroom {
-  id                   String             @id @default(uuid())
-  name                 String
-  ownerName            String
-  vatNumber            String?
-  zatcaRegistered      Boolean            @default(false)
-  profitMarginApproved Boolean            @default(false)
-  vatMethod            VatMethod          @default(FULL_PRICE)
-  city                 String?
-  logoUrl              String?
-  slug                 String?            @unique
+  id                      String             @id @default(uuid())
+  // ── Human-readable platform-wide number ──────
+  // Auto-assigned at creation: 1001, 1002, ...
+  // Displayed as "CL-1001" in UI and admin
+  showroomNumber          Int?               @unique
+  // ── Public URL handle ────────────────────────
+  // Used for: carlink.sa/{slug}  AND  {slug}.carlink.sa
+  slug                    String?            @unique
+  // ── Custom domain (dealer's own domain) ──────
+  // e.g. "mydealership.com" → resolves to this showroom's storefront
+  customDomain            String?            @unique
+  customDomainVerified    Boolean            @default(false)
+  // DNS TXT verification token: carlink-verify={token}
+  customDomainToken       String?
+  tagline                 String?
+  coverImageUrl           String?
+  showPrices              Boolean            @default(true)
+  phone                   String?
+  name                    String
+  ownerName               String
+  vatNumber               String?
+  zatcaRegistered         Boolean            @default(false)
+  profitMarginApproved    Boolean            @default(false)
+  vatMethod               VatMethod          @default(FULL_PRICE)
+  city                    String?
+  logoUrl                 String?
+  marketplaceEnabled      Boolean            @default(false)
+  commissionPct           Decimal?           @db.Decimal(5, 2)
+  gatewayAccountId        String?
+  gatewayOnboardingStatus String?
 
-  // ── CarLink Market (اختياري) ──────────────────
-  // يُفعَّل فقط إذا أراد المعرض عرض سياراته في السوق العام
-  marketplaceEnabled        Boolean   @default(false)
-  commissionPct             Decimal?  @db.Decimal(5, 2)   // null = يستخدم الافتراضي في platform_config
-  gatewayAccountId          String?   // معرّف البائع في بوابة الدفع (Moyasar/PayTabs/Stripe)
-  gatewayOnboardingStatus   String?   // pending | active | suspended
+  // ── Showroom onboarding info ─────────────────
+  activityType          String?   // showroom | agency | hall
+  district              String?
+  whatsapp              String?
+  instagramUrl          String?
+  commercialReg         String?
+  commercialRegDoc      String?   // R2 path
+  commercialRegVerified Boolean   @default(false)
 
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
 
   users               ShowroomUser[]
   cars                Car[]
   sales               Sale[]
   customers           Customer[]
   paymentTransactions PaymentTransaction[]
+  deposits            Deposit[]
+  tradeIns            TradeIn[]
+  expenses            ShowroomExpense[]
+  suppliers           Supplier[]
+  serviceRequests     ServiceRequest[]
   subscription        Subscription?
   carRequests         CarRequest[]
 
@@ -151,25 +245,54 @@ model Showroom {
 }
 
 model ShowroomUser {
-  id         String   @id @default(uuid())
-  showroomId String
-  name       String
-  email      String   @unique
-  password   String
-  role       Role     @default(SHOWROOM_STAFF)
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
+  id          String      @id @default(uuid())
+  showroomId  String
+  name        String
+  email       String      @unique
+  password    String
+  phone       String?
+  role        Role        @default(SHOWROOM_STAFF)
+  accountType AccountType @default(SHOWROOM)
+  isActive    Boolean     @default(true)
 
-  showroom       Showroom      @relation(fields: [showroomId], references: [id])
-  carsCreated    Car[]         @relation("CarCreatedBy")
-  timelineEvents CarTimeline[]
-  documentsAdded CarDocument[]
-  salesCreated   Sale[]
+  // ── Onboarding / profile completion ──────────
+  completedSteps  String[] @default([])   // personalInfo | identity | showroomInfo
+  city            String?
+  dateOfBirth     String?                 // Hijri
+  phoneVerified   Boolean  @default(false)
+  phoneVerifiedAt DateTime?
+
+  // ── Nafath ───────────────────────────────────
+  nationalId       String?   @unique
+  idType           IdType?
+  idExpiryDate     String?   // Hijri
+  nafathVerified   Boolean   @default(false)
+  nafathVerifiedAt DateTime?
+  nafathRawData    Json?
+
+  // ── KYC (manual) ─────────────────────────────
+  kycStatus       KycStatus @default(NONE)
+  kycSubmittedAt  DateTime?
+  kycApprovedAt   DateTime?
+  kycDocFront     String?
+  kycDocBack      String?
+  kycRejectReason String?
+
+  createdAt   DateTime    @default(now())
+
+  showroom        Showroom          @relation(fields: [showroomId], references: [id])
+  carsCreated     Car[]             @relation("CarCreatedBy")
+  timelineEvents  CarTimeline[]
+  documentsAdded  CarDocument[]
+  salesCreated    Sale[]
+  depositsCreated Deposit[]
+  expenses        ShowroomExpense[]
+  bids            Bid[]
 
   @@map("showroom_users")
 }
 
-// ─── Catalog (Admin-managed) ──────────────────
+// ─── Catalog ──────────────────────────────────
 
 model Brand {
   id       String     @id @default(uuid())
@@ -192,11 +315,11 @@ model Category {
   bodyType BodyType
   isActive Boolean  @default(true)
 
-  // Default car attributes for this category — auto-fill the dealer's car form.
-  // A category (e.g. Toyota Corolla) typically ships with known options; the
-  // dealer's "add car" form pre-selects/limits to these so data stays consistent.
-  fuelTypes      FuelType[]     // available fuel options (e.g. [PETROL, HYBRID])
-  transmissions  Transmission[] // available gearbox options (e.g. [AUTOMATIC])
+  // Default car attributes — auto-fill the dealer's "add car" form.
+  // The admin configures the options a category (e.g. Corolla) ships with,
+  // so the dealer form pre-selects/limits to these for consistent data.
+  fuelTypes     FuelType[]     // e.g. [PETROL, HYBRID]
+  transmissions Transmission[] // e.g. [AUTOMATIC]
 
   brand  Brand   @relation(fields: [brandId], references: [id])
   models Model[]
@@ -210,7 +333,7 @@ model Model {
   id         String  @id @default(uuid())
   categoryId String
   name       String
-  yearStart  Int?    // first production year (optional metadata)
+  yearStart  Int?    // first production year (optional)
   yearEnd    Int?    // last production year (null = still produced)
   isActive   Boolean @default(true)
 
@@ -246,31 +369,88 @@ model Car {
   plateNumber   String?
   plateType     PlateType?
   notes         String?
+  // ── Sequential reference number per showroom ─
+  // Auto-assigned: showroom A car #1, showroom B car #1 (independent counters)
+  // Displayed as "#47" in inventory lists and sale records
+  carRefNumber  Int             @default(0)
+  listedOnMarket  Boolean       @default(false)
+  dataSource      CarDataSource @default(MANUAL)
+  vdmLastSyncAt   DateTime?
+  vdmRawData      Json?
+  marketPrice     Decimal?      @db.Decimal(12, 2)
+  supplierId      String?
 
-  // ── CarLink Market ───────────────────────────
-  listedOnMarket  Boolean   @default(false)   // هل معروضة في السوق العام
-  dataSource        CarDataSource  @default(MANUAL)
-  vdmLastSyncAt     DateTime?
-  vdmRawData        Json?
-  marketPrice     Decimal?  @db.Decimal(12, 2) // سعر العرض في السوق (قد يختلف عن sellPrice)
+  // ── VDM (Absher) external fields ─────────────
+  vdmSequenceNumber  String?
+  registrationExpiry DateTime?
+  inspectionExpiry   DateTime?
+  insuranceExpiry    DateTime?
+  insuranceCompany   String?
+  insurancePolicyNo  String?
+  engineSize         String?
+
+  // ── Mojaz report ─────────────────────────────
+  mojazRequestId   String?
+  mojazLastReportAt DateTime?
+  mojazReportUrl   String?
+  mojazRawData     Json?
+  numberOfOwners   Int?
+
+  // ── Accidents (Najm/Basher) ──────────────────
+  accidentsLastCheckAt DateTime?
+  accidentsCount       Int?
+  accidentsCheckYears  Int?
+  accidentsRawData     Json?
+
+  // ── R2 Media cleanup ─────────────────────────
+  // mediaScheduledDeleteAt: set when car is sold/removed (now + platform setting days)
+  // mediaDeletedAt: set after the cron job actually deletes the files
+  mediaScheduledDeleteAt DateTime?
+  mediaDeletedAt         DateTime?
+
+  // ── Publish / Auction ────────────────────────
+  minAcceptedPrice     Decimal?     @db.Decimal(12, 2)  // secret (SOUM)
+  auctionType          AuctionType?
+  auctionSlug          String?      @unique
+  auctionStartAt       DateTime?
+  auctionEndsAt        DateTime?
+  auctionOpeningPrice  Decimal?     @db.Decimal(12, 2)
+  auctionBuyNowPrice   Decimal?     @db.Decimal(12, 2)
+  auctionDepositAmount Decimal?     @db.Decimal(10, 2)
 
   createdBy     String
   deletedAt     DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  showroom  Showroom     @relation(fields: [showroomId], references: [id])
-  brand     Brand        @relation(fields: [brandId], references: [id])
-  category  Category     @relation(fields: [categoryId], references: [id])
-  model     Model        @relation(fields: [modelId], references: [id])
-  creator   ShowroomUser @relation("CarCreatedBy", fields: [createdBy], references: [id])
-  images    CarImage[]
-  documents CarDocument[]
-  expenses  CarExpense[]
-  timeline  CarTimeline[]
-  sale      Sale?
-  requests  CarRequest[]
+  showroom        Showroom         @relation(fields: [showroomId], references: [id])
+  brand           Brand            @relation(fields: [brandId], references: [id])
+  category        Category         @relation(fields: [categoryId], references: [id])
+  model           Model            @relation(fields: [modelId], references: [id])
+  creator         ShowroomUser     @relation("CarCreatedBy", fields: [createdBy], references: [id])
+  supplier        Supplier?        @relation(fields: [supplierId], references: [id])
+  images          CarImage[]
+  documents       CarDocument[]
+  expenses        CarExpense[]
+  timeline        CarTimeline[]
+  sale            Sale?
+  deposits        Deposit[]
+  bids            Bid[]
+  serviceRequests ServiceRequest[]
+  requests        CarRequest[]
 
+  // Unique car number within its showroom
+  @@unique([showroomId, carRefNumber])
+  // ── Performance indexes (hot query paths) ────
+  // Inventory list / dashboard: filter by showroom + status, exclude deleted
+  @@index([showroomId, status, deletedAt])
+  // Public marketplace: browse FOR_SALE/AUCTION cars across showrooms
+  @@index([status, deletedAt])
+  // Filter by brand/category (marketplace + showroom filters)
+  @@index([brandId])
+  @@index([categoryId])
+  // Media cleanup cron: find cars due for deletion
+  @@index([mediaScheduledDeleteAt, mediaDeletedAt])
   @@map("cars")
 }
 
@@ -284,6 +464,8 @@ model CarImage {
 
   car Car @relation(fields: [carId], references: [id])
 
+  // Cars load their images by carId (cover image, gallery)
+  @@index([carId])
   @@map("car_images")
 }
 
@@ -300,6 +482,7 @@ model CarDocument {
   car      Car          @relation(fields: [carId], references: [id])
   uploader ShowroomUser @relation(fields: [uploadedBy], references: [id])
 
+  @@index([carId])
   @@map("car_documents")
 }
 
@@ -326,6 +509,8 @@ model CarTimeline {
   car  Car          @relation(fields: [carId], references: [id])
   user ShowroomUser @relation(fields: [userId], references: [id])
 
+  // Timeline tab loads events for a car, newest first
+  @@index([carId, createdAt])
   @@map("car_timeline")
 }
 
@@ -339,9 +524,12 @@ model Customer {
   idNumber   String?
   email      String?
 
-  showroom Showroom @relation(fields: [showroomId], references: [id])
+  showroom Showroom  @relation(fields: [showroomId], references: [id])
   sales    Sale[]
+  deposits Deposit[]
 
+  // Customers list is scoped to a showroom
+  @@index([showroomId])
   @@map("customers")
 }
 
@@ -361,29 +549,29 @@ model Sale {
   soldAt        DateTime      @default(now())
   createdBy     String
 
-  car      Car          @relation(fields: [carId], references: [id])
-  showroom Showroom     @relation(fields: [showroomId], references: [id])
-  customer Customer     @relation(fields: [customerId], references: [id])
-  creator  ShowroomUser @relation(fields: [createdBy], references: [id])
+  car                Car                 @relation(fields: [carId], references: [id])
+  showroom           Showroom            @relation(fields: [showroomId], references: [id])
+  customer           Customer            @relation(fields: [customerId], references: [id])
+  creator            ShowroomUser        @relation(fields: [createdBy], references: [id])
+  paymentTransaction PaymentTransaction?
+  payments           SalePayment[]
+  tradeIn            TradeIn?
 
+  // Sales list / reports: scoped to showroom, ordered by date
+  @@index([showroomId, soldAt])
   @@map("sales")
 }
-
-// ─── CarLink Market — Payments ─────────────────
-// يُنشأ فقط عند إتمام بيع عبر CarLink Market
-// (لا يُستخدم في بيع SaaS العادي حيث المعرض يتعامل مباشرة)
 
 model PaymentTransaction {
   id            String   @id @default(uuid())
   saleId        String   @unique
   showroomId    String
   buyerName     String
-  grossAmount   Decimal  @db.Decimal(12, 2)  // المبلغ الكامل من المشتري
-  commissionPct Decimal  @db.Decimal(5, 2)   // نسبة عمولة المنصة المطبّقة
-  commissionAmt Decimal  @db.Decimal(10, 2)  // قيمة العمولة بالريال
-  netToShowroom Decimal  @db.Decimal(12, 2)  // الصافي للمعرض بعد العمولة
-  gatewayRef    String?                       // رقم العملية في بوابة الدفع
-  // held = الأموال محتجزة، released = حُرِّرت بعد نقل الملكية
+  grossAmount   Decimal  @db.Decimal(12, 2)
+  commissionPct Decimal  @db.Decimal(5, 2)
+  commissionAmt Decimal  @db.Decimal(10, 2)
+  netToShowroom Decimal  @db.Decimal(12, 2)
+  gatewayRef    String?
   status        String   @default("held")
   heldAt        DateTime?
   releasedAt    DateTime?
@@ -395,32 +583,12 @@ model PaymentTransaction {
   @@map("payment_transactions")
 }
 
-// ─── Platform Configuration ───────────────────
-// إعدادات المنصة العامة — يديرها Platform Admin
-// صف واحد فقط (singleton) — id = "platform"
-
-model PlatformConfig {
-  id                    String   @id @default("platform")
-  defaultCommissionPct  Decimal  @default(2.5) @db.Decimal(5, 2)
-  minCommissionPct      Decimal  @default(0)   @db.Decimal(5, 2)
-  maxCommissionPct      Decimal  @default(10)  @db.Decimal(5, 2)
-  vatPct                Decimal  @default(15)  @db.Decimal(5, 2)  // نسبة الضريبة (ZATCA)
-  activePaymentGateway  String   @default("moyasar")              // moyasar | paytabs | stripe
-  updatedAt             DateTime @updatedAt
-
-  @@map("platform_config")
-}
-
-
-// ─── Deposits (العرابين) ──────────────────────
-
 model Deposit {
   id         String   @id @default(uuid())
   carId      String
   showroomId String
   customerId String
   amount     Decimal  @db.Decimal(10, 2)
-  // held = محتجز، applied_to_sale = خُصم من البيع، refunded = مُرجَع، forfeited = مُصادَر
   status     String   @default("held")
   notes      String?
   saleId     String?
@@ -437,8 +605,6 @@ model Deposit {
   @@map("deposits")
 }
 
-// ─── Sale Payments (دفعات متعددة) ────────────
-
 model SalePayment {
   id        String        @id @default(uuid())
   saleId    String
@@ -453,32 +619,23 @@ model SalePayment {
   @@map("sale_payments")
 }
 
-// ─── Trade-in (صفقات البدل) ───────────────────
-
-enum TradeInCondition {
-  EXCELLENT
-  GOOD
-  FAIR
-  POOR
-}
-
 model TradeIn {
-  id                 String            @id @default(uuid())
-  saleId             String            @unique
-  showroomId         String
-  brandId            String?
-  categoryId         String?
-  modelId            String?
-  year               Int?
-  colorExt           String?
-  odometer           Int?
-  vin                String?
-  condition          TradeInCondition  @default(GOOD)
-  estimatedValue     Decimal           @db.Decimal(12, 2)
-  agreedValue        Decimal           @db.Decimal(12, 2)
-  addedToInventory   Boolean           @default(false)
-  inventoryCarId     String?
-  createdAt          DateTime          @default(now())
+  id               String           @id @default(uuid())
+  saleId           String           @unique
+  showroomId       String
+  brandId          String?
+  categoryId       String?
+  modelId          String?
+  year             Int?
+  colorExt         String?
+  odometer         Int?
+  vin              String?
+  condition        TradeInCondition @default(GOOD)
+  estimatedValue   Decimal          @db.Decimal(12, 2)
+  agreedValue      Decimal          @db.Decimal(12, 2)
+  addedToInventory Boolean          @default(false)
+  inventoryCarId   String?
+  createdAt        DateTime         @default(now())
 
   sale     Sale     @relation(fields: [saleId], references: [id])
   showroom Showroom @relation(fields: [showroomId], references: [id])
@@ -486,17 +643,21 @@ model TradeIn {
   @@map("trade_ins")
 }
 
-// ─── Showroom Expenses (مصروفات التشغيل) ─────
+// ─── Platform Config ──────────────────────────
 
-enum ExpenseCategory {
-  RENT
-  SALARY
-  UTILITIES
-  MARKETING
-  MAINTENANCE
-  INSURANCE
-  OTHER
+model PlatformConfig {
+  id                   String   @id @default("platform")
+  defaultCommissionPct Decimal  @default(2.5) @db.Decimal(5, 2)
+  minCommissionPct     Decimal  @default(0)   @db.Decimal(5, 2)
+  maxCommissionPct     Decimal  @default(10)  @db.Decimal(5, 2)
+  vatPct               Decimal  @default(15)  @db.Decimal(5, 2)
+  activePaymentGateway String   @default("moyasar")
+  updatedAt            DateTime @updatedAt
+
+  @@map("platform_config")
 }
+
+// ─── Showroom Expenses ────────────────────────
 
 model ShowroomExpense {
   id          String          @id @default(uuid())
@@ -516,14 +677,7 @@ model ShowroomExpense {
   @@map("showroom_expenses")
 }
 
-// ─── Suppliers (الموردون) ─────────────────────
-
-enum SupplierType {
-  INDIVIDUAL
-  AUCTION
-  DEALER
-  AGENCY
-}
+// ─── Suppliers ────────────────────────────────
 
 model Supplier {
   id         String       @id @default(uuid())
@@ -540,49 +694,41 @@ model Supplier {
   @@map("suppliers")
 }
 
-// ─── Extended Enums (Phase 1 additions) ──────
+// ─── Service Providers ────────────────────────
 
-enum AccountType {
-  AGENCY
-  SHOWROOM
-  INDIVIDUAL
-  COMPANY
+model ServiceProvider {
+  id        String       @id @default(uuid())
+  name      String
+  type      ProviderType
+  city      String
+  phone     String?
+  isActive  Boolean      @default(true)
+  rating    Decimal?     @db.Decimal(3, 2)
+  createdAt DateTime     @default(now())
+
+  serviceRequests ServiceRequest[]
+
+  @@index([city, type])
+  @@map("service_providers")
 }
 
-enum IndividualType {
-  CITIZEN
-  RESIDENT
-  VISITOR
-}
+model ServiceRequest {
+  id          String   @id @default(uuid())
+  carId       String
+  showroomId  String
+  providerId  String?
+  serviceType String
+  city        String
+  status      String   @default("pending")
+  notes       String?
+  fee         Decimal? @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
 
-enum CompanyType {
-  INSURANCE
-  BANK
-  FINANCING
-  OTHER_COMPANY
-}
+  car      Car              @relation(fields: [carId], references: [id])
+  showroom Showroom         @relation(fields: [showroomId], references: [id])
+  provider ServiceProvider? @relation(fields: [providerId], references: [id])
 
-enum ExtendedCarType {
-  NEW
-  USED
-  USED_QUALIFIED
-  UNDER_CUSTOMS
-}
-
-enum ExtendedPlateType {
-  PRIVATE
-  TAXI
-  TRANSPORT
-  DIPLOMAT
-  EXPORT
-  CUSTOMS_PLATE
-}
-
-enum AuctionType {
-  NONE
-  PUBLIC
-  PRIVATE
-  SOUM
+  @@map("service_requests")
 }
 
 // ─── Wallet ───────────────────────────────────
@@ -602,7 +748,7 @@ model Wallet {
 model WalletTransaction {
   id        String   @id @default(uuid())
   walletId  String
-  type      String   // topup | deduct | refund
+  type      String
   amount    Decimal  @db.Decimal(10, 2)
   reference String?
   notes     String?
@@ -617,31 +763,30 @@ model WalletTransaction {
 // ─── Coupons ──────────────────────────────────
 
 model Coupon {
-  id         String    @id @default(uuid())
-  code       String    @unique
-  type       String    // percentage | fixed
-  value      Decimal   @db.Decimal(10, 2)
-  appliesTo  String    // subscription | service | wallet_topup | all
-  maxUses    Int?
-  usedCount  Int       @default(0)
-  expiresAt  DateTime?
-  isActive   Boolean   @default(true)
-  createdAt  DateTime  @default(now())
+  id        String    @id @default(uuid())
+  code      String    @unique
+  type      String
+  value     Decimal   @db.Decimal(10, 2)
+  appliesTo String
+  maxUses   Int?
+  usedCount Int       @default(0)
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
 
   @@map("coupons")
 }
 
 // ─── Pricing Rules ────────────────────────────
-// كل عملية في المنصة لها سعر قابل للتخصيص من الأدمن
 
 model PricingRule {
   id          String   @id @default(uuid())
-  key         String   @unique  // 'listing_fee' | 'sale_commission' | ...
+  key         String   @unique
   labelAr     String
   labelEn     String
   amount      Decimal  @db.Decimal(10, 2)
-  type        String   // fixed | percentage
-  appliesTo   String   // showroom | individual | provider | all
+  type        String
+  appliesTo   String
   isActive    Boolean  @default(true)
   vatIncluded Boolean  @default(true)
   updatedAt   DateTime @updatedAt
@@ -649,198 +794,86 @@ model PricingRule {
   @@map("pricing_rules")
 }
 
-// ─── Service Providers ────────────────────────
-
-enum ProviderType {
-  WORKSHOP_FIXED
-  WORKSHOP_MOBILE
-  INSPECTION_CENTER
-  TRANSPORT
-  FINANCING_PROVIDER
-}
-
-model ServiceProvider {
-  id          String       @id @default(uuid())
-  name        String
-  type        ProviderType
-  city        String
-  phone       String?
-  isActive    Boolean      @default(true)
-  rating      Decimal?     @db.Decimal(3, 2)
-  createdAt   DateTime     @default(now())
-
-  serviceRequests ServiceRequest[]
-
-  @@index([city, type])
-  @@map("service_providers")
-}
-
-model ServiceRequest {
-  id          String   @id @default(uuid())
-  carId       String
-  showroomId  String
-  providerId  String?
-  serviceType String
-  city        String
-  status      String   @default("pending") // pending | assigned | completed | cancelled
-  notes       String?
-  fee         Decimal? @db.Decimal(10, 2)
-  createdAt   DateTime @default(now())
-
-  car      Car             @relation(fields: [carId], references: [id])
-  showroom Showroom        @relation(fields: [showroomId], references: [id])
-  provider ServiceProvider? @relation(fields: [providerId], references: [id])
-
-  @@map("service_requests")
-}
-
-// ─── VDM Integration ──────────────────────────
-
-enum CarDataSource {
-  MANUAL
-  VDM_VIN
-  VDM_ABSHER
-}
-
-// ─── Nafath fields on ShowroomUser ────────────
-// يُضاف للـ ShowroomUser عبر migration لاحقاً
-// nationalId     String?  @unique
-// idType         String?  // citizen | resident | visitor
-// nafathVerified Boolean  @default(false)
-// nafathVerifiedAt DateTime?
-
-// ─── External Data Fields ─────────────────────
-// حقول تُحدَّث من مصادر خارجية: نفاذ، VDM، موجز
-// كل مجموعة حقول مُسبَّقة بـ prefix يدل على المصدر
-//
-// تُضاف هذه الحقول لجدول ShowroomUser وCar
-// عبر Prisma migration منفصلة عند البناء
-//
-// ShowroomUser — حقول نفاذ:
-//   nationalId           String?   @unique
-//   idType               String?   // citizen | resident | visitor
-//   idIssueDate          String?   // Hijri
-//   idExpiryDate         String?   // Hijri
-//   nafathVerified       Boolean   @default(false)
-//   nafathVerifiedAt     DateTime?
-//   nafathRawData        Json?     // البيانات الخام من JWT نفاذ
-//
-// Car — حقول VDM (أبشر):
-//   dataSource           CarDataSource @default(MANUAL)
-//   vdmSequenceNumber    String?   // رقم التسلسل — يُستخدم في Accidents + Mojaz
-//   vdmLastSyncAt        DateTime?
-//   vdmRawData           Json?
-//   registrationExpiry   DateTime? // انتهاء الاستمارة
-//   inspectionExpiry     DateTime? // انتهاء الفحص
-//   insuranceExpiry      DateTime? // انتهاء التأمين
-//   insuranceCompany     String?
-//   insurancePolicyNo    String?
-//   engineSize           String?
-//
-// Car — حقول موجز:
-//   mojazRequestId       String?   // requestId → لجلب PDF لاحقاً
-//   mojazLastReportAt    DateTime? // تاريخ آخر تقرير
-//   mojazReportUrl       String?   // رابط PDF المخزّن في R2
-//   mojazRawData         Json?     // بيانات موجز الخام
-//
-// Car — حقول الحوادث (علم/بشر):
-//   accidentsLastCheckAt DateTime?
-//   accidentsCount       Int?      // آخر عدد محقَّق
-//   accidentsCheckYears  Int?      // عدد السنوات في آخر استعلام
-
-// ─── KYC Status Enum ──────────────────────────
-
-enum KycStatus {
-  NONE
-  PENDING     // رُفعت المستندات — بانتظار المراجعة
-  APPROVED    // موثّق
-  REJECTED    // مرفوض — يحتاج إعادة رفع
-}
-
-// ─── Profile Completion Fields ────────────────
-// تُضاف لـ ShowroomUser عبر migration
-//
-// نفاذ:
-//   nationalId           String?  @unique
-//   idType               String?   // citizen | resident | visitor
-//   idExpiryDate         String?
-//   nafathVerified       Boolean  @default(false)
-//   nafathVerifiedAt     DateTime?
-//   nafathRawData        Json?
-//
-// KYC يدوي:
-//   kycStatus            KycStatus @default(NONE)
-//   kycSubmittedAt       DateTime?
-//   kycApprovedAt        DateTime?
-//   kycDocFront          String?   // مسار R2
-//   kycDocBack           String?
-//   kycRejectReason      String?
-//
-// معلومات شخصية:
-//   city                 String?
-//   dateOfBirth          String?   // Hijri
-//   phoneVerified        Boolean   @default(false)
-//   phoneVerifiedAt      DateTime?
-//
-// بيانات المعرض/الشركة (على Showroom):
-//   activityType         String?   // showroom | agency | hall
-//   district             String?
-//   instagramUrl         String?
-//   commercialRegDoc     String?   // مسار R2
-//   commercialRegVerified Boolean  @default(false)
-
-// ─── Auction Fields (on Car) ──────────────────
-// تُضاف لجدول Car عبر migration
-// displayMode           String?   // FIXED_PRICE | SOUM | AUCTION
-// minAcceptedPrice      Decimal?  @db.Decimal(12,2)   // سري
-// auctionType           AuctionType?
-// auctionSlug           String?   @unique             // للمزاد الخاص
-// auctionStartAt        DateTime?
-// auctionEndsAt         DateTime?
-// auctionOpeningPrice   Decimal?  @db.Decimal(12,2)
-// auctionBuyNowPrice    Decimal?  @db.Decimal(12,2)   // سعر الشراء الفوري
-// auctionDepositAmount  Decimal?  @db.Decimal(10,2)   // عربون المزايدة
-
-// ─── Bid (المزايدات) ──────────────────────────
+// ─── Bids ─────────────────────────────────────
 
 model Bid {
   id         String   @id @default(uuid())
   carId      String
   bidderId   String
   showroomId String?
-  amount     Decimal  @db.Decimal(12,2)
+  amount     Decimal  @db.Decimal(12, 2)
   isWinning  Boolean  @default(false)
   createdAt  DateTime @default(now())
 
-  car     Car          @relation(fields: [carId], references: [id])
-  bidder  ShowroomUser @relation(fields: [bidderId], references: [id])
+  car    Car          @relation(fields: [carId], references: [id])
+  bidder ShowroomUser @relation(fields: [bidderId], references: [id])
 
   @@index([carId, amount])
   @@index([carId, createdAt])
   @@map("bids")
 }
 
+// ─── Car Requests (buyer → dealer) ────────────
+// Reservation / Soum offer / Purchase request submitted by a buyer on a car.
+
+enum CarRequestType {
+  RESERVATION   // حجز السيارة
+  SOUM_OFFER    // عرض سعر (مساومة)
+  PURCHASE      // طلب شراء
+}
+
+enum CarRequestStatus {
+  PENDING       // بانتظار رد المعرض
+  ACCEPTED      // مقبول
+  REJECTED      // مرفوض
+  CANCELLED     // ألغاه المشتري
+  COMPLETED     // اكتمل (تحوّل لبيع)
+}
+
+model CarRequest {
+  id          String           @id @default(uuid())
+  carId       String
+  showroomId  String           // denormalized for fast dealer-scoped queries
+  type        CarRequestType
+  status      CarRequestStatus @default(PENDING)
+  buyerName   String
+  buyerPhone  String
+  offerAmount Decimal?         @db.Decimal(12, 2)  // for SOUM_OFFER
+  message     String?
+  dealerNote  String?          // optional note when accepting/rejecting
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  car      Car      @relation(fields: [carId], references: [id])
+  showroom Showroom @relation(fields: [showroomId], references: [id])
+
+  // Dealer's requests inbox: scoped to showroom, filter by status, newest first
+  @@index([showroomId, status, createdAt])
+  @@index([carId])
+  @@map("car_requests")
+}
+
 // ─── Plans (dynamic, admin-managed) ──────────
 
 model Plan {
-  id           String   @id @default(uuid())
-  name         String
-  nameAr       String
-  slug         String   @unique  // starter | growth | pro | enterprise
-  description  String?
+  id            String   @id @default(uuid())
+  name          String
+  nameAr        String
+  slug          String   @unique
+  description   String?
   descriptionAr String?
-  priceMonthly Decimal  @db.Decimal(10, 2)
-  priceYearly  Decimal  @db.Decimal(10, 2)
-  maxCars      Int?                           // null = unlimited
+  priceMonthly  Decimal  @db.Decimal(10, 2)
+  priceYearly   Decimal  @db.Decimal(10, 2)
+  maxCars       Int?                         // null = unlimited
   // JSON: { market, auctions, api, reports, support, customShowroom }
-  features     Json     @default("{}")
-  isActive     Boolean  @default(true)
-  isPublic     Boolean  @default(true)       // false = Enterprise (custom pricing)
-  isFeatured   Boolean  @default(false)      // "موصى بها" badge
-  sortOrder    Int      @default(0)
-  trialDays    Int      @default(14)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  features      Json     @default("{}")
+  isActive      Boolean  @default(true)
+  isPublic      Boolean  @default(true)      // false = Enterprise (custom)
+  isFeatured    Boolean  @default(false)     // "موصى بها" badge
+  sortOrder     Int      @default(0)
+  trialDays     Int      @default(14)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   subscriptions Subscription[]
 
@@ -860,7 +893,7 @@ model Subscription {
   currentPeriodEnd   DateTime?
   cancelledAt        DateTime?
   tapCustomerId      String?
-  tapCardId          String?            // saved card token
+  tapCardId          String?
   autoRenew          Boolean            @default(true)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -882,7 +915,7 @@ model TapPayment {
   currency       String   @default("SAR")
   status         String   // INITIATED | CAPTURED | FAILED | REFUNDED
   description    String?
-  tapResponse    Json?    // raw Tap response
+  tapResponse    Json?
   failureReason  String?
   paidAt         DateTime?
   createdAt      DateTime @default(now())
@@ -893,7 +926,7 @@ model TapPayment {
   @@map("tap_payments")
 }
 
-// ─── Platform Settings (key-value) ───────────
+// ─── Platform Settings (key-value, admin) ────
 
 model PlatformSetting {
   key       String   @id
@@ -904,41 +937,3 @@ model PlatformSetting {
 
   @@map("platform_settings")
 }
-
-// ─── Car Requests (buyer → dealer) ───────────
-
-enum CarRequestType {
-  RESERVATION   // حجز
-  SOUM_OFFER    // عرض سعر (سوم)
-  PURCHASE      // طلب شراء مباشر
-}
-
-enum CarRequestStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  COMPLETED
-}
-
-model CarRequest {
-  id          String           @id @default(uuid())
-  carId       String
-  showroomId  String
-  type        CarRequestType
-  status      CarRequestStatus @default(PENDING)
-  buyerName   String
-  buyerPhone  String
-  offerAmount Decimal?         @db.Decimal(10, 2)
-  message     String?
-  dealerNote  String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  car       Car      @relation(fields: [carId], references: [id])
-  showroom  Showroom @relation(fields: [showroomId], references: [id])
-
-  @@index([showroomId, status])
-  @@index([carId])
-  @@map("car_requests")
-}
-

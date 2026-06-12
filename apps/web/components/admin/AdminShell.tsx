@@ -8,12 +8,11 @@ import {
   CreditCard,
   Building2,
   ShieldCheck,
-  Users,
   Settings,
   LogOut,
   ChevronRight,
   Layers,
-  BookOpen,
+  Tag,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -23,10 +22,10 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin',           label: 'نظرة عامة',        icon: LayoutDashboard },
   { href: '/admin/showrooms', label: 'المعارض',           icon: Building2       },
   { href: '/admin/plans',     label: 'الباقات',           icon: Layers          },
-  { href: '/admin/catalog',   label: 'كتالوج السيارات',   icon: BookOpen        },
   { href: '/admin/payments',  label: 'المدفوعات',         icon: CreditCard      },
-  { href: '/admin/kyc',       label: 'طلبات التحقق KYC',  icon: ShieldCheck     },
-  { href: '/admin/settings',  label: 'إعدادات المنصة',   icon: Settings        },
+  { href: '/admin/kyc',             label: 'طلبات التحقق KYC',  icon: ShieldCheck     },
+  { href: '/admin/settings/brands', label: 'براندات السيارات',  icon: Tag             },
+  { href: '/admin/settings',        label: 'إعدادات المنصة',   icon: Settings        },
 ]
 // Note: these hrefs resolve to /[locale]/admin/* in the app router
 // On admin.carsell.one, middleware rewrites the subdomain to these paths
@@ -43,7 +42,9 @@ export function AdminShell({
   const isActive = (href: string) =>
     href === '/admin'
       ? pathname === '/admin' || pathname === '/ar/admin'
-      : pathname.startsWith(href) || pathname.startsWith(`/ar${href}`)
+      : href === '/admin/settings'
+        ? pathname === '/admin/settings' || pathname === '/ar/admin/settings'
+        : pathname.startsWith(href) || pathname.startsWith(`/ar${href}`)
 
   return (
     <div className="flex min-h-screen bg-gray-50" dir="rtl">

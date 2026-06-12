@@ -16,7 +16,14 @@ export const catalogRepository = {
     return prisma.category.findMany({
       where: { brandId, isActive: true },
       orderBy: { nameAr: 'asc' },
-      select: { id: true, nameAr: true, nameEn: true, bodyType: true },
+      select: {
+        id: true,
+        nameAr: true,
+        nameEn: true,
+        bodyType: true,
+        fuelTypes: true,
+        transmissions: true,
+      },
     })
   },
 

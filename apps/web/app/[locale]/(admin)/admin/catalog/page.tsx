@@ -1,7 +1,6 @@
-import AdminCatalogClient from './AdminCatalogClient'
+import { redirect } from 'next/navigation'
 
-export const metadata = { title: 'كتالوج السيارات — CarSell Admin' }
-
-export default function AdminCatalogPage() {
-  return <AdminCatalogClient />
+// Redirect legacy /admin/catalog links to the new location
+export default function AdminCatalogRedirect() {
+  redirect('/admin/settings/brands')
 }

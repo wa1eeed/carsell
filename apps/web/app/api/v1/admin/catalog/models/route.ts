@@ -12,15 +12,21 @@ import { requireAuth } from '@/lib/auth-guard'
 import { apiResponse } from '@/lib/api-response'
 import { prisma } from '@/lib/prisma'
 
+const yearSchema = z.number().int().min(1900).max(2100)
+
 const createSchema = z.object({
   categoryId: z.string().min(1),
   name:       z.string().min(1),
+  yearStart:  yearSchema.optional(),
+  yearEnd:    yearSchema.optional(),
 })
 
 const updateSchema = z.object({
-  id:       z.string().min(1),
-  name:     z.string().min(1).optional(),
-  isActive: z.boolean().optional(),
+  id:        z.string().min(1),
+  name:      z.string().min(1).optional(),
+  yearStart: yearSchema.nullable().optional(),
+  yearEnd:   yearSchema.nullable().optional(),
+  isActive:  z.boolean().optional(),
 })
 
 const deleteSchema = z.object({
@@ -40,9 +46,7 @@ export async function GET(req: NextRequest) {
     include: {
       category: {
         select: {
-          id: true,
-          nameAr: true,
-          nameEn: true,
+          id: true, nameAr: true, nameEn: true,
           brand: { select: { id: true, nameAr: true, nameEn: true } },
         },
       },

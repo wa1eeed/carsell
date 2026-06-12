@@ -8,24 +8,28 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { BodyType } from '@prisma/client'
+import { BodyType, FuelType, Transmission } from '@prisma/client'
 import { requireAuth } from '@/lib/auth-guard'
 import { apiResponse } from '@/lib/api-response'
 import { prisma } from '@/lib/prisma'
 
 const createSchema = z.object({
-  brandId:  z.string().min(1),
-  nameAr:   z.string().min(1),
-  nameEn:   z.string().min(1),
-  bodyType: z.nativeEnum(BodyType),
+  brandId:       z.string().min(1),
+  nameAr:        z.string().min(1),
+  nameEn:        z.string().min(1),
+  bodyType:      z.nativeEnum(BodyType),
+  fuelTypes:     z.array(z.nativeEnum(FuelType)).default([]),
+  transmissions: z.array(z.nativeEnum(Transmission)).default([]),
 })
 
 const updateSchema = z.object({
-  id:       z.string().min(1),
-  nameAr:   z.string().min(1).optional(),
-  nameEn:   z.string().min(1).optional(),
-  bodyType: z.nativeEnum(BodyType).optional(),
-  isActive: z.boolean().optional(),
+  id:            z.string().min(1),
+  nameAr:        z.string().min(1).optional(),
+  nameEn:        z.string().min(1).optional(),
+  bodyType:      z.nativeEnum(BodyType).optional(),
+  fuelTypes:     z.array(z.nativeEnum(FuelType)).optional(),
+  transmissions: z.array(z.nativeEnum(Transmission)).optional(),
+  isActive:      z.boolean().optional(),
 })
 
 const deleteSchema = z.object({

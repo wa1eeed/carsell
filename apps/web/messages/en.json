@@ -347,5 +347,245 @@
     "openPage": "Open page",
     "noSlug": "Add a slug in settings to activate your custom link",
     "hint": "When publishing a car, choose where to show it: your showroom page only, CarSell Live, or both."
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "market": "Market",
+      "login": "Login",
+      "startTrial": "Start free trial",
+      "logoAlt": "CarSell"
+    },
+    "hero": {
+      "badge": "The Smartest Car Platform in the Gulf",
+      "headline": "Manage your inventory and sell smarter",
+      "subheadline": "A complete SaaS platform for car showrooms — track inventory, calculate profit and VAT automatically, and publish your cars across three sales channels.",
+      "ctaPrimary": "Start free trial",
+      "ctaSecondary": "Watch demo",
+      "trialNote": "14 days free — no credit card required",
+      "kpi1Label": "Total Inventory",
+      "kpi1Value": "47",
+      "kpi2Label": "Sales this month",
+      "kpi2Value": "234,500",
+      "kpi2Unit": "SAR",
+      "kpi3Label": "Active listings",
+      "kpi3Value": "31",
+      "kpi4Label": "Close rate",
+      "kpi4Value": "87%"
+    },
+    "trust": {
+      "title": "Trusted by showrooms across the Gulf",
+      "stat1Value": "+12,000",
+      "stat1Label": "Cars managed",
+      "stat2Value": "+350",
+      "stat2Label": "Active showrooms",
+      "stat3Value": "+20",
+      "stat3Label": "Cities",
+      "stat4Value": "98%",
+      "stat4Label": "Customer satisfaction"
+    },
+    "features": {
+      "title": "Everything your showroom needs, in one place",
+      "subtitle": "Professional tools built specifically for car dealerships in Saudi Arabia and the Gulf",
+      "inventory": {
+        "title": "Inventory Management",
+        "desc": "Add, track, and manage your cars with ease. Multiple photos, VIN, and full vehicle details."
+      },
+      "profit": {
+        "title": "Profit & VAT Calculator",
+        "desc": "Automatically calculate profit margin and VAT on every deal. Fully compliant with ZATCA regulations."
+      },
+      "saleModes": {
+        "title": "Three Sale Modes",
+        "desc": "Sell at a fixed price, accept Soum offers, or run an electronic auction — all from one platform."
+      },
+      "market": {
+        "title": "CarSell Live Exposure",
+        "desc": "List your cars on the public marketplace and reach thousands of buyers beyond your showroom page."
+      },
+      "showroom": {
+        "title": "Professional Showroom Page",
+        "desc": "A dedicated page with your own subdomain — share the link with your customers instantly."
+      },
+      "reports": {
+        "title": "Reports & Analytics",
+        "desc": "Track sales performance, fastest-selling cars, and profit margins at a glance."
+      }
+    },
+    "howItWorks": {
+      "title": "Get started in three steps",
+      "subtitle": "From registration to your first deal in minutes",
+      "step1Number": "1",
+      "step1Title": "Register & Verify",
+      "step1Desc": "Create your showroom account and complete identity verification via Nafath in two minutes.",
+      "step2Number": "2",
+      "step2Title": "Add Your Cars",
+      "step2Desc": "Enter vehicle details, upload photos, and set your asking price and cost.",
+      "step3Number": "3",
+      "step3Title": "Publish & Sell",
+      "step3Desc": "Choose your sales channel and expose your cars to buyers instantly."
+    },
+    "saleModes": {
+      "title": "Three sale modes — one platform to manage them all",
+      "subtitle": "Full flexibility in how you sell your cars",
+      "fixedTitle": "Fixed Price",
+      "fixedDesc": "Set a final price and show buyers exactly what they pay — no surprises. Ideal for straightforwardly priced cars.",
+      "fixedTag": "Most common",
+      "soumTitle": "Negotiable (Soum)",
+      "soumDesc": "Open up negotiation and receive buyer offers. Accept, reject, or counter — all from your dashboard.",
+      "soumTag": "Flexible",
+      "auctionTitle": "Electronic Auction",
+      "auctionDesc": "Run a timed auction and watch buyers compete for your car. Set a reserve price and win the highest bid.",
+      "auctionTag": "Highest return"
+    },
+    "market": {
+      "badge": "CarSell Live",
+      "title": "Connect your cars to thousands of buyers",
+      "desc": "CarSell Live is the public marketplace browsed by buyers from across the Gulf. List your cars and gain far greater exposure than your showroom page alone.",
+      "point1": "Thousands of daily visits from real buyers",
+      "point2": "Smart filtering by location, model, and price",
+      "point3": "Instant notifications on every request or offer",
+      "cta": "Browse the market"
+    },
+    "pricing": {
+      "title": "A plan for every showroom size",
+      "subtitle": "Start free — upgrade as your showroom grows",
+      "starterName": "Starter",
+      "starterDesc": "For small and new showrooms",
+      "starterHighlight": "Start for free",
+      "growthName": "Growth",
+      "growthDesc": "For mid-size showrooms",
+      "growthHighlight": "Most popular",
+      "proName": "Pro",
+      "proDesc": "For large showrooms and chains",
+      "proHighlight": "Unlimited",
+      "viewAll": "View all plans & pricing",
+      "trialNote": "All plans include a 14-day free trial"
+    },
+    "finalCta": {
+      "title": "Ready to grow your showroom?",
+      "subtitle": "Join hundreds of showrooms managing their inventory and selling smarter with CarSell.",
+      "cta": "Start free trial",
+      "note": "No credit card required — 24/7 support"
+    },
+    "footer": {
+      "tagline": "The smartest car management and sales platform in the Gulf.",
+      "productLabel": "Product",
+      "companyLabel": "Company",
+      "legalLabel": "Legal",
+      "features": "Features",
+      "pricing": "Pricing",
+      "market": "Public Market",
+      "about": "About us",
+      "blog": "Blog",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "copyright": "© 2025 CarSell. All rights reserved.",
+      "switchLang": "العربية"
+    }
+  },
+  "market": {
+    "title": "CarSell Live — Car Marketplace",
+    "searching": "Searching...",
+    "resultCount": "{count} cars available",
+    "searchPlaceholder": "Search by brand, model, or year...",
+    "filters": "Filters",
+    "clearAll": "Clear all",
+    "showResults": "Show results",
+    "all": "All",
+    "cars": "cars",
+    "sar": "SAR",
+    "km": "km",
+    "price": "Price",
+    "priceOnRequest": "Price on request",
+    "whatsapp": "WhatsApp",
+    "viewDetails": "View details",
+    "share": "Share",
+    "linkCopied": "Link copied",
+    "pagination": "Pagination",
+    "photo": "Photo",
+    "prev": "Previous",
+    "next": "Next",
+    "close": "Close",
+    "specs": "Specifications",
+    "sellerNotes": "Seller Notes",
+    "sendRequest": "Send your request",
+    "reserve": "Reserve this car",
+    "makeOffer": "Make an offer",
+    "buyRequest": "Request to buy",
+    "contactWhatsapp": "Contact via WhatsApp",
+    "callShowroom": "Call showroom",
+    "viewShowroomCars": "View all showroom cars",
+    "soumNote": "Price is negotiable",
+    "whatsappGreeting": "Hello, I'd like to inquire about",
+    "filter": {
+      "brand": "Brand",
+      "category": "Category",
+      "model": "Model",
+      "bodyType": "Body Type",
+      "year": "Year",
+      "price": "Price",
+      "fuelType": "Fuel Type",
+      "transmission": "Transmission",
+      "condition": "Condition",
+      "city": "City"
+    },
+    "sort": {
+      "newest": "Newest first",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low",
+      "year_desc": "Newest year",
+      "odometer_asc": "Lowest mileage"
+    },
+    "listingType": {
+      "FIXED": "Fixed price",
+      "SOUM": "Soum",
+      "AUCTION": "Auction"
+    },
+    "carType": {
+      "NEW": "New",
+      "USED": "Used",
+      "USED_QUALIFIED": "Certified Used"
+    },
+    "fuel": {
+      "PETROL": "Petrol",
+      "DIESEL": "Diesel",
+      "HYBRID": "Hybrid",
+      "ELECTRIC": "Electric"
+    },
+    "transmission": {
+      "AUTOMATIC": "Automatic",
+      "MANUAL": "Manual"
+    },
+    "bodyType": {
+      "SUV": "SUV",
+      "SEDAN": "Sedan",
+      "PICKUP": "Pickup",
+      "COUPE": "Coupe",
+      "HATCHBACK": "Hatchback",
+      "VAN": "Van",
+      "CONVERTIBLE": "Convertible",
+      "WAGON": "Wagon"
+    },
+    "spec": {
+      "year": "Year",
+      "odometer": "Odometer",
+      "fuelType": "Fuel Type",
+      "transmission": "Transmission",
+      "bodyType": "Body Type",
+      "colorExt": "Exterior Color",
+      "colorInt": "Interior Color",
+      "engineSize": "Engine Size",
+      "condition": "Condition",
+      "city": "City",
+      "vin": "VIN",
+      "plateNumber": "Plate Number"
+    },
+    "empty": {
+      "title": "No matching cars",
+      "body": "Try adjusting your filters or broadening your search"
+    }
   }
 }

@@ -13,19 +13,24 @@ import { formatNumber } from '@/lib/format'
 
 interface Option { id: string; nameAr: string; nameEn: string }
 interface ModelOption { id: string; name: string }
+/** Category as returned by the catalog API — includes catalog attributes */
+interface CatalogCategory extends Option {
+  bodyType: string
+  fuelTypes: string[]
+  transmissions: string[]
+}
 type EntryMode = 'choose' | 'manual' | 'vdm'
 
 const YEARS = Array.from({ length: new Date().getFullYear() + 1 - 2000 + 1 }, (_, i) => new Date().getFullYear() + 1 - i)
 const CAR_TYPES = ['NEW', 'USED', 'USED_QUALIFIED'] as const
-const FUELS = ['PETROL', 'DIESEL', 'HYBRID', 'ELECTRIC'] as const
-const TRANSMISSIONS = ['AUTOMATIC', 'MANUAL'] as const
+const ALL_FUELS = ['PETROL', 'DIESEL', 'HYBRID', 'ELECTRIC'] as const
+const ALL_TRANSMISSIONS = ['AUTOMATIC', 'MANUAL'] as const
 const PLATE_TYPES = ['PRIVATE', 'TAXI', 'TRANSPORT', 'DIPLOMAT'] as const
 
 export function CarForm() {
   const t = useTranslations('car')
   const tf = useTranslations('car.fields')
   const tc = useTranslations('common')
-  const ta = useTranslations('carForm')
   const locale = useLocale()
   const router = useRouter()
   const prefix = locale === 'ar' ? '' : '/en'
@@ -33,10 +38,15 @@ export function CarForm() {
   const [mode, setMode] = useState<EntryMode>('choose')
   const [vdmReadonly, setVdmReadonly] = useState(false)
 
-  // Catalog cascade
+  // Catalog cascade — categories include attributes for auto-fill
   const [brands, setBrands] = useState<Option[]>([])
-  const [categories, setCategories] = useState<Option[]>([])
+  const [categories, setCategories] = useState<CatalogCategory[]>([])
   const [models, setModels] = useState<ModelOption[]>([])
+
+  // Derived category constraints (drive filtered dropdowns)
+  const [catBodyType, setCatBodyType] = useState<string | null>(null)
+  const [catFuelTypes, setCatFuelTypes] = useState<string[]>([])
+  const [catTransmissions, setCatTransmissions] = useState<string[]>([])
 
   // Form state
   const [brandId, setBrandId] = useState('')
@@ -47,6 +57,7 @@ export function CarForm() {
   const [vin, setVin] = useState('')
   const [colorExt, setColorExt] = useState('')
   const [colorInt, setColorInt] = useState('')
+  const [bodyType, setBodyType] = useState('')
   const [fuelType, setFuelType] = useState('')
   const [transmission, setTransmission] = useState('')
   const [odometer, setOdometer] = useState('')
@@ -70,30 +81,72 @@ export function CarForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  // Derived: which fuel/transmission options to show
+  const availableFuels = catFuelTypes.length > 0
+    ? ALL_FUELS.filter((f) => catFuelTypes.includes(f))
+    : [...ALL_FUELS]
+  const availableTransmissions = catTransmissions.length > 0
+    ? ALL_TRANSMISSIONS.filter((tr) => catTransmissions.includes(tr))
+    : [...ALL_TRANSMISSIONS]
+
   // Load brands once
   useEffect(() => {
     fetch('/api/v1/catalog/brands')
       .then((r) => r.json())
-      .then((j) => j.success && setBrands(j.data))
+      .then((j) => j.success && setBrands(j.data as Option[]))
       .catch(() => {})
   }, [])
 
   // Cascade: categories
   useEffect(() => {
-    if (!brandId) return setCategories([])
+    if (!brandId) { setCategories([]); return }
     fetch(`/api/v1/catalog/brands?brandId=${brandId}`)
       .then((r) => r.json())
-      .then((j) => j.success && setCategories(j.data))
+      .then((j) => j.success && setCategories(j.data as CatalogCategory[]))
       .catch(() => {})
   }, [brandId])
 
   // Cascade: models
   useEffect(() => {
-    if (!categoryId) return setModels([])
+    if (!categoryId) { setModels([]); return }
     fetch(`/api/v1/catalog/brands?categoryId=${categoryId}`)
       .then((r) => r.json())
-      .then((j) => j.success && setModels(j.data))
+      .then((j) => j.success && setModels(j.data as ModelOption[]))
       .catch(() => {})
+  }, [categoryId])
+
+  // Auto-fill from category attributes
+  useEffect(() => {
+    if (!categoryId) {
+      setCatBodyType(null)
+      setCatFuelTypes([])
+      setCatTransmissions([])
+      return
+    }
+    const cat = categories.find((c) => c.id === categoryId)
+    if (!cat) return
+
+    setCatBodyType(cat.bodyType ?? null)
+    setCatFuelTypes(cat.fuelTypes ?? [])
+    setCatTransmissions(cat.transmissions ?? [])
+
+    // Auto-apply bodyType from category
+    if (cat.bodyType) setBodyType(cat.bodyType)
+
+    // Auto-apply fuelType: if exactly one option pick it; otherwise keep only if still valid
+    if (cat.fuelTypes && cat.fuelTypes.length === 1) {
+      setFuelType(cat.fuelTypes[0])
+    } else if (cat.fuelTypes && cat.fuelTypes.length > 1) {
+      setFuelType((prev) => (cat.fuelTypes.includes(prev) ? prev : ''))
+    }
+
+    // Same for transmission
+    if (cat.transmissions && cat.transmissions.length === 1) {
+      setTransmission(cat.transmissions[0])
+    } else if (cat.transmissions && cat.transmissions.length > 1) {
+      setTransmission((prev) => (cat.transmissions.includes(prev) ? prev : ''))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId])
 
   const pricing = calcNetProfit({
@@ -166,6 +219,7 @@ export function CarForm() {
         vin: vin || undefined,
         colorExt: colorExt || undefined,
         colorInt: colorInt || undefined,
+        bodyType: bodyType || undefined,
         fuelType: fuelType || undefined,
         transmission: transmission || undefined,
         odometer: odometer ? Number(odometer) : undefined,
@@ -205,12 +259,12 @@ export function CarForm() {
         <button onClick={() => setMode('manual')} className="cl-card text-start">
           <FileText size={28} className="text-cl-primary mb-3" />
           <h3 className="font-semibold">{t('manualEntry')}</h3>
-          <p className="text-sm text-cl-gray-600 mt-1">{ta('manualDesc')}</p>
+          <p className="text-sm text-cl-gray-600 mt-1">تعبئة كل الحقول يدوياً</p>
         </button>
         <button onClick={() => setMode('vdm')} className="cl-card text-start">
           <Link2 size={28} className="text-cl-accent mb-3" />
           <h3 className="font-semibold">{t('pullFromAbsher')}</h3>
-          <p className="text-sm text-cl-gray-600 mt-1">{ta('vdmDesc')}</p>
+          <p className="text-sm text-cl-gray-600 mt-1">رقم الهيكل أو رقم التسلسل ← جلب تلقائي</p>
         </button>
       </div>
     )
@@ -233,7 +287,7 @@ export function CarForm() {
         </div>
         <div className="text-center text-xs text-cl-gray-400">{tc('or')}</div>
         <div>
-          <label className="cl-label">{ta('sequenceNumber')}</label>
+          <label className="cl-label">رقم التسلسل (أبشر)</label>
           <div className="flex gap-2">
             <input className="cl-input ltr" value={vdmSequenceNumber} onChange={(e) => setVdmSequenceNumber(e.target.value)} />
             <button className="btn-primary" disabled={!vdmSequenceNumber || saving} onClick={() => handleVdmLookup('sequence')}>
@@ -257,7 +311,7 @@ export function CarForm() {
       <div className="space-y-6">
         {ro && (
           <div className="flex items-center gap-2 rounded-input bg-cl-primary-light text-cl-primary text-sm p-3">
-            <ShieldCheck size={16} /> {ta('vdmVerify')}
+            <ShieldCheck size={16} /> البيانات مسحوبة من أبشر — راجعها قبل الحفظ
           </div>
         )}
         {error && <p className="text-sm text-cl-danger">{error}</p>}
@@ -307,16 +361,25 @@ export function CarForm() {
             <Field label={tf('color')}><input className="cl-input" value={colorExt} onChange={(e) => setColorExt(e.target.value)} /></Field>
             <Field label={tf('colorInt')}><input className="cl-input" value={colorInt} onChange={(e) => setColorInt(e.target.value)} /></Field>
             <Field label={tf('odometer')}><input className="cl-input price-number" inputMode="numeric" value={odometer} onChange={(e) => setOdometer(e.target.value.replace(/\D/g, ''))} /></Field>
+            <Field label={tf('bodyType')}>
+              {/* bodyType is auto-set from category; disabled when category has it configured */}
+              <select className="cl-input" value={bodyType} onChange={(e) => setBodyType(e.target.value)} disabled={!!catBodyType}>
+                <option value="">—</option>
+                {(['SUV','SEDAN','PICKUP','COUPE','HATCHBACK','VAN','CONVERTIBLE','WAGON'] as const).map((bt) => (
+                  <option key={bt} value={bt}>{t(`bodyType.${bt}`)}</option>
+                ))}
+              </select>
+            </Field>
             <Field label={tf('fuelType')}>
               <select className="cl-input" value={fuelType} onChange={(e) => setFuelType(e.target.value)}>
                 <option value="">—</option>
-                {FUELS.map((f) => <option key={f} value={f}>{t(`fuel.${f}`)}</option>)}
+                {availableFuels.map((f) => <option key={f} value={f}>{t(`fuel.${f}`)}</option>)}
               </select>
             </Field>
             <Field label={tf('transmission')}>
               <select className="cl-input" value={transmission} onChange={(e) => setTransmission(e.target.value)}>
                 <option value="">—</option>
-                {TRANSMISSIONS.map((tr) => <option key={tr} value={tr}>{t(`transmission.${tr}`)}</option>)}
+                {availableTransmissions.map((tr) => <option key={tr} value={tr}>{t(`transmission.${tr}`)}</option>)}
               </select>
             </Field>
           </div>
@@ -330,7 +393,7 @@ export function CarForm() {
           <h3 className="font-semibold">{tf('price')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Field label={tf('purchasePrice')}><input className="cl-input price-number" inputMode="numeric" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value.replace(/\D/g, ''))} required /></Field>
-            <Field label={ta('extraCosts')}><input className="cl-input price-number" inputMode="numeric" value={extraCosts} onChange={(e) => setExtraCosts(e.target.value.replace(/\D/g, ''))} /></Field>
+            <Field label="تكاليف إضافية"><input className="cl-input price-number" inputMode="numeric" value={extraCosts} onChange={(e) => setExtraCosts(e.target.value.replace(/\D/g, ''))} /></Field>
             <Field label={tf('status')}>
               <select className="cl-input" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
                 <option value="DRAFT">{t('status.DRAFT')}</option>
@@ -365,10 +428,10 @@ export function CarForm() {
           <h3 className="font-semibold">{t('gallery')}</h3>
           <label className="flex items-center justify-center gap-2 rounded-input border border-dashed border-cl-gray-200 p-6 text-sm text-cl-gray-600 cursor-pointer">
             {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
-            {ta('uploadImages')}
+            رفع الصور (حتى 20)
             <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple hidden onChange={(e) => handleImageUpload(e.target.files)} />
           </label>
-          {imageKeys.length > 0 && <p className="text-xs text-cl-gray-600">{formatNumber(imageKeys.length, locale)} {ta('images')}</p>}
+          {imageKeys.length > 0 && <p className="text-xs text-cl-gray-600">{formatNumber(imageKeys.length, locale)} صورة</p>}
         </section>
       </div>
 
@@ -377,18 +440,18 @@ export function CarForm() {
         <div className="cl-card sticky top-6 space-y-3">
           <h3 className="font-semibold text-sm">{t('financial')}</h3>
           <Row label={tf('purchasePrice')} value={formatNumber(Number(purchasePrice) || 0, locale)} />
-          <Row label={ta('plusExtraCosts')} value={formatNumber(Number(extraCosts) || 0, locale)} />
-          <Row label={ta('totalCost')} value={formatNumber(pricing.totalCost, locale)} bold />
+          <Row label="+ تكاليف إضافية" value={formatNumber(Number(extraCosts) || 0, locale)} />
+          <Row label="= إجمالي التكلفة" value={formatNumber(pricing.totalCost, locale)} bold />
           <Row label={tf('sellPrice')} value={formatNumber(Number(sellPrice) || 0, locale)} />
           <Row label="- VAT" value={formatNumber(pricing.vatAmount, locale)} />
           <hr className="border-cl-gray-100" />
           <div className="flex items-center justify-between">
-            <span className="text-sm">{ta('netProfit')}</span>
+            <span className="text-sm">= صافي الربح</span>
             <span className={`price-number font-semibold ${pricing.netProfit >= 0 ? 'text-cl-success' : 'text-cl-danger'}`}>
               {formatNumber(pricing.netProfit, locale)}
             </span>
           </div>
-          <Row label={ta('marginPct')} value={`${formatNumber(pricing.marginPct, locale)}%`} />
+          <Row label="نسبة الربح" value={`${formatNumber(pricing.marginPct, locale)}%`} />
 
           <button type="submit" className="btn-primary w-full justify-center mt-2" disabled={saving}>
             {saving ? <Loader2 size={16} className="animate-spin" /> : tc('save')}
