@@ -30,7 +30,7 @@ export function SubscriptionBanner({ subscription }: Props) {
     return (
       <Banner dir={dir} type="warning" icon={<AlertTriangle size={16} />}
         message={t('noPlan')} cta={t('choosePlan')}
-        onCta={() => router.push(`/${locale}/pricing`)} onDismiss={() => setDismissed(true)} />
+        onCta={() => router.push(`/${locale}/billing`)} onDismiss={() => setDismissed(true)} />
     )
   }
 

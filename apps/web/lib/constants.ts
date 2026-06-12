@@ -57,6 +57,7 @@ export const RESERVED_SLUGS = new Set<string>([
   'login', 'register', 'onboarding', 'logout', 'forgot-password', 'reset-password', 'verify',
   // dashboard
   'dashboard', 'inventory', 'sales', 'customers', 'reports', 'settings', 'billing', 'auctions',
+  'requests', 'cars', 'profile', 'notifications', 'team', 'kyc',
   // admin
   'admin', 'super-admin',
   // system

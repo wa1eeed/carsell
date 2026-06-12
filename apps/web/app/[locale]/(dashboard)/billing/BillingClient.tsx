@@ -39,25 +39,49 @@ export default function BillingClient({ subscription, plans }: Props) {
   }
 
   async function handleChangePlan(planId: string) {
-    await fetch('/api/v1/subscriptions', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ planId }),
-    })
-    router.refresh()
-    setShowUpgrade(false)
+    setLoading(true)
+    try {
+      await fetch('/api/v1/subscriptions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planId }),
+      })
+      router.refresh()
+      setShowUpgrade(false)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (!subscription) {
     return (
-      <div className="max-w-2xl mx-auto py-12 text-center">
-        <p className="text-gray-500 mb-4">لا يوجد اشتراك نشط</p>
-        <button
-          onClick={() => router.push('/ar/pricing')}
-          className="bg-[#0F3460] text-white px-6 py-3 rounded-[8px] font-medium"
-        >
-          اختر باقة
-        </button>
+      <div className="max-w-3xl mx-auto space-y-6" dir="rtl">
+        <h1 className="text-2xl font-bold text-[#0F3460]">اختر باقتك</h1>
+        <p className="text-gray-500">ابدأ تجربتك المجانية الآن — لا بطاقة ائتمان مطلوبة</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {plans.filter(p => p.isPublic !== false).map((p) => (
+            <button
+              key={p.id}
+              onClick={() => handleChangePlan(p.id)}
+              disabled={loading}
+              className="text-right p-5 rounded-[12px] border-2 border-gray-100 hover:border-[#0F3460]/40 hover:shadow-md transition-all disabled:opacity-50"
+            >
+              <div className="font-bold text-[#0F3460] text-lg">{p.nameAr}</div>
+              <div className="price-number text-[#C9A84C] font-mono ltr text-2xl mt-1">
+                {Number(p.priceMonthly).toFixed(0)}{' '}
+                <span className="text-gray-400 text-sm font-sans">ريال/شهر</span>
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                {p.maxCars === null ? 'سيارات غير محدودة' : `حتى ${p.maxCars} سيارة`}
+              </div>
+              {p.trialDays && p.trialDays > 0 && (
+                <div className="text-xs text-green-600 mt-2 font-medium">
+                  {p.trialDays} يوم تجريبي مجاني
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     )
   }
