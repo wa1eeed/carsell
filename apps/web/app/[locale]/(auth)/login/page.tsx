@@ -29,7 +29,14 @@ export default function LoginPage() {
     if (res?.error) {
       setError(t('login') + ' — ' + tc('error'))
     } else {
-      router.push(`/${locale}/dashboard`)
+      // Fetch session to check role — PLATFORM_ADMIN goes to admin panel
+      const { getSession } = await import('next-auth/react')
+      const session = await getSession()
+      if (session?.user?.role === 'PLATFORM_ADMIN') {
+        router.push(`/${locale}/admin`)
+      } else {
+        router.push(`/${locale}/dashboard`)
+      }
     }
   }
 
