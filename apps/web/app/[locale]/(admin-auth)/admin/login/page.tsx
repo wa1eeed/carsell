@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { Shield } from 'lucide-react'
 
-export const metadata = undefined // client component
-
 export default function AdminLoginPage() {
   const locale = useLocale()
   const router = useRouter()
