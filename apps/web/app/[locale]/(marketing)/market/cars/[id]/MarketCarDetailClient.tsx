@@ -116,7 +116,7 @@ export default function MarketCarDetailClient({ car, locale }: Props) {
     { label: t('spec.engineSize'),   value: car.engineSize },
     { label: t('spec.condition'),    value: t(`carType.${car.carType}`) },
     { label: t('spec.city'),         value: car.showroom.city },
-  ].filter((s): s is { label: string; value: string | number; mono?: boolean } => s.value !== null && s.value !== undefined && s.value !== '')
+  ].filter((s) => s.value !== null && s.value !== undefined && s.value !== '')
 
   return (
     <div className="min-h-screen bg-[#F4F6F9]" dir={locale === 'ar' ? 'rtl' : 'ltr'}>

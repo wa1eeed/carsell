@@ -5,6 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 
 export interface MarketFilters {
   brandId?:      string
@@ -30,10 +31,8 @@ export async function listMarketCars(filters: MarketFilters = {}) {
   const pageSize = Math.min(48, filters.pageSize ?? 24)  // cap at 48 per page
   const skip     = (page - 1) * pageSize
 
-  // Prisma where clause — typed as explicit object to avoid `any`
-  type WhereClause = Parameters<typeof prisma.car.findMany>[0]['where']
-
-  const where: WhereClause = {
+  // Prisma where clause — typed via the generated Prisma namespace (no `any`)
+  const where: Prisma.CarWhereInput = {
     deletedAt: null,
     status:    { in: ['FOR_SALE', 'AUCTION'] },
     ...(filters.brandId    ? { brandId:    filters.brandId    } : {}),
