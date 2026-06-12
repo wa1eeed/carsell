@@ -12,9 +12,11 @@ interface Props {
   completedSteps: string[]
   nafathVerified: boolean
   kycStatus: string
+  initialPhone?: string
+  initialCity?: string
 }
 
-export function OnboardingFlow({ accountType, completedSteps, nafathVerified, kycStatus }: Props) {
+export function OnboardingFlow({ accountType, completedSteps, nafathVerified, kycStatus, initialPhone = '', initialCity = '' }: Props) {
   const t = useTranslations('auth.onboarding')
   const tc = useTranslations('common')
   const locale = useLocale()
@@ -104,6 +106,8 @@ export function OnboardingFlow({ accountType, completedSteps, nafathVerified, ky
         {current === 'personalInfo' && (
           <PersonalInfoStep
             saving={saving}
+            initialPhone={initialPhone}
+            initialCity={initialCity}
             onSubmit={async (data) => {
               if (await submitStep('personal-info', data, 'personalInfo')) advance('personalInfo')
             }}
@@ -161,17 +165,21 @@ function StepItem({ label, active, complete }: { label: string; active: boolean;
 
 function PersonalInfoStep({
   saving,
+  initialPhone = '',
+  initialCity = '',
   onSubmit,
   onSkip,
 }: {
   saving: boolean
+  initialPhone?: string
+  initialCity?: string
   onSubmit: (data: { phone: string; city: string; email?: string; dateOfBirth?: string }) => void
   onSkip: () => void
 }) {
   const t = useTranslations('auth')
   const tc = useTranslations('common')
-  const [phone, setPhone] = useState('')
-  const [city, setCity] = useState('')
+  const [phone, setPhone] = useState(initialPhone)
+  const [city, setCity] = useState(initialCity)
 
   return (
     <form
@@ -184,11 +192,19 @@ function PersonalInfoStep({
       <h3 className="text-lg font-semibold">{t('onboarding.personalInfo')}</h3>
       <div>
         <label className="cl-label">{t('phone')}</label>
-        <input className="cl-input phone-number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+        <input
+          className="cl-input phone-number ltr"
+          dir="ltr"
+          inputMode="tel"
+          placeholder="05XXXXXXXX"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
       </div>
       <div>
         <label className="cl-label">المدينة</label>
-        <input className="cl-input" value={city} onChange={(e) => setCity(e.target.value)} required />
+        <input className="cl-input" placeholder="الرياض" value={city} onChange={(e) => setCity(e.target.value)} required />
       </div>
       <div className="flex gap-3">
         <button type="button" className="btn-secondary justify-center" onClick={onSkip}>

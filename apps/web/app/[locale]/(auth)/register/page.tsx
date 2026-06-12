@@ -61,15 +61,24 @@ export default function RegisterPage() {
 
   async function loadPlans() {
     setPlansLoading(true)
-    const res  = await fetch('/api/v1/plans')
-    const data = await res.json() as { plans?: PlanWithFeatures[] }
-    setPlans(data.plans ?? [])
-    // auto-select featured plan if none preselected
-    if (!selectedPlanId && data.plans) {
-      const featured = data.plans.find((p) => p.isFeatured) ?? data.plans[0]
-      if (featured) setSelectedPlanId(featured.id)
+    setError('')
+    try {
+      const res  = await fetch('/api/v1/plans')
+      const data = await res.json() as { plans?: PlanWithFeatures[] }
+      const list = data.plans ?? []
+      setPlans(list)
+      // auto-select featured plan if none preselected (enables the trial button)
+      if (list.length > 0) {
+        const featured = list.find((p) => p.isFeatured) ?? list[0]
+        setSelectedPlanId((cur) => cur || featured.id)
+      } else {
+        setError('تعذّر تحميل الباقات — حاول لاحقاً أو تابع بـ «سأختار لاحقاً»')
+      }
+    } catch {
+      setError('تعذّر تحميل الباقات — تحقق من اتصالك')
+    } finally {
+      setPlansLoading(false)
     }
-    setPlansLoading(false)
   }
 
   function goToStep2() {

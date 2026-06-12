@@ -23,6 +23,8 @@ export default async function OnboardingPage({
       completedSteps={user.completedSteps}
       nafathVerified={user.nafathVerified}
       kycStatus={user.kycStatus}
+      initialPhone={user.phone ?? ''}
+      initialCity={user.city ?? ''}
     />
   )
 }
