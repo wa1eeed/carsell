@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronRight,
   Layers,
+  BookOpen,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -22,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin',           label: 'نظرة عامة',        icon: LayoutDashboard },
   { href: '/admin/showrooms', label: 'المعارض',           icon: Building2       },
   { href: '/admin/plans',     label: 'الباقات',           icon: Layers          },
+  { href: '/admin/catalog',   label: 'كتالوج السيارات',   icon: BookOpen        },
   { href: '/admin/payments',  label: 'المدفوعات',         icon: CreditCard      },
   { href: '/admin/kyc',       label: 'طلبات التحقق KYC',  icon: ShieldCheck     },
   { href: '/admin/settings',  label: 'إعدادات المنصة',   icon: Settings        },
