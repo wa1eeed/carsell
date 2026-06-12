@@ -125,9 +125,10 @@ async function main() {
 
   // ── Demo data (dev/staging only) ──
   const showroom = await prisma.showroom.upsert({
-    where: { slug: 'al-fahad' }, update: {},
+    where: { slug: 'al-fahad' },
+    update: { name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي' },
     create: {
-      slug: 'al-fahad', name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي', showroomNumber: 1001,
+      slug: 'al-fahad', name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي',
       city: 'الرياض', tagline: 'أفضل السيارات بأفضل الأسعار', whatsapp: '0501234567', phone: '0112345678',
       showPrices: true, profitMarginApproved: true, marketplaceEnabled: true, commissionPct: 2.5,
     },
