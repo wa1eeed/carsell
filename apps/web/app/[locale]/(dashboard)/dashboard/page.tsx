@@ -10,7 +10,7 @@ import { ActivityFeed } from '@/components/features/dashboard/ActivityFeed'
 import { PublicLinksPanel } from '@/components/features/dashboard/PublicLinksPanel'
 import { prisma } from '@/lib/prisma'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const t = await getTranslations('dashboard')
   const user = await requirePageUser()
   const [data, showroom] = await Promise.all([
@@ -43,6 +43,7 @@ export default async function DashboardPage() {
           <PublicLinksPanel
             showroomSlug={showroom?.slug ?? null}
             showroomName={showroom?.name ?? ''}
+            locale={params.locale}
           />
           <AlertsSection alerts={data.alerts} />
         </div>

@@ -16,9 +16,13 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
   const t = useTranslations('publicLinks')
 
   // Always point to the root domain — NOT the current origin (app.carsell.one)
+  // __platform__ is the internal admin showroom — has no public page
+  const realSlug          = showroomSlug && showroomSlug !== '__platform__' ? showroomSlug : null
   const rootOrigin        = `https://${ROOT_DOMAIN}`
-  const showroomDirectUrl = showroomSlug ? `${rootOrigin}/${showroomSlug}` : null
-  const marketUrl         = `${rootOrigin}/market`
+  // Include locale prefix so the showroom page opens in the correct language
+  const localePrefix      = locale && locale !== 'ar' ? `/${locale}` : ''
+  const showroomDirectUrl = realSlug ? `${rootOrigin}${localePrefix}/${realSlug}` : null
+  const marketUrl         = `${rootOrigin}${localePrefix}/market`
 
   function copy(url: string, key: string) {
     navigator.clipboard.writeText(url).then(() => {
@@ -47,7 +51,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
             </div>
           </div>
 
-          {showroomSlug ? (
+          {realSlug ? (
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 bg-gray-50 rounded-[6px] px-2.5 py-1.5">
                 <span className="text-xs text-gray-500 flex-1 truncate ltr font-mono">
