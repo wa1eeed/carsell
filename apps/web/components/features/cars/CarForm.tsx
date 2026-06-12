@@ -25,6 +25,7 @@ export function CarForm() {
   const t = useTranslations('car')
   const tf = useTranslations('car.fields')
   const tc = useTranslations('common')
+  const ta = useTranslations('carForm')
   const locale = useLocale()
   const router = useRouter()
   const prefix = locale === 'ar' ? '' : '/en'
@@ -204,12 +205,12 @@ export function CarForm() {
         <button onClick={() => setMode('manual')} className="cl-card text-start">
           <FileText size={28} className="text-cl-primary mb-3" />
           <h3 className="font-semibold">{t('manualEntry')}</h3>
-          <p className="text-sm text-cl-gray-600 mt-1">تعبئة كل الحقول يدوياً</p>
+          <p className="text-sm text-cl-gray-600 mt-1">{ta('manualDesc')}</p>
         </button>
         <button onClick={() => setMode('vdm')} className="cl-card text-start">
           <Link2 size={28} className="text-cl-accent mb-3" />
           <h3 className="font-semibold">{t('pullFromAbsher')}</h3>
-          <p className="text-sm text-cl-gray-600 mt-1">رقم الهيكل أو رقم التسلسل ← جلب تلقائي</p>
+          <p className="text-sm text-cl-gray-600 mt-1">{ta('vdmDesc')}</p>
         </button>
       </div>
     )
@@ -232,7 +233,7 @@ export function CarForm() {
         </div>
         <div className="text-center text-xs text-cl-gray-400">{tc('or')}</div>
         <div>
-          <label className="cl-label">رقم التسلسل (أبشر)</label>
+          <label className="cl-label">{ta('sequenceNumber')}</label>
           <div className="flex gap-2">
             <input className="cl-input ltr" value={vdmSequenceNumber} onChange={(e) => setVdmSequenceNumber(e.target.value)} />
             <button className="btn-primary" disabled={!vdmSequenceNumber || saving} onClick={() => handleVdmLookup('sequence')}>
@@ -256,7 +257,7 @@ export function CarForm() {
       <div className="space-y-6">
         {ro && (
           <div className="flex items-center gap-2 rounded-input bg-cl-primary-light text-cl-primary text-sm p-3">
-            <ShieldCheck size={16} /> البيانات مسحوبة من أبشر — راجعها قبل الحفظ
+            <ShieldCheck size={16} /> {ta('vdmVerify')}
           </div>
         )}
         {error && <p className="text-sm text-cl-danger">{error}</p>}
@@ -329,7 +330,7 @@ export function CarForm() {
           <h3 className="font-semibold">{tf('price')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Field label={tf('purchasePrice')}><input className="cl-input price-number" inputMode="numeric" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value.replace(/\D/g, ''))} required /></Field>
-            <Field label="تكاليف إضافية"><input className="cl-input price-number" inputMode="numeric" value={extraCosts} onChange={(e) => setExtraCosts(e.target.value.replace(/\D/g, ''))} /></Field>
+            <Field label={ta('extraCosts')}><input className="cl-input price-number" inputMode="numeric" value={extraCosts} onChange={(e) => setExtraCosts(e.target.value.replace(/\D/g, ''))} /></Field>
             <Field label={tf('status')}>
               <select className="cl-input" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
                 <option value="DRAFT">{t('status.DRAFT')}</option>
@@ -364,10 +365,10 @@ export function CarForm() {
           <h3 className="font-semibold">{t('gallery')}</h3>
           <label className="flex items-center justify-center gap-2 rounded-input border border-dashed border-cl-gray-200 p-6 text-sm text-cl-gray-600 cursor-pointer">
             {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
-            رفع الصور (حتى 20)
+            {ta('uploadImages')}
             <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple hidden onChange={(e) => handleImageUpload(e.target.files)} />
           </label>
-          {imageKeys.length > 0 && <p className="text-xs text-cl-gray-600">{formatNumber(imageKeys.length, locale)} صورة</p>}
+          {imageKeys.length > 0 && <p className="text-xs text-cl-gray-600">{formatNumber(imageKeys.length, locale)} {ta('images')}</p>}
         </section>
       </div>
 
@@ -376,18 +377,18 @@ export function CarForm() {
         <div className="cl-card sticky top-6 space-y-3">
           <h3 className="font-semibold text-sm">{t('financial')}</h3>
           <Row label={tf('purchasePrice')} value={formatNumber(Number(purchasePrice) || 0, locale)} />
-          <Row label="+ تكاليف إضافية" value={formatNumber(Number(extraCosts) || 0, locale)} />
-          <Row label="= إجمالي التكلفة" value={formatNumber(pricing.totalCost, locale)} bold />
+          <Row label={ta('plusExtraCosts')} value={formatNumber(Number(extraCosts) || 0, locale)} />
+          <Row label={ta('totalCost')} value={formatNumber(pricing.totalCost, locale)} bold />
           <Row label={tf('sellPrice')} value={formatNumber(Number(sellPrice) || 0, locale)} />
           <Row label="- VAT" value={formatNumber(pricing.vatAmount, locale)} />
           <hr className="border-cl-gray-100" />
           <div className="flex items-center justify-between">
-            <span className="text-sm">= صافي الربح</span>
+            <span className="text-sm">{ta('netProfit')}</span>
             <span className={`price-number font-semibold ${pricing.netProfit >= 0 ? 'text-cl-success' : 'text-cl-danger'}`}>
               {formatNumber(pricing.netProfit, locale)}
             </span>
           </div>
-          <Row label="نسبة الربح" value={`${formatNumber(pricing.marginPct, locale)}%`} />
+          <Row label={ta('marginPct')} value={`${formatNumber(pricing.marginPct, locale)}%`} />
 
           <button type="submit" className="btn-primary w-full justify-center mt-2" disabled={saving}>
             {saving ? <Loader2 size={16} className="animate-spin" /> : tc('save')}

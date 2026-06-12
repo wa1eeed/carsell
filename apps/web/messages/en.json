@@ -4,6 +4,7 @@
     "inventory": "Inventory",
     "sales": "Sales",
     "market": "Market",
+    "requests": "Requests",
     "auctions": "Auctions",
     "customers": "Customers",
     "reports": "Reports",
@@ -286,6 +287,39 @@
       "EXPIRED": "Expired",
       "SUSPENDED": "Suspended"
     }
+  },
+  "carForm": {
+    "manualDesc": "Fill all fields manually",
+    "vdmDesc": "VIN or sequence number ← auto-fetch",
+    "sequenceNumber": "Sequence Number (Absher)",
+    "vdmVerify": "Data pulled from Absher — review before saving",
+    "extraCosts": "Extra Costs",
+    "uploadImages": "Upload Images (up to 20)",
+    "images": "images",
+    "plusExtraCosts": "+ Extra Costs",
+    "totalCost": "= Total Cost",
+    "netProfit": "= Net Profit",
+    "marginPct": "Profit Margin"
+  },
+  "adminDashboard": {
+    "title": "Platform Overview",
+    "subtitle": "CarSell real-time statistics",
+    "totalShowrooms": "Total Showrooms",
+    "activeSubscriptions": "Active Subscriptions",
+    "trialSubscriptions": "In Trial Period",
+    "pastDue": "Past Due Payments",
+    "totalCars": "Total Cars",
+    "totalSales": "Total Sales",
+    "pendingKyc": "KYC Pending Review",
+    "alerts": "Alerts Needing Action",
+    "pastDueAlert": "{n} showroom has a past due payment",
+    "kycAlert": "{n} identity verification request awaiting review",
+    "view": "View ←",
+    "review": "Review ←",
+    "platformStatus": "Platform Status",
+    "conversionRate": "Subscription Conversion Rate",
+    "avgCarsPerShowroom": "Avg Cars / Showroom",
+    "salesRate": "Sales Completion Rate"
   },
   "planGate": {
     "inlineLocked": "{feature} is not available in your current plan",

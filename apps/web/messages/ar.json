@@ -288,6 +288,39 @@
       "SUSPENDED": "موقوف"
     }
   },
+  "carForm": {
+    "manualDesc": "تعبئة كل الحقول يدوياً",
+    "vdmDesc": "رقم الهيكل أو رقم التسلسل ← جلب تلقائي",
+    "sequenceNumber": "رقم التسلسل (أبشر)",
+    "vdmVerify": "البيانات مسحوبة من أبشر — راجعها قبل الحفظ",
+    "extraCosts": "تكاليف إضافية",
+    "uploadImages": "رفع الصور (حتى 20)",
+    "images": "صورة",
+    "plusExtraCosts": "+ تكاليف إضافية",
+    "totalCost": "= إجمالي التكلفة",
+    "netProfit": "= صافي الربح",
+    "marginPct": "نسبة الربح"
+  },
+  "adminDashboard": {
+    "title": "نظرة عامة على المنصة",
+    "subtitle": "إحصائيات CarSell في الوقت الفعلي",
+    "totalShowrooms": "إجمالي المعارض",
+    "activeSubscriptions": "اشتراكات نشطة",
+    "trialSubscriptions": "في فترة التجربة",
+    "pastDue": "دفعات متأخرة",
+    "totalCars": "إجمالي السيارات",
+    "totalSales": "إجمالي المبيعات",
+    "pendingKyc": "KYC قيد المراجعة",
+    "alerts": "تنبيهات تحتاج تدخل",
+    "pastDueAlert": "{n} معرض لديه دفعة متأخرة",
+    "kycAlert": "{n} طلب تحقق هوية بانتظار المراجعة",
+    "view": "عرض ←",
+    "review": "مراجعة ←",
+    "platformStatus": "حالة المنصة",
+    "conversionRate": "معدل التحويل للاشتراك",
+    "avgCarsPerShowroom": "متوسط السيارات / معرض",
+    "salesRate": "معدل إتمام المبيعات"
+  },
   "planGate": {
     "inlineLocked": "{feature} غير متاحة في باقتك الحالية",
     "upgrade": "ترقية",
