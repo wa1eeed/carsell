@@ -337,5 +337,15 @@
       "CUSTOM_SHOWROOM": "Custom Showroom Page",
       "TEAM_MEMBERS": "Extra Team Members"
     }
+  },
+  "publicLinks": {
+    "title": "Your Public Pages",
+    "showroomPage": "Showroom Page",
+    "showroomDesc": "Public catalog of your cars only",
+    "marketDesc": "Public market — all cars from all showrooms",
+    "copyLink": "Copy link",
+    "openPage": "Open page",
+    "noSlug": "Add a slug in settings to activate your custom link",
+    "hint": "When publishing a car, choose where to show it: your showroom page only, CarSell Live, or both."
   }
 }

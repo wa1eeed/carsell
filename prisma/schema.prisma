@@ -145,6 +145,7 @@ model Showroom {
   customers           Customer[]
   paymentTransactions PaymentTransaction[]
   subscription        Subscription?
+  carRequests         CarRequest[]
 
   @@map("showrooms")
 }
@@ -258,6 +259,7 @@ model Car {
   expenses  CarExpense[]
   timeline  CarTimeline[]
   sale      Sale?
+  requests  CarRequest[]
 
   @@map("cars")
 }
@@ -892,3 +894,41 @@ model PlatformSetting {
 
   @@map("platform_settings")
 }
+
+// ─── Car Requests (buyer → dealer) ───────────
+
+enum CarRequestType {
+  RESERVATION   // حجز
+  SOUM_OFFER    // عرض سعر (سوم)
+  PURCHASE      // طلب شراء مباشر
+}
+
+enum CarRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model CarRequest {
+  id          String           @id @default(uuid())
+  carId       String
+  showroomId  String
+  type        CarRequestType
+  status      CarRequestStatus @default(PENDING)
+  buyerName   String
+  buyerPhone  String
+  offerAmount Decimal?         @db.Decimal(10, 2)
+  message     String?
+  dealerNote  String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  car       Car      @relation(fields: [carId], references: [id])
+  showroom  Showroom @relation(fields: [showroomId], references: [id])
+
+  @@index([showroomId, status])
+  @@index([carId])
+  @@map("car_requests")
+}
+

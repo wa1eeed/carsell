@@ -1,15 +1,9 @@
 'use client'
 
-/**
- * PublicLinksPanel — shown on the dashboard homepage.
- * Gives the dealer quick access to their two public-facing URLs:
- *   1. Their own showroom landing page
- *   2. CarSell Live (platform-wide public marketplace)
- */
-
 import { ExternalLink, Store, Globe, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
 import { useOrigin } from '@/lib/hooks/use-origin'
+import { useTranslations } from 'next-intl'
 
 interface Props {
   showroomSlug:   string | null
@@ -19,11 +13,12 @@ interface Props {
 
 export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: Props) {
   const [copied, setCopied] = useState<string | null>(null)
+  const t = useTranslations('publicLinks')
 
   // Showroom public URL — pretty root-level path: carsell.one/{slug}
   const origin = useOrigin()
-  const showroomDirectUrl    = showroomSlug ? `${origin}/${showroomSlug}` : null
-  const marketUrl            = `${origin}/${locale}/market`
+  const showroomDirectUrl = showroomSlug ? `${origin}/${showroomSlug}` : null
+  const marketUrl         = `${origin}/market`
 
   function copy(url: string, key: string) {
     navigator.clipboard.writeText(url).then(() => {
@@ -36,7 +31,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
     <div className="bg-white rounded-[12px] border border-gray-100 p-5" dir="rtl">
       <h2 className="font-bold text-[#0F3460] mb-4 flex items-center gap-2">
         <Globe size={16} />
-        صفحاتك العامة
+        {t('title')}
       </h2>
 
       <div className="space-y-3">
@@ -47,14 +42,13 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
               <Store size={14} className="text-[#0F3460]" />
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-800">صفحة معرضك</div>
-              <div className="text-xs text-gray-400">كتالوج عام لسياراتك فقط</div>
+              <div className="text-sm font-medium text-gray-800">{t('showroomPage')}</div>
+              <div className="text-xs text-gray-400">{t('showroomDesc')}</div>
             </div>
           </div>
 
           {showroomSlug ? (
             <div className="space-y-1.5">
-              {/* Direct URL — carsell.one/{slug} */}
               <div className="flex items-center gap-2 bg-gray-50 rounded-[6px] px-2.5 py-1.5">
                 <span className="text-xs text-gray-500 flex-1 truncate ltr font-mono">
                   carsell.one/{showroomSlug}
@@ -63,7 +57,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
                   <button
                     onClick={() => copy(showroomDirectUrl!, 'direct')}
                     className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                    title="نسخ الرابط"
+                    title={t('copyLink')}
                   >
                     {copied === 'direct' ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
                   </button>
@@ -72,7 +66,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-[#0F3460]"
-                    title="فتح الصفحة"
+                    title={t('openPage')}
                   >
                     <ExternalLink size={12} />
                   </a>
@@ -81,7 +75,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
             </div>
           ) : (
             <div className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1.5 rounded-[6px]">
-              أضف slug للمعرض من الإعدادات لتفعيل الرابط المخصص
+              {t('noSlug')}
             </div>
           )}
         </div>
@@ -94,7 +88,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
             </div>
             <div>
               <div className="text-sm font-medium text-gray-800">CarSell Live</div>
-              <div className="text-xs text-gray-400">سوق عام — كل السيارات من كل المعارض</div>
+              <div className="text-xs text-gray-400">{t('marketDesc')}</div>
             </div>
           </div>
           <div className="flex items-center gap-2 bg-[#C9A84C]/5 rounded-[6px] px-2.5 py-1.5">
@@ -122,7 +116,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
       </div>
 
       <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-        💡 عند نشر سيارة، اختر أين تريد عرضها: صفحة معرضك فقط أو CarSell Live أو كليهما.
+        {t('hint')}
       </p>
     </div>
   )
