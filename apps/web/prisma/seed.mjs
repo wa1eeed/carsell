@@ -111,7 +111,7 @@ async function main() {
         fuels: ['PETROL'], trans: ['AUTOMATIC'],
         models: ['LE', 'SE', 'Platinum', 'NISMO'] },
       { ar: 'التيما', en: 'Altima', body: 'SEDAN',
-        fuels: ['PETROL'], trans: ['AUTOMATIC', 'CVT'],
+        fuels: ['PETROL'], trans: ['AUTOMATIC'],
         models: ['S', 'SV', 'SL', 'SR'] },
     ]},
     { ar: 'BMW', en: 'BMW', cats: [
@@ -199,17 +199,32 @@ async function main() {
   }
 
   // ── Demo Showroom ──
-  const showroom = await prisma.showroom.upsert({
-    where: { slug: 'al-fahad' },
-    update: { name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي' },
-    create: {
-      slug: 'al-fahad', name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي',
-      city: 'الرياض', tagline: 'أفضل السيارات بأفضل الأسعار',
-      whatsapp: '0501234567', phone: '0112345678',
-      showPrices: true, profitMarginApproved: true,
-      marketplaceEnabled: true, commissionPct: 2.5,
-    },
-  })
+  // If DEMO_SHOWROOM_ID is set, seed into that existing showroom.
+  // Otherwise create/upsert the default demo showroom.
+  let showroom
+  const demoShowroomId = process.env.DEMO_SHOWROOM_ID
+  if (demoShowroomId) {
+    showroom = await prisma.showroom.findUnique({ where: { id: demoShowroomId } })
+    if (!showroom) throw new Error(`DEMO_SHOWROOM_ID "${demoShowroomId}" not found in DB`)
+    // Enable marketplace on this showroom
+    await prisma.showroom.update({
+      where: { id: demoShowroomId },
+      data: { marketplaceEnabled: true, showPrices: true, profitMarginApproved: true, commissionPct: 2.5 },
+    })
+    console.log(`  Using existing showroom: ${showroom.name} (${showroom.slug})`)
+  } else {
+    showroom = await prisma.showroom.upsert({
+      where: { slug: 'al-fahad' },
+      update: { name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي' },
+      create: {
+        slug: 'al-fahad', name: 'معرض الفهد للسيارات', ownerName: 'فهد العتيبي',
+        city: 'الرياض', tagline: 'أفضل السيارات بأفضل الأسعار',
+        whatsapp: '0501234567', phone: '0112345678',
+        showPrices: true, profitMarginApproved: true,
+        marketplaceEnabled: true, commissionPct: 2.5,
+      },
+    })
+  }
 
   if (planMap['growth']) {
     await prisma.subscription.upsert({
@@ -222,16 +237,26 @@ async function main() {
     })
   }
 
-  const password = await bcrypt.hash('password123', 12)
-  const user = await prisma.showroomUser.upsert({
-    where: { email: 'demo@carsell.one' }, update: {},
-    create: {
-      showroomId: showroom.id, name: 'فهد العتيبي', email: 'demo@carsell.one', password,
-      phone: '0501234567', role: 'SHOWROOM_OWNER', accountType: 'SHOWROOM', isActive: true,
-      completedSteps: ['personalInfo', 'identity', 'showroomInfo'], nationalId: '1012345678',
-      idType: 'CITIZEN', nafathVerified: true, nafathVerifiedAt: new Date(), kycStatus: 'APPROVED', city: 'الرياض',
-    },
+  // Use the first owner of the target showroom, or create a demo user
+  let user = await prisma.showroomUser.findFirst({
+    where: { showroomId: showroom.id, role: { in: ['SHOWROOM_OWNER', 'SHOWROOM_MANAGER'] } },
+    orderBy: { createdAt: 'asc' },
   })
+  if (!user) {
+    const password = await bcrypt.hash('password123', 12)
+    user = await prisma.showroomUser.upsert({
+      where: { email: 'demo@carsell.one' }, update: {},
+      create: {
+        showroomId: showroom.id, name: 'فهد العتيبي', email: 'demo@carsell.one', password,
+        phone: '0501234567', role: 'SHOWROOM_OWNER', accountType: 'SHOWROOM', isActive: true,
+        completedSteps: ['personalInfo', 'identity', 'showroomInfo'], nationalId: '1012345678',
+        idType: 'CITIZEN', nafathVerified: true, nafathVerifiedAt: new Date(), kycStatus: 'APPROVED', city: 'الرياض',
+      },
+    })
+    console.log(`  Created demo user: demo@carsell.one / password123`)
+  } else {
+    console.log(`  Using existing user: ${user.email}`)
+  }
 
   // ── Clear old demo cars ──
   await prisma.carRequest.deleteMany({ where: { showroomId: showroom.id } })
