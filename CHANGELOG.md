@@ -5,6 +5,61 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [0.7.0] — 2026-06-11 · Deployment + Requests + i18n start
+
+### Added
+- **Car Requests feature** — buyer submits reservation / SOUM offer / purchase
+  request on a car. Dealer inbox at `/requests` with tabs (pending/accepted/
+  completed/rejected), accept/reject, buyer contact. **Fully bilingual** ✅
+- **International phone input** — country dial-code dropdown (50+ countries,
+  Gulf/Arab first, default SA) + national number field → emits E.164
+- **Super Admin from env** — created/updated by seed when SUPER_ADMIN_EMAIL +
+  SUPER_ADMIN_PASSWORD are set (production-safe, no hardcoded credentials)
+- **Reserved slugs guard** + reserved-word handling at slug update
+- **CarSell Live link in header** — opens public marketplace in new tab
+  (moved out of dashboard sidebar)
+- **i18n started** for feature components (SubscriptionBanner, PlanGate)
+- **Docker deployment**:
+  - Root-level Dockerfile (Coolify auto-detects)
+  - Auto-migrations on startup via entrypoint
+  - **Plain JS seed** (`prisma/seed.mjs`) — runs with `node`, no tsx/compile
+  - Optional `SEED_ON_START=true` for fully automated seed at deploy
+  - Healthcheck uses IPv4 (`127.0.0.1`) with 90s start period
+  - Build resilient to `NODE_ENV=production` injection (forces devDependencies)
+- **Robustness First** principle enshrined in `CLAUDE.md` (governing rule)
+- **Database performance indexes** on hot query paths (cars, sales, customers,
+  car_images, car_timeline, car_documents) — 11 indexes total
+- **DB schema**: `CarRequest` model + status/type enums + indexes
+
+### Changed
+- **Rebrand**: CarLink → CarSell · `carlink.sa → carsell.one` (68 files)
+- **Phone validation**: legacy Saudi-only regex → robust E.164 (`+966...`)
+- **Onboarding**: pre-fills phone+city from user record (no re-entry)
+- **Settings**: removed subdomain display (`{slug}.carsell.one`) — keep
+  `carsell.one/{slug}` only
+- **Sidebar**: replaced `/market` with `/requests` (Inbox icon)
+- **Market detail "view showroom" link** → `/{slug}` (was `/showroom`)
+- **HTTP status codes**: reserved slug → 400, taken → 409 (were 500)
+- **API error messages**: friendly first issue text instead of raw Zod JSON
+
+### Fixed
+- **Hydration mismatch** from `window.location.origin` (added `useOrigin()` hook)
+- Plans page in register flow failing to load (try/catch + auto-select featured)
+- Dockerfile Coolify discovery (moved to repo root)
+- Healthcheck IPv6 vs IPv4 binding issue
+- Production seed module not found (compile vs plain JS approach)
+
+### Database Migrations
+- `20260611_performance_indexes` — 11 indexes on cars/sales/customers/...
+- `20260611_car_requests` — CarRequest model + indexes
+
+### Known Issue
+- **In-progress deployment**: Current container built from older Dockerfile
+  (without seed.cjs/mjs). Resolution requires redeploy in Coolify, then
+  `node prisma/seed.mjs` from the carsell app terminal.
+
+---
+
 ## [0.6.0] — 2026-06-11 · Complete Pages + Verification
 
 ### Added
