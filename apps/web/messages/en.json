@@ -246,5 +246,62 @@
       "SOUM_OFFER": "Price offer",
       "PURCHASE": "Purchase request"
     }
+  },
+  "billing": {
+    "banner": {
+      "noPlan": "You haven't chosen a plan yet — start your free trial now",
+      "choosePlan": "Choose a plan",
+      "pastDue": "Subscription payment overdue — renew now to avoid service interruption",
+      "payNow": "Pay now",
+      "cancelled": "Your subscription is cancelled — reactivate to access all features",
+      "expired": "Your subscription has expired — reactivate to access all features",
+      "reactivate": "Reactivate subscription",
+      "trialEnding": "Your free trial ends in {days} days — activate to keep your service",
+      "activateNow": "Activate now"
+    },
+    "page": {
+      "title": "Subscription & Billing",
+      "noSubscription": "No active subscription",
+      "choosePlan": "Choose a plan",
+      "perMonth": "month",
+      "perYear": "year",
+      "renewsOn": "Renews on",
+      "trialEndsOn": "Free trial ends on",
+      "trialEndsAt": "Trial ends at",
+      "payNow": "Pay now",
+      "redirecting": "Redirecting...",
+      "changePlan": "Change plan",
+      "chooseNewPlan": "Choose a new plan",
+      "currentPlan": "Current plan",
+      "unlimitedCars": "Unlimited cars",
+      "upToCars": "Up to {n} cars",
+      "cancel": "Cancel",
+      "riyalPerMonth": "SAR/month"
+    },
+    "status": {
+      "TRIAL": "Free trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "CANCELLED": "Cancelled",
+      "EXPIRED": "Expired",
+      "SUSPENDED": "Suspended"
+    }
+  },
+  "planGate": {
+    "inlineLocked": "{feature} is not available in your current plan",
+    "upgrade": "Upgrade",
+    "lockedTitle": "{feature} is not available",
+    "lockedBody": "This feature is not included in your current plan. Upgrade to a higher plan to access it.",
+    "upgradePlan": "Upgrade plan",
+    "back": "Back",
+    "features": {
+      "MARKET": "CarSell Live",
+      "AUCTIONS": "Auctions",
+      "API": "API Access",
+      "REPORTS_ADVANCED": "Advanced Reports",
+      "REPORTS_FULL": "Full Reports",
+      "CUSTOM_SHOWROOM": "Custom Showroom Page",
+      "TEAM_MEMBERS": "Extra Team Members"
+    }
   }
 }

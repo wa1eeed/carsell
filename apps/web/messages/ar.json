@@ -247,5 +247,62 @@
       "SOUM_OFFER": "عرض سعر",
       "PURCHASE": "طلب شراء"
     }
+  },
+  "billing": {
+    "banner": {
+      "noPlan": "لم تختر باقة بعد — ابدأ تجربتك المجانية الآن",
+      "choosePlan": "اختر باقة",
+      "pastDue": "دفعة الاشتراك متأخرة — جدّد الآن لتجنب تعطيل الخدمة",
+      "payNow": "ادفع الآن",
+      "cancelled": "اشتراكك ملغي — فعّله مجدداً للوصول إلى جميع الميزات",
+      "expired": "اشتراكك منتهي — فعّله مجدداً للوصول إلى جميع الميزات",
+      "reactivate": "تفعيل الاشتراك",
+      "trialEnding": "تنتهي تجربتك المجانية خلال {days} يوم — فعّل اشتراكك لاستمرار الخدمة",
+      "activateNow": "فعّل الآن"
+    },
+    "page": {
+      "title": "الاشتراك والفواتير",
+      "noSubscription": "لا يوجد اشتراك نشط",
+      "choosePlan": "اختر باقة",
+      "perMonth": "شهر",
+      "perYear": "سنة",
+      "renewsOn": "يتجدد في",
+      "trialEndsOn": "تنتهي التجربة المجانية في",
+      "trialEndsAt": "ينتهي وقت التجربة في",
+      "payNow": "ادفع الآن",
+      "redirecting": "جاري التحويل...",
+      "changePlan": "تغيير الباقة",
+      "chooseNewPlan": "اختر باقة جديدة",
+      "currentPlan": "الباقة الحالية",
+      "unlimitedCars": "سيارات غير محدودة",
+      "upToCars": "حتى {n} سيارة",
+      "cancel": "إلغاء",
+      "riyalPerMonth": "ريال/شهر"
+    },
+    "status": {
+      "TRIAL": "تجربة مجانية",
+      "ACTIVE": "نشط",
+      "PAST_DUE": "دفعة متأخرة",
+      "CANCELLED": "ملغي",
+      "EXPIRED": "منتهي",
+      "SUSPENDED": "موقوف"
+    }
+  },
+  "planGate": {
+    "inlineLocked": "{feature} غير متاحة في باقتك الحالية",
+    "upgrade": "ترقية",
+    "lockedTitle": "{feature} غير متاحة",
+    "lockedBody": "هذه الميزة غير مشمولة في باقتك الحالية. ترقّ إلى باقة أعلى للوصول إليها.",
+    "upgradePlan": "ترقية الباقة",
+    "back": "رجوع",
+    "features": {
+      "MARKET": "CarSell Live",
+      "AUCTIONS": "المزادات",
+      "API": "API Access",
+      "REPORTS_ADVANCED": "التقارير المتقدمة",
+      "REPORTS_FULL": "التقارير الكاملة",
+      "CUSTOM_SHOWROOM": "صفحة المعرض المخصصة",
+      "TEAM_MEMBERS": "أعضاء إضافيين"
+    }
   }
 }
