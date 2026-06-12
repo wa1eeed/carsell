@@ -24,6 +24,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY apps/web/ ./
 RUN npx prisma generate
 RUN npm run build
+# Pre-compile the TS seed to plain JS (runtime has no tsx). Run it in prod with:
+#   node prisma/seed.cjs
+RUN ./node_modules/.bin/tsc prisma/seed.ts \
+      --module commonjs --target es2020 --esModuleInterop \
+      --skipLibCheck --moduleResolution node --outDir /tmp/seedout \
+ && cp /tmp/seedout/seed.js prisma/seed.cjs
 
 # ── Runtime ───────────────────────────────────────────────────
 FROM base AS runner
@@ -41,6 +47,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/prisma  ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+# bcryptjs is used by the seed (super admin password) but isn't traced into
+# the standalone output — copy it explicitly (pure JS, no native deps).
+COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
 # Entrypoint runs migrations then starts the server
 COPY --chown=nextjs:nodejs apps/web/docker-entrypoint.sh ./docker-entrypoint.sh
