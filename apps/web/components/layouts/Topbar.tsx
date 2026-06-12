@@ -4,6 +4,7 @@ import { signOut } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import { LogOut, Menu, Store, ExternalLink } from 'lucide-react'
 import { LocaleSwitcher } from './LocaleSwitcher'
+import { ROOT_DOMAIN } from '@/lib/constants'
 
 export function Topbar({ showroomName, onMenuClick }: { showroomName: string; onMenuClick?: () => void }) {
   const t = useTranslations('nav')
@@ -41,7 +42,7 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
         <LocaleSwitcher />
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: locale === 'ar' ? '/login' : '/en/login' })}
+          onClick={() => signOut({ callbackUrl: `https://${ROOT_DOMAIN}${locale === 'ar' ? '/login' : '/en/login'}` })}
           className="flex items-center gap-1.5 rounded-input px-3 py-1.5 text-sm text-cl-gray-600 hover:bg-cl-gray-100"
         >
           <LogOut size={16} />
