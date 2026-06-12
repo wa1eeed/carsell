@@ -2,7 +2,7 @@
 
 import { signOut } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
-import { LogOut, Menu } from 'lucide-react'
+import { LogOut, Menu, Store, ExternalLink } from 'lucide-react'
 import { LocaleSwitcher } from './LocaleSwitcher'
 
 export function Topbar({ showroomName, onMenuClick }: { showroomName: string; onMenuClick?: () => void }) {
@@ -26,6 +26,18 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
       </div>
 
       <div className="flex items-center gap-2 md:gap-3">
+        {/* CarSell Live — opens the public marketplace in a new tab */}
+        <a
+          href={`/${locale}/market`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 rounded-input px-3 py-1.5 text-sm font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
+          title={t('market')}
+        >
+          <Store size={16} />
+          <span className="hidden sm:inline">{t('market')}</span>
+          <ExternalLink size={12} className="opacity-60" />
+        </a>
         <LocaleSwitcher />
         <button
           type="button"

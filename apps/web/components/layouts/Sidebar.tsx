@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import {
   LayoutDashboard,
-  Store,
+  Inbox,
   Gavel,
   Car,
   Users,
@@ -28,7 +28,7 @@ const SECTIONS: NavSection[] = [
     titleKey: 'sections.platform',
     items: [
       { href: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
-      { href: '/market',    labelKey: 'market',    icon: Store           },
+      { href: '/requests',  labelKey: 'requests',  icon: Inbox           },
       { href: '/auctions',  labelKey: 'auctions',  icon: Gavel           },
     ],
   },

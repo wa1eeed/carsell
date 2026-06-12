@@ -5,8 +5,10 @@ import Link from 'next/link'
 import {
   ChevronRight, ChevronLeft, Share2, MessageCircle, Phone,
   MapPin, Calendar, Gauge, Fuel, Settings2, Building2, ArrowRight,
+  CalendarClock, HandCoins, ShoppingCart,
 } from 'lucide-react'
 import { formatPrice } from '@/lib/format'
+import { CarRequestModal } from '@/components/features/market/CarRequestModal'
 
 type Car = {
   id: string
@@ -37,7 +39,9 @@ interface Props { car: Car; locale: string }
 
 export default function MarketCarDetailClient({ car, locale }: Props) {
   const [activeImg, setActiveImg] = useState(0)
+  const [reqType, setReqType] = useState<'RESERVATION' | 'SOUM_OFFER' | 'PURCHASE' | null>(null)
   const price = car.sellPrice ? Number(car.sellPrice) : null
+  const carTitle = `${car.brand.nameAr} ${car.category.nameAr} ${car.year}`
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
 
@@ -207,6 +211,31 @@ export default function MarketCarDetailClient({ car, locale }: Props) {
             </div>
           )}
 
+          {/* Request actions */}
+          <div className="bg-white rounded-[12px] border border-gray-100 p-5 space-y-2">
+            <p className="text-xs font-semibold text-gray-400 mb-1">أرسل طلبك للمعرض</p>
+            <button
+              onClick={() => setReqType('RESERVATION')}
+              className="flex items-center justify-center gap-2 bg-[#0F3460] text-white py-2.5 rounded-[8px] font-medium hover:bg-[#0d2d54] transition-colors w-full text-sm"
+            >
+              <CalendarClock size={16} /> احجز السيارة
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setReqType('SOUM_OFFER')}
+                className="flex-1 flex items-center justify-center gap-1.5 border border-[#C9A84C] text-[#C9A84C] py-2.5 rounded-[8px] font-medium hover:bg-[#C9A84C]/5 transition-colors text-sm"
+              >
+                <HandCoins size={15} /> قدّم عرض
+              </button>
+              <button
+                onClick={() => setReqType('PURCHASE')}
+                className="flex-1 flex items-center justify-center gap-1.5 border border-[#0F3460] text-[#0F3460] py-2.5 rounded-[8px] font-medium hover:bg-[#0F3460]/5 transition-colors text-sm"
+              >
+                <ShoppingCart size={15} /> اطلب شراء
+              </button>
+            </div>
+          </div>
+
           {/* CTA buttons */}
           <div className="bg-white rounded-[12px] border border-gray-100 p-5 space-y-3">
             <a
@@ -267,6 +296,16 @@ export default function MarketCarDetailClient({ car, locale }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Buyer request modal */}
+      {reqType && (
+        <CarRequestModal
+          carId={car.id}
+          carTitle={carTitle}
+          type={reqType}
+          onClose={() => setReqType(null)}
+        />
+      )}
     </div>
   )
 }

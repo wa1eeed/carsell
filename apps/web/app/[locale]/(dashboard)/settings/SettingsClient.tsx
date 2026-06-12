@@ -96,11 +96,11 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
 
       {error && <p className="text-xs text-red-500 mb-2 flex items-center gap-1"><AlertCircle size={12} /> {error}</p>}
 
-      {/* Two URL forms */}
+      {/* Public URL */}
       {slug && (
-        <div className="bg-gray-50 rounded-[8px] p-3 mb-4 space-y-1.5 text-xs">
+        <div className="bg-gray-50 rounded-[8px] p-3 mb-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 w-16">رابط مباشر:</span>
+            <span className="text-gray-400 w-16">رابط معرضك:</span>
             <span className="font-mono text-[#0F3460] ltr flex-1">{origin}/{slug}</span>
             <button onClick={() => { navigator.clipboard.writeText(`${origin}/${slug}`); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
               className="text-gray-400 hover:text-[#0F3460]">
@@ -109,10 +109,6 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
             <a href={`${origin}/${slug}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0F3460]">
               <ExternalLink size={12} />
             </a>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-400 w-16">نطاق فرعي:</span>
-            <span className="font-mono text-[#0F3460]/70 ltr flex-1">{slug}.{ROOT_DOMAIN}</span>
           </div>
         </div>
       )}

@@ -4,6 +4,7 @@
     "inventory": "المخزون",
     "sales": "المبيعات",
     "market": "السوق",
+    "requests": "الطلبات",
     "auctions": "المزادات",
     "customers": "العملاء",
     "reports": "التقارير",
@@ -225,5 +226,26 @@
     "h48": "48 ساعة",
     "h72": "72 ساعة",
     "week1": "أسبوع"
+  },
+  "requests": {
+    "title": "الطلبات",
+    "subtitle": "حجوزات، عروض الأسعار، وطلبات الشراء على سياراتك",
+    "empty": "لا توجد طلبات في هذه الحالة",
+    "offer": "العرض",
+    "listed": "السعر المعروض",
+    "accept": "قبول",
+    "reject": "رفض",
+    "markCompleted": "تم البيع",
+    "tabs": {
+      "pending": "بانتظار الرد",
+      "accepted": "مقبولة",
+      "completed": "مكتملة",
+      "rejected": "مرفوضة"
+    },
+    "type": {
+      "RESERVATION": "حجز",
+      "SOUM_OFFER": "عرض سعر",
+      "PURCHASE": "طلب شراء"
+    }
   }
 }

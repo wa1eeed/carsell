@@ -239,6 +239,7 @@ model Showroom {
   suppliers           Supplier[]
   serviceRequests     ServiceRequest[]
   subscription        Subscription?
+  carRequests         CarRequest[]
 
   @@map("showrooms")
 }
@@ -426,6 +427,7 @@ model Car {
   deposits        Deposit[]
   bids            Bid[]
   serviceRequests ServiceRequest[]
+  requests        CarRequest[]
 
   // Unique car number within its showroom
   @@unique([showroomId, carRefNumber])
@@ -799,6 +801,46 @@ model Bid {
   @@index([carId, amount])
   @@index([carId, createdAt])
   @@map("bids")
+}
+
+// ─── Car Requests (buyer → dealer) ────────────
+// Reservation / Soum offer / Purchase request submitted by a buyer on a car.
+
+enum CarRequestType {
+  RESERVATION   // حجز السيارة
+  SOUM_OFFER    // عرض سعر (مساومة)
+  PURCHASE      // طلب شراء
+}
+
+enum CarRequestStatus {
+  PENDING       // بانتظار رد المعرض
+  ACCEPTED      // مقبول
+  REJECTED      // مرفوض
+  CANCELLED     // ألغاه المشتري
+  COMPLETED     // اكتمل (تحوّل لبيع)
+}
+
+model CarRequest {
+  id          String           @id @default(uuid())
+  carId       String
+  showroomId  String           // denormalized for fast dealer-scoped queries
+  type        CarRequestType
+  status      CarRequestStatus @default(PENDING)
+  buyerName   String
+  buyerPhone  String
+  offerAmount Decimal?         @db.Decimal(12, 2)  // for SOUM_OFFER
+  message     String?
+  dealerNote  String?          // optional note when accepting/rejecting
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  car      Car      @relation(fields: [carId], references: [id])
+  showroom Showroom @relation(fields: [showroomId], references: [id])
+
+  // Dealer's requests inbox: scoped to showroom, filter by status, newest first
+  @@index([showroomId, status, createdAt])
+  @@index([carId])
+  @@map("car_requests")
 }
 
 // ─── Plans (dynamic, admin-managed) ──────────

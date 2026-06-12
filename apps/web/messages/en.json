@@ -225,5 +225,26 @@
     "h48": "48 Hours",
     "h72": "72 Hours",
     "week1": "1 Week"
+  },
+  "requests": {
+    "title": "Requests",
+    "subtitle": "Reservations, price offers, and purchase requests on your cars",
+    "empty": "No requests in this status",
+    "offer": "Offer",
+    "listed": "Listed price",
+    "accept": "Accept",
+    "reject": "Reject",
+    "markCompleted": "Mark sold",
+    "tabs": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "type": {
+      "RESERVATION": "Reservation",
+      "SOUM_OFFER": "Price offer",
+      "PURCHASE": "Purchase request"
+    }
   }
 }
