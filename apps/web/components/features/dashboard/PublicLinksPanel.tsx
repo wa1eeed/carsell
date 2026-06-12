@@ -2,7 +2,7 @@
 
 import { ExternalLink, Store, Globe, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
-import { useOrigin } from '@/lib/hooks/use-origin'
+import { ROOT_DOMAIN } from '@/lib/constants'
 import { useTranslations } from 'next-intl'
 
 interface Props {
@@ -15,10 +15,10 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
   const [copied, setCopied] = useState<string | null>(null)
   const t = useTranslations('publicLinks')
 
-  // Showroom public URL — pretty root-level path: carsell.one/{slug}
-  const origin = useOrigin()
-  const showroomDirectUrl = showroomSlug ? `${origin}/${showroomSlug}` : null
-  const marketUrl         = `${origin}/market`
+  // Always point to the root domain — NOT the current origin (app.carsell.one)
+  const rootOrigin        = `https://${ROOT_DOMAIN}`
+  const showroomDirectUrl = showroomSlug ? `${rootOrigin}/${showroomSlug}` : null
+  const marketUrl         = `${rootOrigin}/market`
 
   function copy(url: string, key: string) {
     navigator.clipboard.writeText(url).then(() => {

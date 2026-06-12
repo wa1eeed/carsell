@@ -166,10 +166,11 @@ export function middleware(req: NextRequest) {
   }
 
   // ── 2. Dashboard app subdomain — app.carsell.one ──────────────────────────
+  // Route groups like (dashboard) don't add a URL prefix in Next.js —
+  // routes are served at /{locale}/requests, /{locale}/cars, etc.
+  // No rewrite needed; auth is enforced at the layout level.
   if (hostname.startsWith('app.')) {
-    const url      = req.nextUrl.clone()
-    url.pathname   = `/dashboard${pathname}`
-    const res      = NextResponse.rewrite(url)
+    const res = NextResponse.next()
     applySecurityHeaders(res)
     return res
   }
