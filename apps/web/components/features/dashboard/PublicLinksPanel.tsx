@@ -23,7 +23,6 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
   // Showroom public URL — pretty root-level path: carsell.one/{slug}
   const origin = useOrigin()
   const showroomDirectUrl    = showroomSlug ? `${origin}/${showroomSlug}` : null
-  const showroomSubdomainUrl = showroomSlug ? `https://${showroomSlug}.carsell.one` : null
   const marketUrl            = `${origin}/${locale}/market`
 
   function copy(url: string, key: string) {
@@ -55,7 +54,7 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
 
           {showroomSlug ? (
             <div className="space-y-1.5">
-              {/* Direct URL (always works) */}
+              {/* Direct URL — carsell.one/{slug} */}
               <div className="flex items-center gap-2 bg-gray-50 rounded-[6px] px-2.5 py-1.5">
                 <span className="text-xs text-gray-500 flex-1 truncate ltr font-mono">
                   carsell.one/{showroomSlug}
@@ -77,25 +76,6 @@ export function PublicLinksPanel({ showroomSlug, showroomName, locale = 'ar' }: 
                   >
                     <ExternalLink size={12} />
                   </a>
-                </div>
-              </div>
-
-              {/* Subdomain (production) */}
-              <div className="flex items-center gap-2 bg-[#0F3460]/5 rounded-[6px] px-2.5 py-1.5">
-                <span className="text-xs text-[#0F3460]/70 flex-1 truncate ltr font-mono">
-                  {showroomSlug}.carsell.one
-                </span>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => copy(showroomSubdomainUrl!, 'subdomain')}
-                    className="p-1 hover:bg-[#0F3460]/10 rounded text-[#0F3460]/50 hover:text-[#0F3460]"
-                    title="نسخ الرابط"
-                  >
-                    {copied === 'subdomain' ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-                  </button>
-                  <span className="text-[9px] bg-[#0F3460]/10 text-[#0F3460]/60 px-1.5 py-0.5 rounded-full font-medium">
-                    PROD
-                  </span>
                 </div>
               </div>
             </div>

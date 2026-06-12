@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { Check, ShieldCheck, Upload, Clock } from 'lucide-react'
+import { PhoneInput } from '@/components/ui/PhoneInput'
 
 type StepKey = 'personalInfo' | 'identity' | 'showroomInfo'
 
@@ -192,15 +193,7 @@ function PersonalInfoStep({
       <h3 className="text-lg font-semibold">{t('onboarding.personalInfo')}</h3>
       <div>
         <label className="cl-label">{t('phone')}</label>
-        <input
-          className="cl-input phone-number ltr"
-          dir="ltr"
-          inputMode="tel"
-          placeholder="05XXXXXXXX"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-        />
+        <PhoneInput value={phone} onChange={setPhone} required />
       </div>
       <div>
         <label className="cl-label">المدينة</label>
@@ -398,7 +391,7 @@ function ShowroomInfoStep({
       </div>
       <div>
         <label className="cl-label">واتساب للتواصل</label>
-        <input className="cl-input phone-number" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} required />
+        <PhoneInput value={whatsapp} onChange={setWhatsapp} required />
       </div>
       <div>
         <label className="cl-label">صورة السجل التجاري</label>

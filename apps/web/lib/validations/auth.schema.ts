@@ -1,33 +1,23 @@
 import { z } from 'zod'
 
 /**
- * Saudi mobile number — robust validator.
- * Accepts (and normalizes to 05XXXXXXXX): 05XXXXXXXX, 5XXXXXXXX,
- * +9665XXXXXXXX, 009665XXXXXXXX, 9665XXXXXXXX — with or without spaces/dashes.
+ * International phone (E.164) — produced by the PhoneInput component as
+ * +<dialcode><national>. Light validation: leading +, 8–15 digits total.
+ * The PhoneInput already strips leading zeros and non-digits.
  */
-export function normalizeSaudiPhone(raw: string): string | null {
-  const digits = raw.replace(/[\s\-()]/g, '').replace(/^\+/, '').replace(/^00/, '')
-  // 9665XXXXXXXX  → 05XXXXXXXX
-  let local = digits
-  if (local.startsWith('966')) local = local.slice(3)
-  if (local.startsWith('5') && local.length === 9) local = '0' + local
-  // must now be 05 + 8 digits
-  return /^05\d{8}$/.test(local) ? local : null
-}
-
-const saudiPhone = z.string().transform((v, ctx) => {
-  const n = normalizeSaudiPhone(v)
-  if (!n) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'رقم جوال سعودي غير صحيح (مثال: 05XXXXXXXX)' })
+const intlPhone = z.string().transform((v, ctx) => {
+  const cleaned = v.replace(/[\s\-()]/g, '')
+  if (!/^\+\d{8,15}$/.test(cleaned)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'رقم جوال غير صحيح' })
     return z.NEVER
   }
-  return n
+  return cleaned
 })
 
 export const registerSchema = z.object({
   accountType:   z.enum(['INDIVIDUAL', 'SHOWROOM', 'AGENCY', 'COMPANY']),
   name:          z.string().min(2, 'الاسم مطلوب').max(200),
-  phone:         saudiPhone,
+  phone:         intlPhone,
   email:         z.string().email('بريد إلكتروني غير صحيح').optional().or(z.literal('')),
   password:      z.string().min(8, 'كلمة المرور 8 أحرف على الأقل').max(100),
   // Nafath pre-fill (readonly when present)
@@ -39,7 +29,7 @@ export const registerSchema = z.object({
 })
 
 export const personalInfoSchema = z.object({
-  phone:       saudiPhone,
+  phone:       intlPhone,
   city:        z.string().min(2, 'المدينة مطلوبة').max(100),
   email:       z.string().email('بريد إلكتروني غير صحيح').optional().or(z.literal('')),
   dateOfBirth: z.string().optional(),
@@ -59,7 +49,7 @@ export const showroomInfoSchema = z.object({
   district:         z.string().optional(),
   commercialReg:    z.string().min(1),
   vatNumber:        z.string().optional(),
-  whatsapp:         z.string().regex(/^(05|\+9665)\d{8}$/),
+  whatsapp:         intlPhone,
   instagramUrl:     z.string().url().optional(),
   logoUrl:          z.string().optional(),
   commercialRegDoc: z.string().min(1, 'صورة السجل التجاري مطلوبة'),

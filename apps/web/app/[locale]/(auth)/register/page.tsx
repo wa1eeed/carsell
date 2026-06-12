@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { Building2, User, Briefcase, Landmark, ShieldCheck, Check, Star } from 'lucide-react'
 import { NafathButton } from '@/components/features/auth/NafathButton'
+import { PhoneInput } from '@/components/ui/PhoneInput'
 import type { PlanWithFeatures } from '@/repositories/plan.repository'
 
 type AccountType = 'INDIVIDUAL' | 'SHOWROOM' | 'AGENCY' | 'COMPANY'
@@ -247,14 +248,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
-              <input
-                type="tel"
-                className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm phone-number ltr focus:outline-none focus:ring-1 focus:ring-[#0F3460]"
-                placeholder="05XXXXXXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
+              <PhoneInput value={phone} onChange={setPhone} required />
             </div>
 
             <div>

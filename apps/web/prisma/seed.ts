@@ -70,6 +70,39 @@ async function main() {
     console.log(`  Plan: ${p.nameAr} (${p.slug})`)
   }
 
+  // ── Super Admin (platform owner) ──────────────────────────────
+  // Created from env vars (production-safe — no hardcoded credentials).
+  // Set SUPER_ADMIN_EMAIL + SUPER_ADMIN_PASSWORD before running the seed.
+  const saEmail    = process.env.SUPER_ADMIN_EMAIL
+  const saPassword = process.env.SUPER_ADMIN_PASSWORD
+  if (saEmail && saPassword) {
+    // Super admin needs a showroom row (FK), but it's a platform-level container.
+    const adminShowroom = await prisma.showroom.upsert({
+      where:  { slug: '__platform__' },
+      update: {},
+      create: { slug: '__platform__', name: 'CarSell Platform', ownerName: 'Platform Admin' },
+    })
+    const hash = await bcrypt.hash(saPassword, 12)
+    await prisma.showroomUser.upsert({
+      where:  { email: saEmail },
+      update: { role: 'PLATFORM_ADMIN', password: hash, isActive: true },
+      create: {
+        showroomId: adminShowroom.id,
+        name: 'Platform Admin',
+        email: saEmail,
+        password: hash,
+        role: 'PLATFORM_ADMIN',
+        accountType: 'COMPANY',
+        isActive: true,
+        completedSteps: ['personalInfo', 'identity', 'showroomInfo'],
+        kycStatus: 'APPROVED',
+      },
+    })
+    console.log(`  ✓ Super Admin: ${saEmail}`)
+  } else {
+    console.log('  (skip Super Admin — set SUPER_ADMIN_EMAIL + SUPER_ADMIN_PASSWORD)')
+  }
+
   // ── Catalog: brands → categories → models ──
   const catalog: { ar: string; en: string; cats: { ar: string; en: string; body: 'SUV' | 'SEDAN' | 'PICKUP'; models: string[] }[] }[] = [
     {

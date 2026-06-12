@@ -257,7 +257,7 @@ export default function MarketCarDetailClient({ car, locale }: Props) {
 
             {car.showroom.slug && (
               <Link
-                href={`/${locale}/showroom`}
+                href={`/${locale}/${car.showroom.slug}`}
                 className="flex items-center justify-between text-sm text-[#0F3460] hover:text-[#C9A84C] transition-colors pt-3 border-t border-gray-50"
               >
                 <span>عرض جميع سيارات المعرض</span>
