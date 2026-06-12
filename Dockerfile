@@ -24,12 +24,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY apps/web/ ./
 RUN npx prisma generate
 RUN npm run build
-# Pre-compile the TS seed to plain JS (runtime has no tsx). Run it in prod with:
-#   node prisma/seed.cjs
-RUN ./node_modules/.bin/tsc prisma/seed.ts \
-      --module commonjs --target es2020 --esModuleInterop \
-      --skipLibCheck --moduleResolution node --outDir /tmp/seedout \
- && cp /tmp/seedout/seed.js prisma/seed.cjs
+# The seed is plain JS (prisma/seed.mjs) — runs with `node prisma/seed.mjs`,
+# no compile/tsx needed. It's already carried by the `COPY prisma` below.
 
 # ── Runtime ───────────────────────────────────────────────────
 FROM base AS runner
