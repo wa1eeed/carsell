@@ -4,18 +4,13 @@ import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 
-/**
- * Responsive dashboard shell:
- *  - lg+ : static Navy sidebar alongside content
- *  - < lg: sidebar hidden; hamburger in topbar opens it as a slide-in drawer
- */
 export function DashboardShell({ showroomName, children }: { showroomName: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-cl-gray-50">
-      {/* Desktop sidebar */}
-      <div className="hidden lg:block">
+    <div className="flex h-screen bg-cl-gray-50">
+      {/* Desktop sidebar — fixed height, scrolls internally */}
+      <div className="hidden lg:flex lg:shrink-0">
         <Sidebar />
       </div>
 
@@ -29,9 +24,12 @@ export function DashboardShell({ showroomName, children }: { showroomName: strin
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Right side — topbar + scrollable content */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <Topbar showroomName={showroomName} onMenuClick={() => setOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6">
+          {children}
+        </main>
       </div>
     </div>
   )
