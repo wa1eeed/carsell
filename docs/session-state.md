@@ -1,159 +1,160 @@
-# Session State — Design, i18n & UX Improvements
+# Session State — آخر حالة للمشروع
 
-**Date:** 2026-06-13  
+**آخر تحديث:** 2026-06-13  
 **Branch:** `main`  
 **Status:** ✅ كل التغييرات مرفوعة على GitHub `main`
 
 ---
 
-## ما تم إنجازه
+## ما تم إنجازه (الجلسات الأخيرة)
 
-### 1. i18n — استبدال النصوص العربية الثابتة
+### 1. مراحل طلبات العملاء (Car Request Pipeline)
 
-**ملفات الترجمة:**
-- `apps/web/messages/en.json` — namespaces: `salesPage`, `customersPage`, `reportsPage`, `auctionsPage`, `printSlip`, `adminShowrooms`, `adminPlans`, `adminKyc`, `adminPayments`, `inventoryPage`, `settingsPage`, `adminShell`
-- `apps/web/messages/ar.json` — نفس البنية بالعربية
+**Schema:**
+- تغيير `CarRequestStatus` enum: `PENDING → RESERVED → WAITING_PAYMENT → OWNERSHIP_TRANSFER → COMPLETED` (+ `REJECTED / CANCELLED`)
+- إضافة `customerId String?` على `CarRequest` مع FK للـ `Customer`
+- إضافة `auctionBidIncrement Decimal?` على `Car`
 
-**صفحات الداشبورد (server components):**
-- `(dashboard)/sales/page.tsx`
-- `(dashboard)/customers/page.tsx`
-- `(dashboard)/reports/page.tsx`
-- `(dashboard)/auctions/page.tsx`
-- `(dashboard)/inventory/page.tsx`
+**Migrations:**
+- `apps/web/prisma/migrations/20260613_request_stages_customer_link/migration.sql`
+- `apps/web/prisma/migrations/20260613_auction_bid_increment/migration.sql`
 
-**مكونات الداشبورد (client components):**
-- `(dashboard)/billing/BillingClient.tsx`
-- `(dashboard)/settings/SettingsClient.tsx`
-- `(dashboard)/inventory/[id]/print/PrintSlipClient.tsx`
-
-**مكونات الأدمن:**
-- `(admin)/admin/showrooms/AdminShowroomsClient.tsx`
-- `(admin)/admin/plans/AdminPlansClient.tsx`
-- `(admin)/admin/kyc/AdminKycClient.tsx`
-- `(admin)/admin/payments/page.tsx`
-- `components/admin/AdminShell.tsx` — قائمة جانبية بالكامل + `dir` ديناميكي
+**Logic:**
+- `repositories/request.repository.ts` — `updateStatus()` يُزامن حالة السيارة تلقائياً + ينشئ Customer عند RESERVED
+- `app/api/v1/requests/[id]/route.ts` — يقبل الحالات الجديدة
+- `app/[locale]/(dashboard)/requests/RequestsClient.tsx` — pipeline progress bar + أزرار ذكية حسب الحالة
 
 ---
 
-### 2. إصلاحات UX
+### 2. صفحة تفاصيل السيارة (Car Detail Overhaul)
 
-| المشكلة | الملف | الإصلاح |
-|---------|-------|---------|
-| تسجيل الخروج يوجّه لـ `app.carsell.one` | `Topbar.tsx`, `AdminShell.tsx` | `signOut({ callbackUrl: 'https://carsell.one/...' })` |
-| القائمة تمتد مع المحتوى | `DashboardShell.tsx`, `AdminShell.tsx` | `h-screen` + `min-h-0` + `overflow-y-auto` على `<main>` |
-| ماركت يظهر فارغاً عند بحث بدون نتائج | `MarketClient.tsx` | EmptyState يعرض نص البحث وزر "تصفّح جميع السيارات" |
-| `.claude` مجلد في GitHub | `.gitignore` | حُذف وأضيف للـ gitignore |
+**الملفات:**
+- `components/features/cars/CarDetail.tsx` — إعادة كتابة كاملة
 
----
-
-### 3. تصميم — shadcn/ui + Tailwind
-
-**مكونات جديدة:**
-- `components/ui/button.tsx` — Button مع variants (default, accent, outline, ghost, destructive)
-- `components/ui/badge.tsx` — Badge مع variants
-- `components/ui/card.tsx` — Card, CardHeader, CardContent, CardFooter
-- `components/ui/ToastProvider.tsx` — مضاف على root layout
-- `components/ui/ConfirmDialog.tsx` — popup تأكيد الحذف
-- `lib/utils.ts` — دالة `cn()`
-
-**حزم مثبّتة:**
-```
-@radix-ui/react-slot
-@radix-ui/react-dropdown-menu
-@radix-ui/react-dialog
-@radix-ui/react-avatar
-@radix-ui/react-separator
-class-variance-authority
-react-hot-toast
-```
-
-**مكونات معاد تصميمها:**
-- `Sidebar.tsx` — gradient navy، أيقونة CarSell ذهبية، نقطة نشطة، `h-screen sticky`
-- `Topbar.tsx` — initials المعرض، جرس إشعارات، رابط Market بإطار ذهبي
-- `KpiCard.tsx` — أيقونات ملونة، trend indicators، hover gradient
-- `ShowroomHeader.tsx` — hero كامل العرض، gradient overlay، شارة موثّق، WhatsApp أخضر
-- `PublicCarCard.tsx` — zoom عند hover، quick view arrow، تصميم أنظف
-- `MarketClient.tsx` — MarketCarCard بـ rounded-2xl وhover أقوى
+**ما تم:**
+- تبويبات: تفاصيل، مالي، مزايدات، عروض سوم، السجل، مستندات
+- Hero header مع صورة الغلاف + badge حالة النشر + رقم السيارة
+- **زر نشر/إيقاف ذكي**: يعرض "إيقاف الإعلان" عند النشر ويطلب تأكيد
+- **BidsTab**: قائمة مزايدات مرتبة مع إشارة الفائز وإحصائيات
+- **SaumTab**: سجل التفاوض مع إبراز العرض المقبول
+- **TimelineTab**: خط زمني عمودي مع أيقونات وتسميات بشرية مفهومة
+- **FinancialTab**: حساب الربح والتكاليف
 
 ---
 
-### 4. استخدام Toast و ConfirmDialog
+### 3. روابط السيارات بـ carRefNumber
 
-**Toast:**
-```tsx
-import toast from 'react-hot-toast'
+- `/inventory/10001` يعمل بجانب UUID
+- `/market/cars/10001` يعمل في صفحة السوق العام
+- كروت المخزون تعرض رقم مرجعي وترتبط بـ carRefNumber
+- print slip يعرض رقم السيارة كـ badge
 
-toast.success('تم الحفظ بنجاح')
-toast.error('حدث خطأ، يرجى المحاولة مجدداً')
+---
+
+### 4. نموذج النشر (PublishModal)
+
+- إضافة حقل "الحد الأدنى للمزايدة" (`bidIncrement`) لنموذج المزاد
+
+---
+
+### 5. Unpublish Endpoint
+
+- `app/api/v1/cars/[id]/unpublish/route.ts` — يُعيد السيارة لـ DRAFT مع تسجيل في السجل
+
+---
+
+### 6. بحث المخزون
+
+- `carFilterSchema` + `carRepository.findByShowroom` يدعمان `q`
+- البحث يعمل بـ: رقم السيارة (رقمي) → `carRefNumber`، نص → VIN، لوحة، اسم ماركة
+- `InventoryFilters.tsx` يعرض search box
+
+---
+
+### 7. Dashboard Improvements
+
+- **KPIs مع trend**: مقارنة شهر/شهر على المبيعات والإيراد (نسبة ↑↓)
+- **تنبيهات ذكية**:
+  - طلبات لم يُرد عليها منذ 24 ساعة
+  - صفقات نشطة قيد المتابعة (RESERVED/WAITING_PAYMENT/OWNERSHIP_TRANSFER)
+  - سيارات بدون صور (FOR_SALE/DRAFT)
+
+---
+
+### 8. Print Slip ثنائي اللغة
+
+- يتغير بين AR/EN حسب locale
+- يعرض `carRefNumber` كـ badge
+- كل العناصر الإنجليزية في العرض الإنجليزي
+
+---
+
+## هيكل الـ Migrations الحالية
+
 ```
-
-**ConfirmDialog:**
-```tsx
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-
-<ConfirmDialog
-  open={showConfirm}
-  title="حذف السيارة"
-  message="هل أنت متأكد؟ لا يمكن التراجع."
-  confirmLabel="حذف"
-  variant="danger"
-  onConfirm={handleDelete}
-  onCancel={() => setShowConfirm(false)}
-/>
+apps/web/prisma/migrations/
+├── 20260613_request_stages_customer_link/migration.sql
+└── 20260613_auction_bid_increment/migration.sql
 ```
 
----
-
-## المتبقي من المشروع
-
-### أولوية عالية ❗
-
-- [ ] **ربط toast بعمليات CRUD** في:
-  - `AdminShowroomsClient.tsx`
-  - `AdminPlansClient.tsx`
-  - `AdminKycClient.tsx`
-  - `inventory/` صفحات إضافة وتعديل السيارة
-  - `settings/SettingsClient.tsx`
-  - `billing/BillingClient.tsx`
-
-- [ ] **ConfirmDialog قبل كل حذف** في الصفحات أعلاه
-
-- [ ] **Pagination للأدمن:**
-  - `(admin)/admin/kyc/`
-  - `(admin)/admin/payments/`
-
-### أولوية متوسطة ⚡
-
-- [ ] اختبار RTL كامل للأدمن بالعربية
-- [ ] تحسين صفحة تفاصيل السيارة (market + showroom)
-- [ ] تحسين صفحة Pricing
-- [ ] صفحة 404 مخصصة
-
-### أولوية منخفضة 📌
-
-- [ ] Dark mode
-- [ ] Search في الداشبورد
-- [ ] Notifications system
-- [ ] Skeleton loading screens محسّنة
+> يجب تشغيل هذه الـ migrations على قاعدة بيانات Production بعد الـ deploy.
 
 ---
 
-## معلومات تقنية مهمة
+## أنماط تقنية مهمة
 
-- **GitHub token** — لتفعيله في كل جلسة: `git remote set-url origin https://<TOKEN>@github.com/wa1eeed/carsell.git`
-- **NEXTAUTH_URL** — يجب أن يكون `https://carsell.one` وليس `app.carsell.one`
-- **NODE_OPTIONS** في Dockerfile — `--max-old-space-size=2048`
+### Pre-migration Type Safety
+بعض الحقول الجديدة (مثل `auctionBidIncrement`, `carRequests` بالحالات الجديدة) تستخدم `as any` حتى يُشغَّل الـ migration ويُعاد توليد Prisma client:
+
+```typescript
+// مؤقت — يُزال بعد prisma generate
+(prisma.carRequest as any).count({ ... })
+(fullCar as any).auctionBidIncrement
+```
+
+### Dual-ID Lookup Pattern
+```typescript
+const isRef = /^\d+$/.test(params.id)
+const car = isRef
+  ? await carRepository.findByRef(Number(params.id), showroomId)
+  : await carRepository.findById(params.id, showroomId)
+```
+
+---
+
+## معلومات تقنية
+
+- **GitHub token** — لتفعيله في كل جلسة:
+  ```bash
+  git remote set-url origin https://<TOKEN>@github.com/wa1eeed/carsell.git
+  ```
+- **Type check بدون DB:**
+  ```bash
+  DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx tsc --noEmit -p apps/web/tsconfig.json
+  ```
+- **Prisma generate بدون DB:**
+  ```bash
+  DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma@5 generate
+  ```
 - **Deploy** — Coolify يسحب من branch `main`
+
+---
 
 ## آخر Commits
 
 ```
-bd4a463 fix: sidebar stays fixed height, main content scrolls correctly
-57d0f4d feat: ToastProvider + ConfirmDialog + sidebar h-screen fix
-ecc8bba fix: improve market empty state
-677011e revert: restore callbackUrl for sign-out
-5e61704 fix: sign-out redirects to carsell.one
-8de3648 feat: redesign showroom landing, market cards, public car cards
-5a99b14 feat: redesign dashboard UI — shadcn/ui base components
-2fada5b feat: i18n across dashboard and admin
+33b4e67 feat: search by carRefNumber/VIN/brand in inventory, market URLs by ref, KPI trends, no-image alert
+4913f4b feat: dashboard smart alerts — pending requests (24h+) and active deals count
+6fc83df feat: show carRefNumber badge on inventory cards and link via ref URL
+bbce310 feat: add bid increment field to auction publish modal
+6e22d33 feat: overhaul car detail page with timeline, bids, soum history, and smart publish toggle
 ```
+
+---
+
+## ما لم يُنجز (ما زال في القائمة)
+
+- Dark mode
+- Skeleton loading screens
+- صفحة 404 مخصصة
+- Notifications system حقيقي
