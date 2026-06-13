@@ -417,6 +417,7 @@ model Car {
   auctionOpeningPrice  Decimal?     @db.Decimal(12, 2)
   auctionBuyNowPrice   Decimal?     @db.Decimal(12, 2)
   auctionDepositAmount Decimal?     @db.Decimal(10, 2)
+  auctionBidIncrement  Decimal?     @db.Decimal(10, 2)  // minimum bid step
 
   createdBy     String
   deletedAt     DateTime?

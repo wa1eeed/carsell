@@ -29,7 +29,12 @@ export default async function PrintSlipPage({ params }: Props) {
   const session = await getServerSession(authOptions)
   if (!session?.user) redirect(`/${params.locale}/login`)
 
-  const car = await carRepository.findById(params.id, session.user.showroomId)
+  // Support carRefNumber in URL
+  const isRef = /^\d+$/.test(params.id)
+  const baseCar = isRef
+    ? await carRepository.findByRef(Number(params.id), session.user.showroomId)
+    : await carRepository.findById(params.id, session.user.showroomId)
+  const car = isRef && baseCar ? await carRepository.findById(baseCar.id, session.user.showroomId) : baseCar as Awaited<ReturnType<typeof carRepository.findById>>
   if (!car) notFound()
 
   const showroom = await prisma.showroom.findUnique({
@@ -45,36 +50,38 @@ export default async function PrintSlipPage({ params }: Props) {
     },
   })
 
-  const brand    = await prisma.brand.findUnique({ where: { id: car.brandId }, select: { nameAr: true, nameEn: true } })
-  const category = await prisma.category.findUnique({ where: { id: car.categoryId }, select: { nameAr: true } })
-  const model    = await prisma.model.findUnique({ where: { id: car.modelId }, select: { name: true } })
+  const brand    = await prisma.brand.findUnique({ where: { id: car!.brandId }, select: { nameAr: true, nameEn: true } })
+  const category = await prisma.category.findUnique({ where: { id: car!.categoryId }, select: { nameAr: true, nameEn: true } })
+  const model    = await prisma.model.findUnique({ where: { id: car!.modelId }, select: { name: true } })
   const coverImg = await prisma.carImage.findFirst({
-    where: { carId: car.id, isCover: true },
+    where: { carId: car!.id, isCover: true },
     select: { url: true },
   })
 
-  const publicUrl = `https://carsell.one/${params.locale}/market/cars/${car.id}`
+  const publicUrl = `https://carsell.one/${params.locale}/market/cars/${car!.carRefNumber}`
 
   return (
     <PrintSlipClient
       car={{
-        id:           car.id,
-        carRefNumber: car.carRefNumber,
-        year:         car.year,
-        carType:      car.carType,
-        odometer:     car.odometer,
-        fuelType:     car.fuelType,
-        transmission: car.transmission,
-        colorExt:     car.colorExt,
-        colorInt:     car.colorInt,
-        engineSize:   car.engineSize,
-        vin:          car.vin,
-        plateNumber:  car.plateNumber,
-        sellPrice:    car.sellPrice ? Number(car.sellPrice) : null,
-        notes:        car.notes,
-        brandNameAr:  brand?.nameAr ?? '',
-        categoryName: category?.nameAr ?? '',
-        modelName:    model?.name ?? '',
+        id:            car!.id,
+        carRefNumber:  car!.carRefNumber,
+        year:          car!.year,
+        carType:       car!.carType,
+        odometer:      car!.odometer,
+        fuelType:      car!.fuelType,
+        transmission:  car!.transmission,
+        colorExt:      car!.colorExt,
+        colorInt:      car!.colorInt,
+        engineSize:    car!.engineSize,
+        vin:           car!.vin,
+        plateNumber:   car!.plateNumber,
+        sellPrice:     car!.sellPrice ? Number(car!.sellPrice) : null,
+        notes:         car!.notes,
+        brandNameAr:   brand?.nameAr ?? '',
+        brandNameEn:   brand?.nameEn ?? '',
+        categoryNameAr: category?.nameAr ?? '',
+        categoryNameEn: category?.nameEn ?? '',
+        modelName:     model?.name ?? '',
         coverImageUrl: coverImg?.url ?? null,
       }}
       showroom={{

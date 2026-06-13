@@ -91,6 +91,7 @@ export const publishCarSchema = z.discriminatedUnion('mode', [
     auctionType:         z.enum(['PUBLIC', 'PRIVATE']),
     openingPrice:        z.number().positive(),
     deposit:             z.number().min(0).optional(),
+    bidIncrement:        z.number().min(100).optional(),
     startDate:           z.string().datetime(),
     durationHours:       z.union([z.literal(24), z.literal(48), z.literal(72), z.literal(168)]),
     buyNowPrice:         z.number().positive().optional(),

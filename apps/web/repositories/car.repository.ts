@@ -57,7 +57,25 @@ export const carRepository = {
         timeline:  { orderBy: { createdAt: 'desc' }, include: { user: { select: { name: true } } } },
         expenses:  true,
         sale:      true,
+        bids:      {
+          orderBy: { createdAt: 'desc' },
+          include: { bidder: { select: { name: true } } },
+        },
+        carRequests: {
+          where:   { type: 'SOUM_OFFER' },
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true, buyerName: true, buyerPhone: true,
+            offerAmount: true, status: true, dealerNote: true, createdAt: true,
+          },
+        },
       },
+    })
+  },
+
+  async findByRef(carRefNumber: number, showroomId: string) {
+    return prisma.car.findFirst({
+      where: { carRefNumber, showroomId, deletedAt: null },
     })
   },
 

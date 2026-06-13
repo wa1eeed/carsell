@@ -8,24 +8,26 @@ import { formatPrice } from '@/lib/format'
 import { formatCarRef, formatShowroomId } from '@/lib/format'
 
 interface CarData {
-  id:            string
-  carRefNumber:  number
-  year:          number
-  carType:       string
-  odometer:      number | null
-  fuelType:      string | null
-  transmission:  string | null
-  colorExt:      string | null
-  colorInt:      string | null
-  engineSize:    string | null
-  vin:           string | null
-  plateNumber:   string | null
-  sellPrice:     number | null
-  notes:         string | null
-  brandNameAr:   string
-  categoryName:  string
-  modelName:     string
-  coverImageUrl: string | null
+  id:             string
+  carRefNumber:   number
+  year:           number
+  carType:        string
+  odometer:       number | null
+  fuelType:       string | null
+  transmission:   string | null
+  colorExt:       string | null
+  colorInt:       string | null
+  engineSize:     string | null
+  vin:            string | null
+  plateNumber:    string | null
+  sellPrice:      number | null
+  notes:          string | null
+  brandNameAr:    string
+  brandNameEn:    string
+  categoryNameAr: string
+  categoryNameEn: string
+  modelName:      string
+  coverImageUrl:  string | null
 }
 
 interface ShowroomData {
@@ -68,7 +70,7 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
           </a>
           <span className="text-gray-300">|</span>
           <h1 className="font-semibold text-gray-800 text-sm">
-            {t('printTitle')} {car.brandNameAr} {car.categoryName} {car.year}
+            {t('printTitle')} {locale === 'ar' ? car.brandNameAr : car.brandNameEn} {locale === 'ar' ? car.categoryNameAr : car.categoryNameEn} {car.year}
           </h1>
         </div>
 
@@ -121,14 +123,18 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
 // ── A4 Slip ──────────────────────────────────────────────────────────────────
 
 function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'slipType'> & { qrDataUrl: string }) {
-  const t = useTranslations('printSlip')
+  const t   = useTranslations('printSlip')
+  const ar  = locale === 'ar'
+  const dir = ar ? 'rtl' : 'ltr'
   const price = car.sellPrice
+  const brandName    = ar ? car.brandNameAr    : car.brandNameEn
+  const categoryName = ar ? car.categoryNameAr : car.categoryNameEn
 
   return (
     <div
       className="print-slip bg-white w-[210mm] min-h-[297mm] shadow-lg"
       style={{ fontFamily: '"IBM Plex Sans Arabic", sans-serif' }}
-      dir="rtl"
+      dir={dir}
     >
       {/* Header — Showroom branding */}
       <div className="bg-[#0F3460] text-white px-8 py-5 flex items-center justify-between">
@@ -141,21 +147,28 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
             {showroom.city && <div className="text-white/70 text-sm">{showroom.city}</div>}
           </div>
         </div>
-        <div className="text-left text-sm text-white/70 space-y-0.5">
-          {showroom.phone   && <div>📞 {showroom.phone}</div>}
-          {showroom.whatsapp && <div>💬 {showroom.whatsapp}</div>}
+        <div className={`text-sm text-white/70 space-y-0.5 ${ar ? 'text-left' : 'text-right'}`}>
+          {showroom.phone   && <div>📞 <span className="font-mono ltr">{showroom.phone}</span></div>}
+          {showroom.whatsapp && <div>💬 <span className="font-mono ltr">{showroom.whatsapp}</span></div>}
           {showroom.showroomNumber && (
             <div className="text-xs font-mono">{formatShowroomId(showroom.showroomNumber)}</div>
           )}
         </div>
       </div>
 
+      {/* Car ID badge */}
+      <div className={`px-8 pt-4 flex items-center gap-2`}>
+        <span className="text-xs bg-[#0F3460]/10 text-[#0F3460] font-mono font-bold px-2.5 py-1 rounded-full">
+          #{formatCarRef(car.carRefNumber)}
+        </span>
+      </div>
+
       {/* Car image */}
       {car.coverImageUrl && (
-        <div className="px-8 pt-6">
+        <div className="px-8 pt-3">
           <img
             src={car.coverImageUrl}
-            alt={`${car.brandNameAr} ${car.year}`}
+            alt={`${brandName} ${car.year}`}
             className="w-full h-56 object-cover rounded-[8px]"
           />
         </div>
@@ -166,7 +179,7 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold text-[#0F3460]">
-              {car.brandNameAr} {car.categoryName} {car.year}
+              {brandName} {categoryName} {car.year}
             </h2>
             <p className="text-gray-500 mt-0.5">{car.modelName}</p>
             <span className={`inline-block mt-2 text-xs font-bold px-2.5 py-0.5 rounded-full ${
@@ -283,7 +296,7 @@ function LabelSlip({ car, showroom, qrDataUrl }: { car: CarData; showroom: Showr
       {/* Content */}
       <div className="p-4">
         <h2 className="font-bold text-[#0F3460] text-base">
-          {car.brandNameAr} {car.categoryName} {car.year}
+          {car.brandNameAr} {car.categoryNameAr} {car.year}
         </h2>
         <p className="text-xs text-gray-500">{car.modelName} · {t(`conditions.${car.carType}` as Parameters<typeof t>[0]) ?? car.carType}</p>
 

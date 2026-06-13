@@ -82,6 +82,8 @@ export async function publishCar(user: AuthUser, carId: string, input: PublishCa
         auctionOpeningPrice: input.openingPrice,
         auctionBuyNowPrice: input.buyNowPrice ?? null,
         auctionDepositAmount: input.deposit ?? null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...(((input as any).bidIncrement != null) ? { auctionBidIncrement: (input as any).bidIncrement } : {}),
         listedOnMarket: !isPrivate,
       },
     })
