@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { SessionProvider } from '@/components/providers/SessionProvider'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -21,7 +22,10 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            {children}
+            <ToastProvider />
+          </SessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

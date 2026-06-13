@@ -63,7 +63,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
   return (
     <aside
-      className="w-[240px] shrink-0 min-h-screen flex flex-col"
+      className="w-[240px] shrink-0 h-screen sticky top-0 flex flex-col"
       style={{ background: 'linear-gradient(180deg, #0F3460 0%, #0A2540 100%)' }}
     >
       {/* Logo */}

@@ -13,7 +13,7 @@ export function DashboardShell({ showroomName, children }: { showroomName: strin
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-cl-gray-50">
+    <div className="flex h-screen overflow-hidden bg-cl-gray-50">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar />
@@ -31,7 +31,7 @@ export function DashboardShell({ showroomName, children }: { showroomName: strin
 
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar showroomName={showroomName} onMenuClick={() => setOpen(true)} />
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   )
