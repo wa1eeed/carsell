@@ -2,8 +2,9 @@
 
 import { signOut } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
-import { LogOut, Menu, Store, Bell, ChevronDown, ExternalLink } from 'lucide-react'
+import { LogOut, Menu, Store, Bell, ExternalLink } from 'lucide-react'
 import { LocaleSwitcher } from './LocaleSwitcher'
+import { ROOT_DOMAIN } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 export function Topbar({ showroomName, onMenuClick }: { showroomName: string; onMenuClick?: () => void }) {
@@ -70,7 +71,7 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
         {/* User menu */}
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
+          onClick={() => signOut({ callbackUrl: `https://${ROOT_DOMAIN}${locale === 'ar' ? '/login' : '/en/login'}` })}
           className={cn(
             'flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-sm text-cl-gray-600',
             'hover:bg-red-50 hover:text-red-600 transition-colors'
