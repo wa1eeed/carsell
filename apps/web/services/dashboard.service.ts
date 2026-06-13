@@ -22,7 +22,7 @@ export async function getDashboardData(user: AuthUser) {
       recentCars: [],
       auctions: [],
       activity: [],
-      alerts: { kycPending: 0, expiringSubscriptions: 0, auctionEnding: 0, dayAgo: new Date() },
+      alerts: { kycPending: 0, expiringSubscriptions: 0, auctionEnding: 0, dayAgo: new Date(), pendingRequests: 0, activeDeals: 0 },
     }
   }
 }

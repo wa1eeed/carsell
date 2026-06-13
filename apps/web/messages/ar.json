@@ -199,7 +199,9 @@
     "endsIn": "ينتهي خلال",
     "kycPending": "تحقق هوية معلق",
     "expiringSubscriptions": "اشتراكات تنتهي قريباً",
-    "auctionEndingSoon": "مزاد ينتهي قريباً"
+    "auctionEndingSoon": "مزاد ينتهي قريباً",
+    "pendingRequestsAlert": "طلبات لم يُرد عليها منذ 24 ساعة",
+    "activeDeals": "صفقات نشطة قيد المتابعة"
   },
   "publish": {
     "title": "نشر السيارة",

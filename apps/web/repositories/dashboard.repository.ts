@@ -159,7 +159,7 @@ export const dashboardRepository = {
 
   async getAlerts(user: AuthUser) {
     const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const [kycPending, auctionEnding] = await Promise.all([
+    const [kycPending, auctionEnding, pendingRequests, activeDeals] = await Promise.all([
       prisma.showroomUser.count({
         where: isPlatformAdmin(user)
           ? { kycStatus: 'PENDING' }
@@ -170,12 +170,23 @@ export const dashboardRepository = {
           ? { status: 'AUCTION', deletedAt: null }
           : { showroomId: user.showroomId, status: 'AUCTION', deletedAt: null },
       }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma.carRequest as any).count({
+        where: isPlatformAdmin(user)
+          ? { status: 'PENDING', createdAt: { lte: dayAgo } }
+          : { showroomId: user.showroomId, status: 'PENDING', createdAt: { lte: dayAgo } },
+      }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma.carRequest as any).count({
+        where: isPlatformAdmin(user)
+          ? { status: { in: ['RESERVED', 'WAITING_PAYMENT', 'OWNERSHIP_TRANSFER'] } }
+          : { showroomId: user.showroomId, status: { in: ['RESERVED', 'WAITING_PAYMENT', 'OWNERSHIP_TRANSFER'] } },
+      }),
     ])
-    // Subscriptions expiring: showrooms with EXPIRED/SUSPENDED status (platform admin only meaningful)
     const expiringSubscriptions = isPlatformAdmin(user)
       ? await prisma.subscription.count({ where: { status: { in: ['EXPIRED', 'SUSPENDED'] } } })
       : 0
 
-    return { kycPending, expiringSubscriptions, auctionEnding, dayAgo }
+    return { kycPending, expiringSubscriptions, auctionEnding, dayAgo, pendingRequests, activeDeals }
   },
 }

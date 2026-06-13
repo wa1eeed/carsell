@@ -199,7 +199,9 @@
     "endsIn": "Ends in",
     "kycPending": "KYC Pending",
     "expiringSubscriptions": "Expiring Subscriptions",
-    "auctionEndingSoon": "Auction Ending Soon"
+    "auctionEndingSoon": "Auction Ending Soon",
+    "pendingRequestsAlert": "Requests unanswered for 24+ hours",
+    "activeDeals": "Active deals in progress"
   },
   "publish": {
     "title": "Publish Car",

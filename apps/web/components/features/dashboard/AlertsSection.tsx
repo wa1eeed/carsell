@@ -1,18 +1,22 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { ShieldAlert, CalendarClock, Gavel, CheckCircle2 } from 'lucide-react'
+import { ShieldAlert, CalendarClock, Gavel, CheckCircle2, Clock, Handshake } from 'lucide-react'
 
 interface Alerts {
   kycPending: number
   expiringSubscriptions: number
   auctionEnding: number
+  pendingRequests?: number
+  activeDeals?: number
 }
 
 export function AlertsSection({ alerts }: { alerts: Alerts }) {
   const t = useTranslations('dashboard')
 
   const items = [
+    { key: 'pendingReq', count: alerts.pendingRequests ?? 0, label: t('pendingRequestsAlert'), icon: Clock, tone: 'warning' as const },
+    { key: 'activeDeals', count: alerts.activeDeals ?? 0, label: t('activeDeals'), icon: Handshake, tone: 'primary' as const },
     { key: 'kyc', count: alerts.kycPending, label: t('kycPending'), icon: ShieldAlert, tone: 'warning' as const },
     {
       key: 'subs',
