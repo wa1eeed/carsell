@@ -102,10 +102,7 @@ export function AdminShell({
             </div>
           </div>
           <button
-            onClick={async () => {
-              await signOut({ redirect: false })
-              window.location.href = `https://${ROOT_DOMAIN}${locale === 'ar' ? '/admin/login' : '/en/admin/login'}`
-            }}
+            onClick={() => signOut({ callbackUrl: `https://${ROOT_DOMAIN}${locale === 'ar' ? '/admin/login' : '/en/admin/login'}` })}
             className="flex items-center gap-2 w-full px-3 py-2 rounded-[8px] text-sm text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
           >
             <LogOut size={14} />

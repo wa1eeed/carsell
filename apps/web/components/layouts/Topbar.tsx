@@ -71,10 +71,7 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
         {/* User menu */}
         <button
           type="button"
-          onClick={async () => {
-            await signOut({ redirect: false })
-            window.location.href = `https://${ROOT_DOMAIN}${locale === 'ar' ? '/login' : '/en/login'}`
-          }}
+          onClick={() => signOut({ callbackUrl: `https://${ROOT_DOMAIN}${locale === 'ar' ? '/login' : '/en/login'}` })}
           className={cn(
             'flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-sm text-cl-gray-600',
             'hover:bg-red-50 hover:text-red-600 transition-colors'
