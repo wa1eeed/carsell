@@ -20,6 +20,7 @@ export interface MarketFilters {
   fuelType?:     string
   transmission?: string
   bodyType?:     string   // SUV | SEDAN | PICKUP | COUPE | HATCHBACK | VAN | CONVERTIBLE | WAGON
+  displayMode?:  'AUCTION' // filter to show only auction cars
   search?:       string
   page?:         number
   pageSize?:     number
@@ -34,7 +35,9 @@ export async function listMarketCars(filters: MarketFilters = {}) {
   // Prisma where clause — typed via the generated Prisma namespace (no `any`)
   const where: Prisma.CarWhereInput = {
     deletedAt: null,
-    status:    { in: ['FOR_SALE', 'AUCTION'] },
+    status:    filters.displayMode === 'AUCTION'
+      ? 'AUCTION'
+      : { in: ['FOR_SALE', 'AUCTION'] },
     ...(filters.brandId    ? { brandId:    filters.brandId    } : {}),
     ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
     ...(filters.modelId    ? { modelId:    filters.modelId    } : {}),

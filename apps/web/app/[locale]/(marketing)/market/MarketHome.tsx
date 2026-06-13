@@ -70,10 +70,10 @@ export default function MarketHome({ newCars, usedCars, auctionCars, brands, loc
         </Link>
 
         <div className="hidden md:flex items-center gap-1 text-sm">
-          <Link href={`${prefix}/market?carType=NEW`}    className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'جديدة' : 'New'}</Link>
-          <Link href={`${prefix}/market?carType=USED`}   className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'مستعملة' : 'Used'}</Link>
-          <Link href={`${prefix}/market?status=AUCTION`} className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors flex items-center gap-1"><Gavel size={13} />{ar ? 'مزادات' : 'Auctions'}</Link>
-          <Link href={`${prefix}/market`}                className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'كل السيارات' : 'All Cars'}</Link>
+          <Link href={`${prefix}/market?carType=NEW`}          className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'جديدة' : 'New'}</Link>
+          <Link href={`${prefix}/market?carType=USED`}         className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'مستعملة' : 'Used'}</Link>
+          <Link href={`${prefix}/market?displayMode=AUCTION`}  className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors flex items-center gap-1"><Gavel size={13} />{ar ? 'مزادات' : 'Auctions'}</Link>
+          <Link href={`${prefix}/market?page=1`}               className="px-3 py-1.5 rounded-[6px] hover:bg-white/10 transition-colors">{ar ? 'كل السيارات' : 'All Cars'}</Link>
         </div>
 
         <Link href={`${prefix}/market`} className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-[8px] text-sm transition-colors">
@@ -100,10 +100,10 @@ export default function MarketHome({ newCars, usedCars, auctionCars, brands, loc
           {/* Quick filters */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             {[
-              { label: ar ? 'كل السيارات' : 'All Cars',   href: `${prefix}/market` },
+              { label: ar ? 'كل السيارات' : 'All Cars',   href: `${prefix}/market?page=1` },
               { label: ar ? 'سيارات جديدة' : 'New Cars',  href: `${prefix}/market?carType=NEW` },
               { label: ar ? 'سيارات مستعملة' : 'Used',    href: `${prefix}/market?carType=USED` },
-              { label: ar ? 'مزادات' : 'Auctions',        href: `${prefix}/market?status=AUCTION` },
+              { label: ar ? 'مزادات' : 'Auctions',        href: `${prefix}/market?displayMode=AUCTION` },
             ].map((f) => (
               <Link key={f.href} href={f.href}
                 className="px-5 py-2.5 rounded-full border border-white/30 text-sm font-medium hover:bg-white hover:text-[#0F3460] transition-all">
@@ -180,7 +180,7 @@ export default function MarketHome({ newCars, usedCars, auctionCars, brands, loc
           title={ar ? '🔴 مزادات مباشرة' : '🔴 Live Auctions'}
           subtitle={ar ? 'مزادات تنتهي قريباً — زايد الآن' : 'Ending soon — bid now'}
           cars={auctionCars}
-          viewAllHref={`${prefix}/market?status=AUCTION`}
+          viewAllHref={`${prefix}/market?displayMode=AUCTION`}
           viewAllLabel={ar ? 'كل المزادات' : 'All Auctions'}
           locale={locale}
           carUrl={carUrl}

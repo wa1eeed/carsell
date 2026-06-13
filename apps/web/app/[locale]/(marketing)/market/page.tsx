@@ -26,7 +26,7 @@ interface Props {
 export default async function MarketPage({ params, searchParams }: Props) {
   const hasFilters = Object.keys(searchParams).some((k) =>
     ['brandId','categoryId','modelId','yearMin','yearMax','priceMin','priceMax',
-     'city','carType','fuelType','transmission','bodyType','q'].includes(k)
+     'city','carType','fuelType','transmission','bodyType','q','displayMode'].includes(k)
   )
 
   // Show homepage when no filters active
@@ -49,6 +49,7 @@ export default async function MarketPage({ params, searchParams }: Props) {
     fuelType:     searchParams.fuelType,
     transmission: searchParams.transmission,
     bodyType:     searchParams.bodyType,
+    displayMode:  searchParams.displayMode as 'AUCTION' | undefined,
     search:       searchParams.q,
     page:         searchParams.page ? Number(searchParams.page) : 1,
     sortBy: searchParams.sort as

@@ -17,14 +17,16 @@ export default async function RequestsPage({ searchParams }: { searchParams: { s
     ? (searchParams.status as Status)
     : 'PENDING'
 
-  const [requests, counts] = await Promise.all([
+  const [requestsRaw, counts] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    requestRepository.listForShowroom(user.showroomId, { status: status as any }),
-    requestRepository.countsForShowroom(user.showroomId),
+    requestRepository.listForShowroom(user.showroomId, { status: status as any }).catch(() => []),
+    requestRepository.countsForShowroom(user.showroomId).catch(() => ({
+      pending: 0, reserved: 0, waitingPayment: 0, ownershipTransfer: 0,
+      completed: 0, rejected: 0, cancelled: 0, total: 0,
+    })),
   ])
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data = (requests as any[]).map((r) => ({
+  const data = (requestsRaw as any[]).map((r) => ({
     id:          r.id,
     type:        r.type,
     status:      r.status,

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { ROOT_DOMAIN } from '@/lib/constants'
 import { DashboardShell } from '@/components/layouts/DashboardShell'
 import { SubscriptionBanner } from '@/components/features/billing/SubscriptionBanner'
 import { getSubscriptionByShowroom } from '@/repositories/plan.repository'
@@ -19,16 +20,22 @@ export default async function DashboardLayout({
   const [showroom, subscription] = await Promise.all([
     prisma.showroom.findUnique({
       where: { id: session.user.showroomId },
-      select: { name: true, slug: true },
+      select: { name: true, slug: true, customDomain: true, customDomainVerified: true },
     }).catch(() => null),
     getSubscriptionByShowroom(session.user.showroomId).catch(() => null),
   ])
 
   const showroomName = showroom?.name ?? 'CarSell'
   const showroomSlug = showroom?.slug ?? null
+  // Use verified custom domain if set, otherwise fall back to carsell.one/{slug}
+  const showroomUrl = showroom?.customDomainVerified && showroom.customDomain
+    ? `https://${showroom.customDomain}`
+    : showroomSlug
+      ? `https://${ROOT_DOMAIN}/${showroomSlug}`
+      : null
 
   return (
-    <DashboardShell showroomName={showroomName} showroomSlug={showroomSlug}>
+    <DashboardShell showroomName={showroomName} showroomSlug={showroomSlug} showroomUrl={showroomUrl}>
       {/* Subscription status banner */}
       <div className="mb-4">
         <SubscriptionBanner subscription={subscription} />
