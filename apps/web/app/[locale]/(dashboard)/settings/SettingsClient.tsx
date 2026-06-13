@@ -8,6 +8,8 @@ import {
   AlertCircle, CheckCircle2, Trash2, RefreshCw,
 } from 'lucide-react'
 import { ROOT_DOMAIN } from '@/lib/constants'
+import toast from 'react-hot-toast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useOrigin } from '@/lib/hooks/use-origin'
 
 interface DnsRecord { type: string; name: string; value: string }
@@ -149,6 +151,7 @@ function CustomDomainSection({
   const [dns, setDns]         = useState<DnsInstructions | null>(null)
   const [verifying, setVerifying] = useState(false)
   const [verifyMsg, setVerifyMsg] = useState('')
+  const [confirmRemove, setConfirmRemove] = useState(false)
 
   async function connect() {
     setSaving(true); setError(''); setDns(null)
@@ -174,9 +177,9 @@ function CustomDomainSection({
   }
 
   async function remove() {
-    if (!confirm(t('removeDomainConfirm'))) return
     await fetch('/api/v1/showroom/domain', { method: 'DELETE' })
     setDns(null); setValue('')
+    toast.success('تم إزالة الدومين المخصص')
     onChange()
   }
 
@@ -209,7 +212,7 @@ function CustomDomainSection({
                 <ExternalLink size={14} />
               </a>
             )}
-            <button onClick={remove} className="text-gray-400 hover:text-red-500" title={t('removeTitle')}>
+            <button onClick={() => setConfirmRemove(true)} className="text-gray-400 hover:text-red-500" title={t('removeTitle')}>
               <Trash2 size={14} />
             </button>
           </div>
@@ -251,6 +254,17 @@ function CustomDomainSection({
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmRemove}
+        title={t('removeDomainConfirm')}
+        message="بعد الإزالة لن يعمل الدومين المخصص وستحتاج إعادة ضبطه."
+        confirmLabel="إزالة"
+        cancelLabel="إلغاء"
+        variant="danger"
+        onConfirm={() => { setConfirmRemove(false); remove() }}
+        onCancel={() => setConfirmRemove(false)}
+      />
     </div>
   )
 }

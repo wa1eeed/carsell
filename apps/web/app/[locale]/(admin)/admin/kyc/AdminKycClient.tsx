@@ -30,9 +30,11 @@ interface Props {
   requests:     KycRequest[]
   counts:       { pending: number; approved: number; rejected: number }
   activeStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
+  page:         number
+  pageSize:     number
 }
 
-export default function AdminKycClient({ requests, counts, activeStatus }: Props) {
+export default function AdminKycClient({ requests, counts, activeStatus, page, pageSize }: Props) {
   const router = useRouter()
   const t = useTranslations('adminKyc')
   const [busy, setBusy]           = useState<string | null>(null)
@@ -98,6 +100,31 @@ export default function AdminKycClient({ requests, counts, activeStatus }: Props
           )
         })}
       </div>
+
+      {/* Pagination info */}
+      {requests.length > 0 && (
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <span>صفحة {page}</span>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <button
+                onClick={() => router.push(`/admin/kyc?status=${activeStatus}&page=${page - 1}`)}
+                className="px-3 py-1 border border-gray-200 rounded-[6px] hover:bg-gray-50"
+              >
+                السابق
+              </button>
+            )}
+            {requests.length === pageSize && (
+              <button
+                onClick={() => router.push(`/admin/kyc?status=${activeStatus}&page=${page + 1}`)}
+                className="px-3 py-1 border border-gray-200 rounded-[6px] hover:bg-gray-50"
+              >
+                التالي
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Requests */}
       {requests.length === 0 ? (

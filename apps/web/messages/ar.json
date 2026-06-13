@@ -687,7 +687,14 @@
     "maxCars": "الحد الأقصى للسيارات",
     "trialDays": "أيام التجربة",
     "descAr": "الوصف (AR)",
-    "descEn": "الوصف (EN)"
+    "descEn": "الوصف (EN)",
+    "savedSuccess": "تم حفظ الباقة بنجاح",
+    "createdSuccess": "تم إنشاء الباقة بنجاح",
+    "deletedSuccess": "تم حذف الباقة بنجاح",
+    "errorSave": "حدث خطأ، يرجى المحاولة مرة أخرى",
+    "deletePlanTitle": "حذف الباقة",
+    "deletePlanMsg": "هل أنت متأكد من حذف هذه الباقة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "delete": "حذف"
   },
   "adminKyc": {
     "title": "طلبات التحقق من الهوية (KYC)",
@@ -728,6 +735,8 @@
     "colDate": "التاريخ",
     "colChargeId": "Charge ID",
     "empty": "لا توجد مدفوعات بعد",
+    "prev": "السابق",
+    "next": "التالي",
     "statuses": {
       "CAPTURED": "ناجحة",
       "INITIATED": "معلّقة",

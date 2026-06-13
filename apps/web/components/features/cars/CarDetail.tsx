@@ -10,8 +10,10 @@ import { calcNetProfit } from '@/lib/tax'
 import { parsePlateNumber, type SaudiPlateType } from '@/lib/saudi-plate'
 import { formatDateTime, formatNumber } from '@/lib/format'
 import { uploadFile } from '@/lib/upload-client'
+import toast from 'react-hot-toast'
 import { PublishModal } from './PublishModal'
 import { ShareButton } from '@/components/ui/ShareButton'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export interface CarDetailData {
   id: string
@@ -58,18 +60,24 @@ export function CarDetail({ car }: { car: CarDetailData }) {
   const prefix = locale === 'ar' ? '' : '/en'
   const [tab, setTab] = useState<Tab>('details')
   const [syncing, setSyncing] = useState(false)
+  const [confirmAbsher, setConfirmAbsher] = useState(false)
 
   const showVdmUpdate = car.dataSource === 'MANUAL' && car.vin != null
   const plate = parsePlateNumber(car.plateNumber)
 
   async function updateFromAbsher() {
-    if (!confirm('سيتم تحديث البيانات من أبشر — المتابعة؟')) return
     setSyncing(true)
     try {
       const res = await fetch(`/api/v1/cars/${car.id}/vdm-sync`, { method: 'POST' })
       const json = await res.json()
-      if (json.success) window.location.reload()
-      else alert(json.error?.message ?? tc('error'))
+      if (json.success) {
+        toast.success('تم تحديث البيانات من أبشر بنجاح')
+        window.location.reload()
+      } else {
+        toast.error(json.error?.message ?? tc('error'))
+      }
+    } catch {
+      toast.error(tc('error'))
     } finally {
       setSyncing(false)
     }
@@ -86,7 +94,7 @@ export function CarDetail({ car }: { car: CarDetailData }) {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {showVdmUpdate && (
-            <button className="btn-secondary" onClick={updateFromAbsher} disabled={syncing}>
+            <button className="btn-secondary" onClick={() => setConfirmAbsher(true)} disabled={syncing}>
               {syncing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
               {ta('updateFromAbsher')}
             </button>
@@ -152,6 +160,17 @@ export function CarDetail({ car }: { car: CarDetailData }) {
           showroomSlug={car.showroomSlug}
         />
       )}
+
+      <ConfirmDialog
+        open={confirmAbsher}
+        title="تحديث البيانات من أبشر"
+        message="سيتم تحديث بيانات السيارة من نظام أبشر — هل تريد المتابعة؟"
+        confirmLabel="تحديث"
+        cancelLabel="إلغاء"
+        variant="warning"
+        onConfirm={() => { setConfirmAbsher(false); updateFromAbsher() }}
+        onCancel={() => setConfirmAbsher(false)}
+      />
     </div>
   )
 }
@@ -381,9 +400,10 @@ function MojazTab({
       const json = await res.json()
       if (json.success) {
         setUrl(json.data.pdfUrl)
+        toast.success('تم إصدار تقرير موجاز بنجاح')
         window.location.reload()
       } else {
-        alert(json.error?.message ?? tc('error'))
+        toast.error(json.error?.message ?? tc('error'))
       }
     } finally {
       setLoading(false)

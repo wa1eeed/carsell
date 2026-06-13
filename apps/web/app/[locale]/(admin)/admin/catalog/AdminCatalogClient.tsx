@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Pencil, Trash2, Tag, RefreshCw } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -183,13 +185,14 @@ export default function AdminCatalogClient() {
 // ── Brands Tab ────────────────────────────────────────────────────────────────
 
 function BrandsTab() {
-  const [brands, setBrands]     = useState<Brand[]>([])
-  const [loading, setLoading]   = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editItem, setEditItem] = useState<Brand | null>(null)
-  const [saving, setSaving]     = useState(false)
-  const [error, setError]       = useState('')
-  const [form, setForm]         = useState({ nameAr: '', nameEn: '', logoUrl: '' })
+  const [brands, setBrands]         = useState<Brand[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [showForm, setShowForm]     = useState(false)
+  const [editItem, setEditItem]     = useState<Brand | null>(null)
+  const [saving, setSaving]         = useState(false)
+  const [error, setError]           = useState('')
+  const [form, setForm]             = useState({ nameAr: '', nameEn: '', logoUrl: '' })
+  const [deleteTarget, setDeleteTarget] = useState<Brand | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -243,11 +246,11 @@ function BrandsTab() {
   }
 
   async function remove(b: Brand) {
-    if (!confirm(`هل تريد حذف "${b.nameAr}"؟`)) return
     try {
       await apiFetch('/api/v1/admin/catalog/brands', { method: 'DELETE', body: JSON.stringify({ id: b.id }) })
+      toast.success('تم حذف الماركة بنجاح')
       void load()
-    } catch { /* silent */ }
+    } catch { toast.error('فشل الحذف، حاول مرة أخرى') }
   }
 
   return (
@@ -323,7 +326,7 @@ function BrandsTab() {
                   <td className="p-4">
                     <div className="flex items-center gap-1">
                       <button onClick={() => openEdit(b)} className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-[#0F3460]"><Pencil size={14} /></button>
-                      <button onClick={() => void remove(b)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                      <button onClick={() => setDeleteTarget(b)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -332,6 +335,17 @@ function BrandsTab() {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="حذف الماركة"
+        message={`هل أنت متأكد من حذف "${deleteTarget?.nameAr}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        cancelLabel="إلغاء"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) void remove(deleteTarget); setDeleteTarget(null) }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
@@ -361,6 +375,7 @@ function CategoriesTab() {
   const [saving, setSaving]               = useState(false)
   const [error, setError]                 = useState('')
   const [form, setForm]                   = useState<CategoryForm>(DEFAULT_CAT_FORM)
+  const [deleteTarget, setDeleteTarget]   = useState<Category | null>(null)
 
   const loadBrands = useCallback(async () => {
     const data = await apiFetch<Brand[]>('/api/v1/admin/catalog/brands')
@@ -417,11 +432,11 @@ function CategoriesTab() {
   }
 
   async function remove(c: Category) {
-    if (!confirm(`هل تريد حذف "${c.nameAr}"؟`)) return
     try {
       await apiFetch('/api/v1/admin/catalog/categories', { method: 'DELETE', body: JSON.stringify({ id: c.id }) })
+      toast.success('تم حذف الفئة بنجاح')
       void loadCategories()
-    } catch { /* silent */ }
+    } catch { toast.error('فشل الحذف، حاول مرة أخرى') }
   }
 
   return (
@@ -567,7 +582,7 @@ function CategoriesTab() {
                   <td className="p-4">
                     <div className="flex items-center gap-1">
                       <button onClick={() => openEdit(c)} className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-[#0F3460]"><Pencil size={14} /></button>
-                      <button onClick={() => void remove(c)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                      <button onClick={() => setDeleteTarget(c)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -576,6 +591,17 @@ function CategoriesTab() {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="حذف الفئة"
+        message={`هل أنت متأكد من حذف "${deleteTarget?.nameAr}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        cancelLabel="إلغاء"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) void remove(deleteTarget); setDeleteTarget(null) }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
@@ -597,6 +623,7 @@ function ModelsTab() {
   const [error, setError]                 = useState('')
   const [form, setForm]                   = useState<ModelForm>({ brandId: '', categoryId: '', name: '', yearStart: '', yearEnd: '' })
   const [formCats, setFormCats]           = useState<Category[]>([])
+  const [deleteTarget, setDeleteTarget]   = useState<Model | null>(null)
 
   const loadBrands = useCallback(async () => {
     const data = await apiFetch<Brand[]>('/api/v1/admin/catalog/brands')
@@ -673,9 +700,9 @@ function ModelsTab() {
   }
 
   async function remove(m: Model) {
-    if (!confirm(`هل تريد حذف "${m.name}"؟`)) return
     try {
       await apiFetch('/api/v1/admin/catalog/models', { method: 'DELETE', body: JSON.stringify({ id: m.id }) })
+      toast.success('تم حذف الموديل بنجاح')
       void loadModels()
     } catch { /* silent */ }
   }
@@ -787,7 +814,7 @@ function ModelsTab() {
                   <td className="p-4">
                     <div className="flex items-center gap-1">
                       <button onClick={() => openEdit(m)} className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-[#0F3460]"><Pencil size={14} /></button>
-                      <button onClick={() => void remove(m)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                      <button onClick={() => setDeleteTarget(m)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -796,6 +823,17 @@ function ModelsTab() {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="حذف الموديل"
+        message={`هل أنت متأكد من حذف "${deleteTarget?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        cancelLabel="إلغاء"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) void remove(deleteTarget); setDeleteTarget(null) }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

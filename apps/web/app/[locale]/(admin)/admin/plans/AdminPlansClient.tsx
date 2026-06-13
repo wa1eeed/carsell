@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Plus, Pencil, Trash2, Star } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { PlanWithFeatures, PlanFeatures } from '@/repositories/plan.repository'
 
 interface Props { plans: PlanWithFeatures[] }
@@ -24,6 +26,7 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
   const [plans, setPlans] = useState(initialPlans)
   const [editing, setEditing] = useState<PlanWithFeatures | null>(null)
   const [creating, setCreating] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<PlanWithFeatures> & { features: PlanFeatures }>({
     features: DEFAULT_FEATURES,
   })
@@ -45,33 +48,49 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
     setSaving(true)
     const url = editing ? `/api/v1/admin/plans/${editing.id}` : '/api/v1/admin/plans'
     const method = editing ? 'PATCH' : 'POST'
-
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    const data = await res.json() as { plan?: PlanWithFeatures }
-    setSaving(false)
-    if (data.plan) {
-      setCreating(false)
-      router.refresh()
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json() as { plan?: PlanWithFeatures }
+      if (data.plan) {
+        toast.success(editing ? t('savedSuccess') : t('createdSuccess'))
+        setCreating(false)
+        router.refresh()
+      } else {
+        toast.error(t('errorSave'))
+      }
+    } catch {
+      toast.error(t('errorSave'))
+    } finally {
+      setSaving(false)
     }
   }
 
   async function deletePlan(id: string) {
-    if (!confirm(t('confirmDelete'))) return
-    await fetch(`/api/v1/admin/plans/${id}`, { method: 'DELETE' })
-    router.refresh()
+    try {
+      await fetch(`/api/v1/admin/plans/${id}`, { method: 'DELETE' })
+      toast.success(t('deletedSuccess'))
+      router.refresh()
+    } catch {
+      toast.error(t('errorSave'))
+    }
   }
 
   async function toggleActive(plan: PlanWithFeatures) {
-    await fetch(`/api/v1/admin/plans/${plan.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive: !plan.isActive }),
-    })
-    router.refresh()
+    try {
+      await fetch(`/api/v1/admin/plans/${plan.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !plan.isActive }),
+      })
+      toast.success(plan.isActive ? 'تم إيقاف الباقة' : 'تم تفعيل الباقة')
+      router.refresh()
+    } catch {
+      toast.error(t('errorSave'))
+    }
   }
 
   function setFeature<K extends keyof PlanFeatures>(key: K, value: PlanFeatures[K]) {
@@ -157,7 +176,7 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
                     <button onClick={() => openEdit(plan)} className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-[#0F3460]">
                       <Pencil size={14} />
                     </button>
-                    <button onClick={() => deletePlan(plan.id)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500">
+                    <button onClick={() => setDeleteId(plan.id)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -276,6 +295,17 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteId}
+        title={t('deletePlanTitle')}
+        message={t('deletePlanMsg')}
+        confirmLabel={t('delete')}
+        cancelLabel={t('cancel')}
+        variant="danger"
+        onConfirm={() => { if (deleteId) deletePlan(deleteId); setDeleteId(null) }}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   )
 }

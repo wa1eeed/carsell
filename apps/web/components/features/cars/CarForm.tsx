@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { FileText, Link2, ShieldCheck, Upload, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { SaudiPlate } from './SaudiPlate'
 import { Price } from '@/components/ui/Price'
 import { calcNetProfit } from '@/lib/tax'
@@ -241,12 +242,17 @@ export function CarForm() {
       })
       const json = await res.json()
       if (!json.success) {
-        setError(json.error?.message ?? tc('error'))
+        const msg = json.error?.message ?? tc('error')
+        setError(msg)
+        toast.error(msg)
         return
       }
+      toast.success('تمت إضافة السيارة بنجاح')
       router.push(`${prefix}/inventory/${json.data.id}`)
     } catch {
-      setError(tc('error'))
+      const msg = tc('error')
+      setError(msg)
+      toast.error(msg)
     } finally {
       setSaving(false)
     }

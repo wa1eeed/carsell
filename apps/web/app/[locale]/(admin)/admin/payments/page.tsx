@@ -5,13 +5,17 @@ import { formatShowroomId } from '@/lib/format'
 
 export const dynamic  = 'force-dynamic'
 
-export default async function AdminPaymentsPage() {
-  const t = await getTranslations('adminPayments')
+const PAGE_SIZE = 25
 
-  const [payments, stats] = await Promise.all([
+export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string } }) {
+  const t    = await getTranslations('adminPayments')
+  const page = Math.max(1, parseInt(searchParams.page ?? '1', 10))
+
+  const [payments, stats, total] = await Promise.all([
     prisma.tapPayment.findMany({
       orderBy: { createdAt: 'desc' },
-      take:    100,
+      skip:    (page - 1) * PAGE_SIZE,
+      take:    PAGE_SIZE,
       include: {
         subscription: {
           select: {
@@ -30,6 +34,7 @@ export default async function AdminPaymentsPage() {
       const failed = await prisma.tapPayment.count({ where: { status: 'FAILED' } })
       return { totalRevenue: Number(captured._sum.amount ?? 0), successCount: captured._count, failedCount: failed }
     })(),
+    prisma.tapPayment.count(),
   ])
 
   const STATUS_STYLE: Record<string, { cls: string; icon: typeof CheckCircle2 }> = {
@@ -124,6 +129,25 @@ export default async function AdminPaymentsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {total > PAGE_SIZE && (
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-2">
+          <span>{t('prev')} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} {t('next')} {total}</span>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <a href={`?page=${page - 1}`} className="px-3 py-1.5 border border-gray-200 rounded-[6px] hover:bg-gray-50">
+                {t('prev')}
+              </a>
+            )}
+            {page * PAGE_SIZE < total && (
+              <a href={`?page=${page + 1}`} className="px-3 py-1.5 border border-gray-200 rounded-[6px] hover:bg-gray-50">
+                {t('next')}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
