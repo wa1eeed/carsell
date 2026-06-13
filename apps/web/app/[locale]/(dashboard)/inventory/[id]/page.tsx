@@ -30,6 +30,7 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
   const data: CarDetailData = {
     id:              fullCar.id,
     carRefNumber:    fullCar.carRefNumber,
+    carPublicId:     fullCar.carPublicId ?? null,
     showroomSlug:    showroom?.slug ?? null,
     brandNameAr:     fullCar.brand.nameAr,
     brandNameEn:     fullCar.brand.nameEn,

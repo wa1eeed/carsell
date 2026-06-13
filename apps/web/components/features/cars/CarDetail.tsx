@@ -7,8 +7,9 @@ import {
   Upload, ChevronDown, Receipt, Printer, Gavel, StopCircle,
   Fuel, Gauge, Palette, Hash, CalendarDays, Car, Settings2,
   Users, Banknote, Clock, TrendingUp, ChevronRight, Phone,
-  FileText, Image as ImageIcon, Tag, ShieldCheck,
+  FileText, Image as ImageIcon, Tag, ShieldCheck, ArrowRight,
 } from 'lucide-react'
+import Link from 'next/link'
 import { SaudiPlate } from './SaudiPlate'
 import { Price } from '@/components/ui/Price'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -24,6 +25,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 export interface CarDetailData {
   id:             string
   carRefNumber:   number
+  carPublicId?:   string | null
   showroomSlug?:  string | null
   brandNameAr:    string
   brandNameEn:    string
@@ -145,6 +147,14 @@ export function CarDetail({ car }: { car: CarDetailData }) {
   return (
     <div className="space-y-5" dir={ar ? 'rtl' : 'ltr'}>
 
+      {/* ── Back button ── */}
+      <div>
+        <Link href={`/${locale}/inventory`} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0F3460] transition-colors">
+          <ArrowRight size={15} className={ar ? '' : 'rotate-180'} />
+          {ar ? 'رجوع إلى المخزون' : 'Back to Inventory'}
+        </Link>
+      </div>
+
       {/* ── Hero header ── */}
       <div className="bg-white rounded-[16px] border border-gray-100 overflow-hidden">
         {/* Cover strip */}
@@ -164,9 +174,16 @@ export function CarDetail({ car }: { car: CarDetailData }) {
             </div>
           )}
 
-          {/* Car ref ID */}
-          <div className={`absolute top-3 ${ar ? 'left-3' : 'right-3'} bg-black/40 text-white text-xs font-mono px-2.5 py-1 rounded-full`}>
-            #{formatCarRef(car.carRefNumber)}
+          {/* Car ref ID + Public ID */}
+          <div className={`absolute top-3 ${ar ? 'left-3' : 'right-3'} flex flex-col items-end gap-1`}>
+            <div className="bg-black/40 text-white text-xs font-mono px-2.5 py-1 rounded-full">
+              #{formatCarRef(car.carRefNumber)}
+            </div>
+            {car.carPublicId && (
+              <div className="bg-[#C9A84C]/90 text-white text-[10px] font-mono px-2 py-0.5 rounded-full tracking-wider">
+                {car.carPublicId}
+              </div>
+            )}
           </div>
 
           {/* Title overlay */}

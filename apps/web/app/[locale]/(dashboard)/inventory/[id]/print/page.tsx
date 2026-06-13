@@ -59,8 +59,11 @@ export default async function PrintSlipPage({ params }: Props) {
   })
 
   const publicUrl = showroom?.slug
-    ? `https://${showroom.slug}.carsell.one/cars/${car!.carRefNumber}`
+    ? `https://carsell.one/${showroom.slug}/cars/${car!.carRefNumber}`
     : `https://carsell.one/${params.locale}/market/cars/${car!.carRefNumber}`
+
+  // Back link — direct href because print opens in a new tab (no history)
+  const backUrl = `/${params.locale}/inventory/${car!.carRefNumber}`
 
   return (
     <PrintSlipClient
@@ -96,6 +99,7 @@ export default async function PrintSlipPage({ params }: Props) {
       }}
       publicUrl={publicUrl}
       locale={params.locale}
+      backUrl={backUrl}
     />
   )
 }

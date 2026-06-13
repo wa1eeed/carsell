@@ -348,6 +348,7 @@ model Model {
 
 model Car {
   id            String        @id @default(uuid())
+  carPublicId   String?       @unique @map("car_public_id") // e.g. CS26000001
   showroomId    String
   brandId       String
   categoryId    String

@@ -3,6 +3,23 @@ import type { Prisma } from '@prisma/client'
 import type { CreateCarInput, UpdateCarInput, CarFilterInput } from '@/lib/validations/car.schema'
 import { PAGINATION } from '@/lib/constants'
 
+/** Generate a platform-wide unique car public ID: CS + YY + 6-digit sequence = 10 chars */
+async function generateCarPublicId(): Promise<string> {
+  const yy = new Date().getFullYear().toString().slice(2) // '2026' → '26'
+  const prefix = `CS${yy}`
+  // Find highest sequence in current year to determine next number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const latest = await (prisma.car as any).findFirst({
+    where:   { carPublicId: { startsWith: prefix } },
+    orderBy: { carPublicId: 'desc' },
+    select:  { carPublicId: true },
+  }) as { carPublicId: string | null } | null
+  const nextSeq = latest?.carPublicId
+    ? Number(latest.carPublicId.slice(4)) + 1  // slice after 'CS' + 'YY' = 4 chars
+    : 1
+  return `${prefix}${String(nextSeq).padStart(6, '0')}`
+}
+
 export const carRepository = {
   async findByShowroom(showroomId: string, opts?: Partial<CarFilterInput>) {
     const page     = opts?.page ?? 1
@@ -96,10 +113,13 @@ export const carRepository = {
   },
 
   async create(showroomId: string, createdBy: string, data: CreateCarInput & { carRefNumber?: number }) {
-    return prisma.car.create({
+    const carPublicId = await generateCarPublicId()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (prisma.car as any).create({
       data: {
         showroomId,
         createdBy,
+        carPublicId,
         carRefNumber:  data.carRefNumber ?? 0,
         brandId:       data.brandId,
         categoryId:    data.categoryId,

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Printer, ArrowRight } from 'lucide-react'
 import QRCode from 'qrcode'
@@ -45,11 +44,11 @@ interface Props {
   showroom:  ShowroomData
   publicUrl: string
   locale:    string
+  backUrl:   string
 }
 
-export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Props) {
-  const t      = useTranslations('printSlip')
-  const router = useRouter()
+export default function PrintSlipClient({ car, showroom, publicUrl, locale, backUrl }: Props) {
+  const t = useTranslations('printSlip')
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [slipType, setSlipType]   = useState<'a4' | 'label'>('a4')
 
@@ -67,9 +66,9 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
       {/* Controls bar — hidden on print */}
       <div className="print:hidden bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+          <a href={backUrl} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
             <ArrowRight size={14} /> {t('back')}
-          </button>
+          </a>
           <span className="text-gray-300">|</span>
           <h1 className="font-semibold text-gray-800 text-sm">
             {t('printTitle')} {locale === 'ar' ? car.brandNameAr : car.brandNameEn} {locale === 'ar' ? car.categoryNameAr : car.categoryNameEn} {car.year}
@@ -124,7 +123,7 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
 
 // ── A4 Slip ──────────────────────────────────────────────────────────────────
 
-function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'slipType'> & { qrDataUrl: string }) {
+function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'slipType' | 'backUrl'> & { qrDataUrl: string }) {
   const t   = useTranslations('printSlip')
   const ar  = locale === 'ar'
   const dir = ar ? 'rtl' : 'ltr'
