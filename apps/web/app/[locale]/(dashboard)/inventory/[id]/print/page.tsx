@@ -58,7 +58,9 @@ export default async function PrintSlipPage({ params }: Props) {
     select: { url: true },
   })
 
-  const publicUrl = `https://carsell.one/${params.locale}/market/cars/${car!.carRefNumber}`
+  const publicUrl = showroom?.slug
+    ? `https://${showroom.slug}.carsell.one/cars/${car!.carRefNumber}`
+    : `https://carsell.one/${params.locale}/market/cars/${car!.carRefNumber}`
 
   return (
     <PrintSlipClient

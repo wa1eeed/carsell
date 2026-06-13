@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import {
   Inbox, CalendarClock, HandCoins, ShoppingCart, Phone,
@@ -82,10 +82,15 @@ const NEXT_ACTIONS: Record<RequestStatus, { status: RequestStatus; label: string
 }
 
 export function RequestsClient({ requests, counts, activeStatus }: Props) {
-  const router = useRouter()
-  const locale = useLocale()
+  const router   = useRouter()
+  const pathname = usePathname()
+  const locale   = useLocale()
   const t  = useTranslations('requests')
   const ar = locale === 'ar'
+
+  function goStatus(s: string) {
+    router.push(`${pathname}?status=${s}`)
+  }
   const [busy, setBusy] = useState<string | null>(null)
 
   async function act(id: string, status: RequestStatus) {
@@ -132,7 +137,7 @@ export function RequestsClient({ requests, counts, activeStatus }: Props) {
           {(['PENDING','RESERVED','WAITING_PAYMENT','OWNERSHIP_TRANSFER','COMPLETED'] as RequestStatus[]).map((s, i) => (
             <div key={s} className="flex items-center gap-1 flex-1">
               <button
-                onClick={() => router.push(`/${locale}/requests?status=${s}`)}
+                onClick={() => goStatus(s)}
                 className={`flex-1 text-center py-1.5 rounded-[6px] font-medium transition-all ${
                   activeStatus === s
                     ? 'bg-[#0F3460] text-white'
@@ -155,7 +160,7 @@ export function RequestsClient({ requests, counts, activeStatus }: Props) {
           {(['REJECTED','CANCELLED'] as RequestStatus[]).map((s) => (
             <button
               key={s}
-              onClick={() => router.push(`/${locale}/requests?status=${s}`)}
+              onClick={() => goStatus(s)}
               className={`text-xs px-3 py-1 rounded-[6px] border transition-all ${
                 activeStatus === s
                   ? 'bg-gray-700 text-white border-gray-700'

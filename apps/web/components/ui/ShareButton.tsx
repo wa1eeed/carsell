@@ -37,8 +37,9 @@ export function ShareButton({ carId, carTitle, price, showroomSlug, source, loca
           ? `${base}/${showroomSlug}/cars/${carId}`
           : `${base}/${locale}/market/cars/${carId}`
       case 'dashboard':
-        // Share to the public market page (most useful from dashboard)
-        return `${base}/${locale}/market/cars/${carId}`
+        return showroomSlug
+          ? `${base}/${showroomSlug}/cars/${carId}`
+          : `${base}/${locale}/market/cars/${carId}`
     }
   }
 

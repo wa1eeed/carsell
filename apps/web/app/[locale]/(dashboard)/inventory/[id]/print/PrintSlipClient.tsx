@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Printer, ArrowRight } from 'lucide-react'
 import QRCode from 'qrcode'
@@ -47,7 +48,8 @@ interface Props {
 }
 
 export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Props) {
-  const t = useTranslations('printSlip')
+  const t      = useTranslations('printSlip')
+  const router = useRouter()
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [slipType, setSlipType]   = useState<'a4' | 'label'>('a4')
 
@@ -65,9 +67,9 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
       {/* Controls bar — hidden on print */}
       <div className="print:hidden bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <a href="javascript:history.back()" className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+          <button onClick={() => router.back()} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
             <ArrowRight size={14} /> {t('back')}
-          </a>
+          </button>
           <span className="text-gray-300">|</span>
           <h1 className="font-semibold text-gray-800 text-sm">
             {t('printTitle')} {locale === 'ar' ? car.brandNameAr : car.brandNameEn} {locale === 'ar' ? car.categoryNameAr : car.categoryNameEn} {car.year}

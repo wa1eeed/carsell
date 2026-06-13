@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 
-export function DashboardShell({ showroomName, children }: { showroomName: string; children: React.ReactNode }) {
+export function DashboardShell({ showroomName, showroomSlug, children }: { showroomName: string; showroomSlug?: string | null; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -26,7 +26,7 @@ export function DashboardShell({ showroomName, children }: { showroomName: strin
 
       {/* Right side — topbar + scrollable content */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        <Topbar showroomName={showroomName} onMenuClick={() => setOpen(true)} />
+        <Topbar showroomName={showroomName} showroomSlug={showroomSlug} onMenuClick={() => setOpen(true)} />
         <main className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6">
           {children}
         </main>

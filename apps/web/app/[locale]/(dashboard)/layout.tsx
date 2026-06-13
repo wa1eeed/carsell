@@ -19,15 +19,16 @@ export default async function DashboardLayout({
   const [showroom, subscription] = await Promise.all([
     prisma.showroom.findUnique({
       where: { id: session.user.showroomId },
-      select: { name: true },
+      select: { name: true, slug: true },
     }).catch(() => null),
     getSubscriptionByShowroom(session.user.showroomId).catch(() => null),
   ])
 
   const showroomName = showroom?.name ?? 'CarSell'
+  const showroomSlug = showroom?.slug ?? null
 
   return (
-    <DashboardShell showroomName={showroomName}>
+    <DashboardShell showroomName={showroomName} showroomSlug={showroomSlug}>
       {/* Subscription status banner */}
       <div className="mb-4">
         <SubscriptionBanner subscription={subscription} />

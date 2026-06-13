@@ -2,12 +2,12 @@
 
 import { signOut } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
-import { LogOut, Menu, Store, Bell, ExternalLink } from 'lucide-react'
+import { LogOut, Menu, Store, Bell, ExternalLink, Building2 } from 'lucide-react'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import { ROOT_DOMAIN } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
-export function Topbar({ showroomName, onMenuClick }: { showroomName: string; onMenuClick?: () => void }) {
+export function Topbar({ showroomName, showroomSlug, onMenuClick }: { showroomName: string; showroomSlug?: string | null; onMenuClick?: () => void }) {
   const t      = useTranslations('nav')
   const locale = useLocale()
 
@@ -42,15 +42,28 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
 
       {/* Right — actions */}
       <div className="flex items-center gap-1.5">
-        {/* Market link */}
+        {/* My Showroom */}
+        {showroomSlug && (
+          <a
+            href={`https://${showroomSlug}.${ROOT_DOMAIN}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-xs font-semibold text-cl-primary border border-cl-primary/20 hover:bg-cl-primary/5 transition-colors"
+          >
+            <Building2 size={13} />
+            {t('myShowroom')}
+            <ExternalLink size={11} className="opacity-50" />
+          </a>
+        )}
+        {/* CarSell Market */}
         <a
-          href={`/${locale}/market`}
+          href={`https://${ROOT_DOMAIN}/${locale}/market`}
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-xs font-semibold text-cl-accent border border-cl-accent/30 hover:bg-cl-accent/5 transition-colors"
         >
           <Store size={13} />
-          {t('market')}
+          CarSell Market
           <ExternalLink size={11} className="opacity-50" />
         </a>
 

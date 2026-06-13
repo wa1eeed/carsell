@@ -213,9 +213,10 @@ export function CarDetail({ car }: { car: CarDetailData }) {
           </a>
 
           <ShareButton
-            carId={car.id}
+            carId={String(car.carRefNumber)}
             carTitle={`${brandName} ${categoryName} ${car.year}`}
             price={car.sellPrice ? String(car.sellPrice) : undefined}
+            showroomSlug={car.showroomSlug}
             source="dashboard"
             locale={locale}
           />
