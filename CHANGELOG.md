@@ -5,6 +5,15 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.3] — 2026-06-13 · carPublicId Lookup + Robust Showroom URL
+
+### Fixed
+- **صفحة تفاصيل السيارة في لوحة المعرض** (`/inventory/CS26000014`) — كانت تنهار (client-side exception / 404) لأن الصفحة كانت تتعامل مع `carPublicId` كأنه UUID. الآن `inventory/[id]` و`inventory/[id]/print` يكتشفان نمط `CS\d{8}` ويبحثان عبر `carRepository.findByPublicId`
+- **`carRepository.findByPublicId`** — دالة جديدة للبحث عن السيارة بـ `carPublicId` ضمن نطاق المعرض
+- **زر My Showroom** — أصبح طلب `customDomain` منفصلاً في الـ layout، بحيث لا يؤدي غياب العمود في قواعد بيانات قديمة إلى تصفير الـ slug وإخفاء/تعطيل الزر. كما يتم تجاهل slug الخاص بـ `__platform__`. الرابط الآن دائماً `carsell.one/{slug}` أو الدومين الخاص الموثّق
+
+---
+
 ## [1.0.2] — 2026-06-13 · Inventory Links + Print Slip Fix
 
 ### Fixed
