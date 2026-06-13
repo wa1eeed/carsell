@@ -149,7 +149,7 @@ export function CarDetail({ car }: { car: CarDetailData }) {
 
       {/* ── Back button ── */}
       <div>
-        <Link href={`/${locale}/inventory`} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0F3460] transition-colors">
+        <Link href={`${prefix}/inventory`} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0F3460] transition-colors">
           <ArrowRight size={15} className={ar ? '' : 'rotate-180'} />
           {ar ? 'رجوع إلى المخزون' : 'Back to Inventory'}
         </Link>

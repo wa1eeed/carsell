@@ -36,11 +36,15 @@ export default async function DashboardLayout({
   const showroomName = showroom?.name ?? 'CarSell'
   // `__platform__` is the internal admin showroom — it has no public landing page
   const showroomSlug = showroom?.slug && showroom.slug !== '__platform__' ? showroom.slug : null
-  // Use verified custom domain if set, otherwise fall back to carsell.one/{slug}
+  // Locale prefix for platform URLs (as-needed: Arabic default has none, others do).
+  // Without it, carsell.one/{slug} triggers a next-intl locale-detection redirect
+  // that lands on the reserved internal /{locale}/showroom route — the bug users hit.
+  const lp = locale === 'ar' ? '' : `/${locale}`
+  // Use verified custom domain if set, otherwise fall back to carsell.one/{locale}/{slug}
   const showroomUrl = customDomainInfo?.customDomainVerified && customDomainInfo.customDomain
     ? `https://${customDomainInfo.customDomain}`
     : showroomSlug
-      ? `https://${ROOT_DOMAIN}/${showroomSlug}`
+      ? `https://${ROOT_DOMAIN}${lp}/${showroomSlug}`
       : null
 
   return (

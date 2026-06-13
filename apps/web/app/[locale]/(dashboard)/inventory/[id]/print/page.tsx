@@ -66,12 +66,16 @@ export default async function PrintSlipPage({ params }: Props) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const carSlug = (car as any).carPublicId ?? car!.carRefNumber
+  // Locale prefix (as-needed): Arabic default has none, others do. Required so the
+  // public URL goes straight to /{locale}/{slug}/cars/... without a locale-detection
+  // redirect that would expose the reserved internal /{locale}/showroom route.
+  const lp = params.locale === 'ar' ? '' : `/${params.locale}`
   const publicUrl = showroom?.slug
-    ? `https://carsell.one/${showroom.slug}/cars/${carSlug}`
-    : `https://carsell.one/${params.locale}/market/cars/${carSlug}`
+    ? `https://carsell.one${lp}/${showroom.slug}/cars/${carSlug}`
+    : `https://carsell.one${lp}/market/cars/${carSlug}`
 
   // Back link — direct href because print opens in a new tab (no history)
-  const backUrl = `/${params.locale}/inventory/${carSlug}`
+  const backUrl = `${lp}/inventory/${carSlug}`
 
   return (
     <PrintSlipClient

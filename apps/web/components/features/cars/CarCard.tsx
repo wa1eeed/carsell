@@ -39,7 +39,7 @@ export function CarCard({ car }: { car: CarCardData }) {
           <StatusBadge status={car.status} />
         </span>
         <span className="absolute bottom-2 start-2 bg-black/50 text-white text-[10px] font-mono px-1.5 py-0.5 rounded">
-          #{formatCarRef(car.carRefNumber)}
+          {car.carPublicId ?? `#${formatCarRef(car.carRefNumber)}`}
         </span>
       </div>
 
