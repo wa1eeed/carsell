@@ -7,6 +7,7 @@ export interface DashboardKpis {
   inventoryCount: number
   monthlySales: number
   monthlyRevenue: number
+  pendingRequests: number
   activeUsers: number
   showroomCount: number
   trends: {
@@ -62,7 +63,7 @@ export const dashboardRepository = {
     const lastMonthStart = startOfLastMonth()
     const saleScope = isPlatformAdmin(user) ? {} : { showroomId: user.showroomId }
 
-    const [inventoryCount, monthlySales, revenueAgg, prevSales, prevRevenueAgg, activeUsers, showroomCount] = await Promise.all([
+    const [inventoryCount, monthlySales, revenueAgg, prevSales, prevRevenueAgg, activeUsers, showroomCount, pendingRequests] = await Promise.all([
       prisma.car.count({ where: carScope(user) }),
       prisma.sale.count({ where: { ...saleScope, soldAt: { gte: monthStart } } }),
       prisma.sale.aggregate({ where: { ...saleScope, soldAt: { gte: monthStart } }, _sum: { sellPrice: true } }),
@@ -72,6 +73,12 @@ export const dashboardRepository = {
         where: isPlatformAdmin(user) ? { isActive: true } : { showroomId: user.showroomId, isActive: true },
       }),
       isPlatformAdmin(user) ? prisma.showroom.count() : Promise.resolve(1),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma.carRequest as any).count({
+        where: isPlatformAdmin(user)
+          ? { status: 'PENDING' }
+          : { showroomId: user.showroomId, status: 'PENDING' },
+      }).catch(() => 0),
     ])
 
     const monthlyRevenue = Number(revenueAgg._sum.sellPrice ?? 0)
@@ -81,6 +88,7 @@ export const dashboardRepository = {
       inventoryCount,
       monthlySales,
       monthlyRevenue,
+      pendingRequests,
       activeUsers,
       showroomCount,
       trends: {

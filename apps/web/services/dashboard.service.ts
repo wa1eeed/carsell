@@ -17,7 +17,7 @@ export async function getDashboardData(user: AuthUser) {
     logger.error({ err }, 'dashboard.load.failed')
     return {
       ok: false as const,
-      kpis: { inventoryCount: 0, monthlySales: 0, monthlyRevenue: 0, activeUsers: 0, showroomCount: 0, trends: { monthlySales: { value: 0 }, monthlyRevenue: { value: 0 } } },
+      kpis: { inventoryCount: 0, monthlySales: 0, monthlyRevenue: 0, pendingRequests: 0, activeUsers: 0, showroomCount: 0, trends: { monthlySales: { value: 0 }, monthlyRevenue: { value: 0 } } },
       market: { listedCount: 0, marketValue: 0, brandBreakdown: [] },
       recentCars: [],
       auctions: [],
