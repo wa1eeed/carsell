@@ -5,6 +5,19 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.5] — 2026-06-13 · Showroom-relevant Dashboard KPIs
+
+### Changed
+- **عدّادات لوحة المعرض (KPIs)** — أُعيد بناؤها لتعرض ما يهم صاحب المعرض فعلاً. العدّادات الأربعة الآن: **المخزون / مبيعات الشهر / الإيرادات / الطلبات المعلّقة**
+- **استبدال «المستخدمون النشطون»** بعدّاد **الطلبات المعلّقة** (`pendingRequests`) — وهو الأهم تشغيلياً للمعرض إذ يُظهر فوراً الطلبات التي تنتظر رداً
+
+### Added
+- **`pendingRequests` في `DashboardKpis`** — يحسب `carRequest.count` بحالة `PENDING` ضمن نطاق `showroomId` (وكامل المنصّة لمشرف المنصّة)، مع `.catch(() => 0)` للمتانة
+- **أيقونة `requests` (Inbox) بلون برتقالي** في `KpiCard`
+- **مفاتيح ترجمة `pendingRequests`** في `ar.json` و`en.json`
+
+---
+
 ## [1.0.4] — 2026-06-13 · Session Separation + Admin-only KPI
 
 ### Fixed
