@@ -238,9 +238,12 @@
     "markCompleted": "Mark sold",
     "tabs": {
       "pending": "Pending",
-      "accepted": "Accepted",
+      "reserved": "Reserved",
+      "waitingPayment": "Awaiting Payment",
+      "ownershipTransfer": "Ownership Transfer",
       "completed": "Completed",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
     },
     "type": {
       "RESERVATION": "Reservation",

@@ -40,7 +40,7 @@ export interface CarDetailData {
   engineSize: string | null
   mojazReportUrl: string | null
   numberOfOwners: number | null
-  timeline: { id: string; eventType: string; userName: string; createdAt: string }[]
+  timeline: { id: string; eventType: string; payload: Record<string, unknown>; userName: string; createdAt: string }[]
   documents: { id: string; docType: string; fileName: string; fileUrl: string }[]
 }
 
@@ -251,6 +251,45 @@ function FinancialTab({ car, tf }: { car: CarDetailData; tf: (k: string) => stri
   )
 }
 
+const CAR_STATUS_AR: Record<string, string> = {
+  DRAFT: 'مسودة', FOR_SALE: 'معروضة للبيع', RESERVED: 'محجوزة', AUCTION: 'مزاد', SOLD: 'مباعة',
+}
+const REQUEST_STATUS_AR: Record<string, string> = {
+  RESERVED: 'محجوزة', WAITING_PAYMENT: 'انتظار الدفع',
+  OWNERSHIP_TRANSFER: 'نقل الملكية', COMPLETED: 'مكتملة',
+  REJECTED: 'مرفوضة', CANCELLED: 'ملغاة',
+}
+const DISPLAY_MODE_AR: Record<string, string> = {
+  FIXED_PRICE: 'سعر ثابت', SOUM: 'سوم', AUCTION: 'مزاد',
+}
+
+function timelineLabel(eventType: string, payload: Record<string, unknown>): string {
+  switch (eventType) {
+    case 'CAR_CREATED':    return 'تم إنشاء السيارة'
+    case 'FIELD_UPDATED':  return `تحديث حقل: ${payload.field ?? ''}`
+    case 'PRICE_CHANGED':  return `تغيير السعر → ${payload.to ?? ''} ريال`
+    case 'NOTE_ADDED':     return 'إضافة ملاحظة'
+    case 'FILE_UPLOADED':  return 'رفع ملف'
+    case 'FILE_DELETED':   return 'حذف ملف'
+    case 'SALE_REGISTERED': return 'تسجيل بيع'
+    case 'STATUS_CHANGED': {
+      const to   = String(payload.to ?? '')
+      const mode = payload.displayMode ? ` (${DISPLAY_MODE_AR[String(payload.displayMode)] ?? payload.displayMode})` : ''
+      // Published
+      if (payload.displayMode) return `نشر السيارة${mode} — ${CAR_STATUS_AR[to] ?? to}`
+      // Request-driven
+      const reqStatus = String(payload.requestStatus ?? '')
+      if (reqStatus) {
+        const buyer = payload.buyerName ? ` · ${payload.buyerName}` : ''
+        return `${REQUEST_STATUS_AR[reqStatus] ?? reqStatus}${buyer} — السيارة: ${CAR_STATUS_AR[to] ?? to}`
+      }
+      const from = CAR_STATUS_AR[String(payload.from ?? '')] ?? payload.from ?? ''
+      return `تغيير الحالة: ${from} ← ${CAR_STATUS_AR[to] ?? to}`
+    }
+    default: return eventType
+  }
+}
+
 function TimelineTab({
   timeline,
   locale,
@@ -262,13 +301,14 @@ function TimelineTab({
 }) {
   if (timeline.length === 0) return <p className="text-sm text-cl-gray-400">{tc('noData')}</p>
   return (
-    <ol className="space-y-3">
+    <ol className="relative border-r border-gray-100 mr-3 space-y-0">
       {timeline.map((e) => (
-        <li key={e.id} className="cl-card flex items-center justify-between !py-3">
-          <span className="text-sm">{e.eventType}</span>
-          <span className="text-xs text-cl-gray-400">
-            {e.userName} · {formatDateTime(e.createdAt, locale)}
-          </span>
+        <li key={e.id} className="mb-4 mr-6">
+          <span className="absolute -right-1.5 mt-1.5 w-3 h-3 rounded-full border-2 border-white bg-[#C9A84C]" />
+          <div className="bg-white border border-gray-100 rounded-[8px] px-3 py-2.5">
+            <p className="text-sm font-medium text-gray-800">{timelineLabel(e.eventType, e.payload)}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{e.userName} · {formatDateTime(e.createdAt, locale)}</p>
+          </div>
         </li>
       ))}
     </ol>

@@ -41,9 +41,10 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
     mojazReportUrl: car.mojazReportUrl,
     numberOfOwners: car.numberOfOwners,
     timeline: car.timeline.map((e) => ({
-      id: e.id,
+      id:        e.id,
       eventType: e.eventType,
-      userName: e.user.name,
+      payload:   e.payload as Record<string, unknown>,
+      userName:  e.user.name,
       createdAt: e.createdAt.toISOString(),
     })),
     documents: car.documents.map((d) => ({

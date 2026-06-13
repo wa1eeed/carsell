@@ -237,10 +237,13 @@
     "reject": "رفض",
     "markCompleted": "تم البيع",
     "tabs": {
-      "pending": "بانتظار الرد",
-      "accepted": "مقبولة",
+      "pending": "قيد الانتظار",
+      "reserved": "محجوزة",
+      "waitingPayment": "انتظار الدفع",
+      "ownershipTransfer": "نقل الملكية",
       "completed": "مكتملة",
-      "rejected": "مرفوضة"
+      "rejected": "مرفوضة",
+      "cancelled": "ملغاة"
     },
     "type": {
       "RESERVATION": "حجز",

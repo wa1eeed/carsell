@@ -1,26 +1,30 @@
 import { requirePageUser } from '@/lib/auth-guard'
 import { requestRepository } from '@/repositories/request.repository'
 import { RequestsClient } from './RequestsClient'
-import type { CarRequestStatus } from '@prisma/client'
 
 export const dynamic  = 'force-dynamic'
 export const metadata = { title: 'الطلبات — CarSell' }
 
+const VALID_STATUSES = [
+  'PENDING', 'RESERVED', 'WAITING_PAYMENT', 'OWNERSHIP_TRANSFER', 'COMPLETED', 'REJECTED', 'CANCELLED',
+] as const
+type Status = typeof VALID_STATUSES[number]
+
 export default async function RequestsPage({ searchParams }: { searchParams: { status?: string } }) {
   const user = await requirePageUser()
 
-  const valid = ['PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED'] as const
-  const status = (valid as readonly string[]).includes(searchParams.status ?? '')
-    ? (searchParams.status as CarRequestStatus)
-    : undefined
+  const status: Status = (VALID_STATUSES as readonly string[]).includes(searchParams.status ?? '')
+    ? (searchParams.status as Status)
+    : 'PENDING'
 
   const [requests, counts] = await Promise.all([
-    requestRepository.listForShowroom(user.showroomId, { status }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    requestRepository.listForShowroom(user.showroomId, { status: status as any }),
     requestRepository.countsForShowroom(user.showroomId),
   ])
 
-  // Serialize Decimal → number for the client component
-  const data = requests.map((r) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = (requests as any[]).map((r) => ({
     id:          r.id,
     type:        r.type,
     status:      r.status,
@@ -30,6 +34,7 @@ export default async function RequestsPage({ searchParams }: { searchParams: { s
     message:     r.message,
     dealerNote:  r.dealerNote,
     createdAt:   r.createdAt.toISOString(),
+    customer:    r.customer ?? null,
     car: {
       ref:        r.car.carRefNumber,
       year:       r.car.year,
@@ -42,5 +47,5 @@ export default async function RequestsPage({ searchParams }: { searchParams: { s
     },
   }))
 
-  return <RequestsClient requests={data} counts={counts} activeStatus={status ?? 'PENDING'} />
+  return <RequestsClient requests={data} counts={counts} activeStatus={status} />
 }

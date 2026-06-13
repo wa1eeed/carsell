@@ -524,9 +524,10 @@ model Customer {
   idNumber   String?
   email      String?
 
-  showroom Showroom  @relation(fields: [showroomId], references: [id])
-  sales    Sale[]
-  deposits Deposit[]
+  showroom    Showroom     @relation(fields: [showroomId], references: [id])
+  sales       Sale[]
+  deposits    Deposit[]
+  carRequests CarRequest[]
 
   // Customers list is scoped to a showroom
   @@index([showroomId])
@@ -823,11 +824,13 @@ enum CarRequestType {
 }
 
 enum CarRequestStatus {
-  PENDING       // بانتظار رد المعرض
-  ACCEPTED      // مقبول
-  REJECTED      // مرفوض
-  CANCELLED     // ألغاه المشتري
-  COMPLETED     // اكتمل (تحوّل لبيع)
+  PENDING              // بانتظار رد المعرض
+  RESERVED             // قبل المعرض — السيارة محجوزة
+  WAITING_PAYMENT      // بانتظار الدفع
+  OWNERSHIP_TRANSFER   // جاري نقل الملكية
+  COMPLETED            // اكتمل (تحوّل لبيع)
+  REJECTED             // رفضه المعرض
+  CANCELLED            // ألغي
 }
 
 model CarRequest {
@@ -841,11 +844,13 @@ model CarRequest {
   offerAmount Decimal?         @db.Decimal(12, 2)  // for SOUM_OFFER
   message     String?
   dealerNote  String?          // optional note when accepting/rejecting
+  customerId  String?          // created/linked when request is RESERVED
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  car      Car      @relation(fields: [carId], references: [id])
-  showroom Showroom @relation(fields: [showroomId], references: [id])
+  car      Car       @relation(fields: [carId], references: [id])
+  showroom Showroom  @relation(fields: [showroomId], references: [id])
+  customer Customer? @relation(fields: [customerId], references: [id])
 
   // Dealer's requests inbox: scoped to showroom, filter by status, newest first
   @@index([showroomId, status, createdAt])

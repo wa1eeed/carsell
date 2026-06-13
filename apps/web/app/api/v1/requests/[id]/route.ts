@@ -10,7 +10,7 @@ import { requestRepository } from '@/repositories/request.repository'
 import logger from '@/lib/logger'
 
 const schema = z.object({
-  status:     z.enum(['ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED']),
+  status:     z.enum(['RESERVED', 'WAITING_PAYMENT', 'OWNERSHIP_TRANSFER', 'COMPLETED', 'REJECTED', 'CANCELLED'] as const),
   dealerNote: z.string().max(500).optional(),
 })
 
@@ -22,7 +22,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!parsed.success) return apiResponse.validationError(parsed.error)
 
   const result = await requestRepository.updateStatus(
-    params.id, session.showroomId, parsed.data.status, parsed.data.dealerNote,
+    params.id, session.showroomId,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parsed.data.status as any,
+    parsed.data.dealerNote,
   )
   if (result.count === 0) return apiResponse.notFound('الطلب غير موجود')
 
