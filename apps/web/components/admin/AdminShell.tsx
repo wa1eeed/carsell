@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import { useLocale } from 'next-intl'
 import {
   LayoutDashboard,
   CreditCard,
@@ -38,6 +39,7 @@ export function AdminShell({
   adminName: string
 }) {
   const pathname = usePathname()
+  const locale = useLocale()
 
   const isActive = (href: string) =>
     href === '/admin'
@@ -98,7 +100,7 @@ export function AdminShell({
             </div>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/ar/login' })}
+            onClick={() => signOut({ callbackUrl: `/${locale}/admin/login` })}
             className="flex items-center gap-2 w-full px-3 py-2 rounded-[8px] text-sm text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
           >
             <LogOut size={14} />

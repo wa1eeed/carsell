@@ -42,7 +42,7 @@ export function Topbar({ showroomName, onMenuClick }: { showroomName: string; on
         <LocaleSwitcher />
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: `https://${ROOT_DOMAIN}${locale === 'ar' ? '/login' : '/en/login'}` })}
+          onClick={() => signOut({ callbackUrl: `https://app.${ROOT_DOMAIN}/${locale}/login` })}
           className="flex items-center gap-1.5 rounded-input px-3 py-1.5 text-sm text-cl-gray-600 hover:bg-cl-gray-100"
         >
           <LogOut size={16} />
