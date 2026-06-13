@@ -777,23 +777,25 @@ function MarketCarCard({
   }
 
   return (
-    <article className="group bg-white rounded-[14px] border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+    <article className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
       {/* Cover image */}
-      <Link href={detailHref} className="block relative aspect-[16/11] overflow-hidden bg-gray-100">
+      <Link href={detailHref} className="block relative aspect-[16/10] overflow-hidden bg-gray-100">
         {coverUrl ? (
           <Image
             src={coverUrl}
             alt={`${car.brand.nameAr} ${car.year}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50">
-            <Car size={36} className="text-gray-200" />
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gray-50">
+            <Car size={32} className="text-gray-200" />
+            <span className="text-xs text-gray-300">لا توجد صورة</span>
           </div>
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
         {/* Condition badge — top-start */}
         <span className={`
@@ -887,21 +889,21 @@ function MarketCarCard({
         <div className="flex gap-1.5 mt-2.5">
           <button
             onClick={handleWhatsApp}
-            className="flex-1 flex items-center justify-center gap-1 bg-[#25D366] text-white text-xs py-2 rounded-[8px] hover:bg-[#1da855] transition-colors font-medium"
+            className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] transition-colors shrink-0"
+            title={t('whatsapp')}
           >
-            <MessageCircle size={13} />
-            {t('whatsapp')}
+            <MessageCircle size={16} />
           </button>
           <Link
             href={detailHref}
-            className="flex-1 flex items-center justify-center text-xs py-2 rounded-[8px] bg-[#0F3460]/5 text-[#0F3460] hover:bg-[#0F3460]/10 transition-colors font-medium"
+            className="flex-1 flex items-center justify-center text-xs py-2 rounded-xl bg-[#0F3460] text-white hover:bg-[#0A2540] transition-colors font-semibold"
           >
             {t('viewDetails')}
           </Link>
           <button
             onClick={handleShare}
             aria-label={t('share')}
-            className="px-2.5 py-2 border border-gray-200 rounded-[8px] text-gray-400 hover:text-[#0F3460] hover:border-[#0F3460]/30 transition-colors"
+            className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 text-gray-400 hover:text-[#0F3460] hover:border-[#0F3460]/30 transition-colors shrink-0"
           >
             <Share2 size={13} />
           </button>

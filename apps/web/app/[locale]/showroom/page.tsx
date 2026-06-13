@@ -97,7 +97,7 @@ export default async function ShowroomPage({
   }))
 
   return (
-    <div className="min-h-screen bg-cl-gray-50">
+    <div className="min-h-screen bg-[#F4F6F9]">
       <ShowroomHeader
         showroom={{
           name: showroom.name,
@@ -110,13 +110,27 @@ export default async function ShowroomPage({
           instagramUrl: showroom.instagramUrl,
         }}
       />
+
+      {/* Stats bar */}
+      <div className="bg-white border-b border-cl-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-6">
+          <span className="text-sm text-cl-text-secondary">
+            <span className="font-bold text-cl-primary">{mapped.length}</span>
+            {' '}{tc('carsAvailable') || 'سيارة متاحة'}
+          </span>
+        </div>
+      </div>
+
       <ShowroomFilterBar brands={brands} />
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         {mapped.length === 0 ? (
-          <div className="cl-card text-center text-cl-gray-400 py-16">{tc('noData')}</div>
+          <div className="bg-white rounded-2xl border border-cl-gray-200 text-center text-cl-gray-400 py-20">
+            <div className="text-4xl mb-3">🚗</div>
+            <p className="text-base font-medium">{tc('noData')}</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {mapped.map((car) => (
               <PublicCarCard
                 key={car.id}
@@ -131,8 +145,18 @@ export default async function ShowroomPage({
         )}
       </main>
 
-      <footer className="border-t border-cl-gray-200 py-6 text-center text-xs text-cl-gray-400">
-        مدعوم بـ <span className="text-cl-primary font-medium">CarSell</span>
+      <footer className="border-t border-cl-gray-200 bg-white py-8 mt-8">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-cl-gray-400">
+            {showroom.name} &copy; {new Date().getFullYear()}
+          </p>
+          <p className="text-xs text-cl-gray-400">
+            مدعوم بـ{' '}
+            <a href="https://carsell.one" className="text-cl-primary font-semibold hover:underline">
+              CarSell
+            </a>
+          </p>
+        </div>
       </footer>
     </div>
   )
