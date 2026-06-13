@@ -868,5 +868,19 @@
     "verifyNow": "Verify Now",
     "copy": "Copy",
     "domainDesc": "Connect your own domain (e.g. {placeholder}) to use it as your showroom link instead of the platform URL."
+  },
+  "adminShell": {
+    "nav": {
+      "overview": "Overview",
+      "showrooms": "Showrooms",
+      "plans": "Plans",
+      "payments": "Payments",
+      "kyc": "KYC Requests",
+      "brands": "Car Brands",
+      "settings": "Platform Settings"
+    },
+    "platformAdmin": "Platform Admin",
+    "logout": "Sign Out",
+    "controlPanel": "Control Panel"
   }
 }

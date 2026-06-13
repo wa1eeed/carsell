@@ -868,5 +868,19 @@
     "verifyNow": "تحقّق الآن",
     "copy": "نسخ",
     "domainDesc": "اربط دومينك الخاص (مثل {placeholder}) ليصبح هو رابط معرضك بدلاً من رابط المنصة."
+  },
+  "adminShell": {
+    "nav": {
+      "overview": "نظرة عامة",
+      "showrooms": "المعارض",
+      "plans": "الباقات",
+      "payments": "المدفوعات",
+      "kyc": "طلبات التحقق KYC",
+      "brands": "براندات السيارات",
+      "settings": "إعدادات المنصة"
+    },
+    "platformAdmin": "مدير المنصة",
+    "logout": "تسجيل الخروج",
+    "controlPanel": "لوحة التحكم"
   }
 }
