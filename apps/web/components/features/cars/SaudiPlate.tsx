@@ -204,41 +204,84 @@ function KsaStrip({ colors, size }: { colors: { border: string; fg: string }; si
   )
 }
 
-/** Saudi emblem: palm tree + two crossed swords, rendered as inline SVG */
+/** Saudi emblem: palm tree + two crossed curved swords, traced to match the official emblem */
 function PalmSwordsEmblem({ size, color }: { size: number; color: string }) {
   return (
     <svg
       width={size}
-      height={size}
-      viewBox="0 0 100 100"
+      height={Math.round(size * 1.08)}
+      viewBox="0 0 200 216"
       fill={color}
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Palm trunk */}
-      <rect x="47" y="28" width="6" height="42" rx="2" />
+      {/* ── TRUNK ── */}
+      <path d="M96 42 C95 70 94 105 94 152 L106 152 C106 105 105 70 104 42 Z" />
 
-      {/* Palm fronds */}
-      <path d="M50 28 C50 28 30 22 24 10 C30 14 42 20 50 28Z" />
-      <path d="M50 28 C50 28 70 22 76 10 C70 14 58 20 50 28Z" />
-      <path d="M50 28 C50 28 20 30 12 20 C20 22 40 24 50 28Z" />
-      <path d="M50 28 C50 28 80 30 88 20 C80 22 60 24 50 28Z" />
-      <path d="M50 28 C50 28 26 38 16 32 C24 32 42 30 50 28Z" />
-      <path d="M50 28 C50 28 74 38 84 32 C76 32 58 30 50 28Z" />
+      {/* ── PALM FRONDS ──
+          Each frond is a filled leaf-shape: starts at crown, widens slightly, tapers to tip.
+          Left side (6 fronds), Right side (mirror, 6 fronds), plus one top frond. */}
 
-      {/* Left sword */}
-      <path d="M8 80 L46 55 L48 58 L10 83 Z" />
-      {/* Left sword guard */}
-      <ellipse cx="10" cy="81" rx="5" ry="2.5" transform="rotate(-32 10 81)" />
-      {/* Left sword pommel */}
-      <circle cx="6" cy="83" r="3" />
+      {/* Top frond — straight up */}
+      <path d="M100 4 C98 10 97 26 98 38 L102 38 C103 26 102 10 100 4 Z" />
 
-      {/* Right sword */}
-      <path d="M92 80 L54 55 L52 58 L90 83 Z" />
-      {/* Right sword guard */}
-      <ellipse cx="90" cy="81" rx="5" ry="2.5" transform="rotate(32 90 81)" />
-      {/* Right sword pommel */}
-      <circle cx="94" cy="83" r="3" />
+      {/* Upper-left fronds (steep angles) */}
+      <path d="M99 18 C88 12 68  6 52  2 C62  8 86 16 100 24 Z" />
+      <path d="M99 22 C84 18 60 14 42 12 C56 16 84 22 100 27 Z" />
+
+      {/* Mid-left fronds (shallow angles) */}
+      <path d="M98 28 C82 26 58 26 38 28 C54 26 82 28 100 31 Z" />
+      <path d="M98 33 C82 36 58 42 38 48 C56 42 82 35 100 33 Z" />
+
+      {/* Lower-left frond (drooping) */}
+      <path d="M98 38 C86 46 68 60 54 72 C66 60 86 46 100 38 Z" />
+
+      {/* Upper-right fronds */}
+      <path d="M101 18 C112 12 132  6 148  2 C138  8 114 16 100 24 Z" />
+      <path d="M101 22 C116 18 140 14 158 12 C144 16 116 22 100 27 Z" />
+
+      {/* Mid-right fronds */}
+      <path d="M102 28 C118 26 142 26 162 28 C146 26 118 28 100 31 Z" />
+      <path d="M102 33 C118 36 142 42 162 48 C144 42 118 35 100 33 Z" />
+
+      {/* Lower-right frond (drooping) */}
+      <path d="M102 38 C114 46 132 60 146 72 C134 60 114 46 100 38 Z" />
+
+      {/* ── LEFT SWORD ──
+          Blade: curved scimitar sweeping from far-left tip to the crossing point at trunk base.
+          The blade has a distinct curved belly. */}
+      <path d="
+        M 6 144
+        C 30 136 62 136 93 150
+        L 95 158
+        C 62 146 28 148  8 150
+        Z
+      " />
+
+      {/* Left sword — handle assembly (guard → grip → pommel) */}
+      {/* Grip */}
+      <path d="M93 150 L95 158 L89 174 L86 167 Z" />
+      {/* Guard (oval crosspiece, angled) */}
+      <ellipse cx="88" cy="170" rx="9" ry="3.5" transform="rotate(-28 88 170)" />
+      {/* Pommel */}
+      <circle cx="83" cy="185" r="7.5" />
+      {/* Pommel decoration (small knob at very end) */}
+      <circle cx="83" cy="195" r="3" />
+
+      {/* ── RIGHT SWORD (mirror of left) ── */}
+      <path d="
+        M 194 144
+        C 170 136 138 136 107 150
+        L 105 158
+        C 138 146 172 148 192 150
+        Z
+      " />
+
+      {/* Right sword — handle assembly */}
+      <path d="M107 150 L105 158 L111 174 L114 167 Z" />
+      <ellipse cx="112" cy="170" rx="9" ry="3.5" transform="rotate(28 112 170)" />
+      <circle cx="117" cy="185" r="7.5" />
+      <circle cx="117" cy="195" r="3" />
     </svg>
   )
 }
