@@ -266,7 +266,7 @@ export default function MarketClient({
 
             {/* Grid */}
             {cars.length === 0 ? (
-              <EmptyState t={t} onClear={clearAll} hasFilters={activeCount > 0} />
+              <EmptyState t={t} onClear={clearAll} hasFilters={activeCount > 0} searchQuery={currentFilters.q as string | undefined} />
             ) : (
               <div
                 className={`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 transition-opacity duration-200 ${
@@ -715,23 +715,47 @@ function Pagination({
 // ─── EmptyState ───────────────────────────────────────────────────────────────
 
 function EmptyState({
-  t, onClear, hasFilters,
+  t, onClear, hasFilters, searchQuery,
 }: {
   t: ReturnType<typeof useTranslations<'market'>>
   onClear: () => void
   hasFilters: boolean
+  searchQuery?: string
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <Car size={52} className="text-gray-200 mb-4" />
-      <h3 className="text-lg font-semibold text-gray-700 mb-1">{t('empty.title')}</h3>
-      <p className="text-sm text-gray-400 mb-5">{t('empty.body')}</p>
+    <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+      <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-5">
+        <Car size={36} className="text-gray-300" />
+      </div>
+
+      {searchQuery ? (
+        <>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            {t('empty.title')}
+          </h3>
+          <p className="text-sm text-gray-400 mb-2 max-w-sm">
+            لم نجد نتائج للبحث عن
+          </p>
+          <span className="inline-block bg-[#0F3460]/8 text-[#0F3460] text-sm font-medium px-3 py-1 rounded-full mb-5 max-w-xs truncate">
+            &ldquo;{searchQuery}&rdquo;
+          </span>
+          <p className="text-xs text-gray-400 mb-6">
+            قد تكون السيارة بيعت أو غير متاحة حالياً — جرّب البحث بكلمات أخرى أو تصفّح جميع السيارات
+          </p>
+        </>
+      ) : (
+        <>
+          <h3 className="text-lg font-semibold text-gray-700 mb-1">{t('empty.title')}</h3>
+          <p className="text-sm text-gray-400 mb-5">{t('empty.body')}</p>
+        </>
+      )}
+
       {hasFilters && (
         <button
           onClick={onClear}
-          className="flex items-center gap-1.5 text-sm text-[#0F3460] border border-[#0F3460]/25 hover:bg-[#0F3460]/5 px-4 py-2 rounded-[8px] transition-all"
+          className="flex items-center gap-2 text-sm font-semibold bg-[#0F3460] text-white px-5 py-2.5 rounded-xl hover:bg-[#0A2540] transition-colors shadow-sm"
         >
-          <X size={14} /> {t('clearAll')}
+          <X size={14} /> تصفّح جميع السيارات
         </button>
       )}
     </div>
