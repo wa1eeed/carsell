@@ -189,6 +189,7 @@
     "inventory": "Inventory",
     "monthlySales": "Monthly Sales",
     "revenue": "Revenue",
+    "pendingRequests": "Pending Requests",
     "activeUsers": "Active Users",
     "showrooms": "Showrooms",
     "recentCars": "Recent Cars",

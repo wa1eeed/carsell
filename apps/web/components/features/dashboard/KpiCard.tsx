@@ -1,12 +1,12 @@
 'use client'
 
 import { useLocale } from 'next-intl'
-import { Car, TrendingUp, TrendingDown, Coins, Users, Building2, type LucideIcon } from 'lucide-react'
+import { Car, TrendingUp, TrendingDown, Coins, Users, Building2, Inbox, type LucideIcon } from 'lucide-react'
 import { formatNumber } from '@/lib/format'
 import { Price } from '@/components/ui/Price'
 import { cn } from '@/lib/utils'
 
-export type KpiIcon = 'car' | 'sales' | 'revenue' | 'users' | 'showrooms'
+export type KpiIcon = 'car' | 'sales' | 'revenue' | 'users' | 'showrooms' | 'requests'
 
 const ICONS: Record<KpiIcon, LucideIcon> = {
   car:       Car,
@@ -14,6 +14,7 @@ const ICONS: Record<KpiIcon, LucideIcon> = {
   revenue:   Coins,
   users:     Users,
   showrooms: Building2,
+  requests:  Inbox,
 }
 
 const ICON_COLORS: Record<KpiIcon, { bg: string; text: string }> = {
@@ -22,6 +23,7 @@ const ICON_COLORS: Record<KpiIcon, { bg: string; text: string }> = {
   revenue:   { bg: 'bg-amber-50',  text: 'text-amber-600'  },
   users:     { bg: 'bg-purple-50', text: 'text-purple-600' },
   showrooms: { bg: 'bg-sky-50',    text: 'text-sky-600'    },
+  requests:  { bg: 'bg-orange-50', text: 'text-orange-600' },
 }
 
 export function KpiCard({

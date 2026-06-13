@@ -17,6 +17,13 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions)
   if (!session?.user) redirect(`/${locale}/login`)
 
+  // Session separation: a PLATFORM_ADMIN session must never render the showroom
+  // panel. Browsers share the auth cookie across tabs, so logging into the admin
+  // panel in one tab and refreshing an open showroom tab would otherwise run the
+  // showroom dashboard with an admin session — which crashed inner pages. Mirror
+  // the admin layout (which sends showroom users to /dashboard) and send admins home.
+  if (session.user.role === 'PLATFORM_ADMIN') redirect(`/${locale}/admin`)
+
   // Base fields (name + slug) — always available. Kept in a separate query so a
   // missing customDomain column in older DBs can't null out the whole result.
   const [showroom, subscription] = await Promise.all([
