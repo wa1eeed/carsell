@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Building2, CheckCircle, AlertCircle, XCircle, Clock, Loader2, ChevronDown } from 'lucide-react'
 
 type Sub = {
@@ -33,11 +34,6 @@ const STATUS_STYLES: Record<string, string> = {
   SUSPENDED:'bg-red-50 text-red-600 border-red-200',
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  TRIAL: 'تجربة', ACTIVE: 'نشط', PAST_DUE: 'متأخر',
-  CANCELLED: 'ملغي', EXPIRED: 'منتهي', SUSPENDED: 'موقوف',
-}
-
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   TRIAL:    <Clock size={11} />,
   ACTIVE:   <CheckCircle size={11} />,
@@ -49,6 +45,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 export default function AdminShowroomsClient({ subscriptions, plans, totalShowrooms, page }: Props) {
   const router = useRouter()
+  const t = useTranslations('adminShowrooms')
   const [saving, setSaving] = useState<string | null>(null)
 
   async function updateSub(showroomId: string, patch: { status?: string; planId?: string }) {
@@ -73,8 +70,8 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F3460]">المعارض والاشتراكات</h1>
-          <p className="text-sm text-gray-400 mt-0.5">إجمالي المعارض: {totalShowrooms}</p>
+          <h1 className="text-2xl font-bold text-[#0F3460]">{t('title')}</h1>
+          <p className="text-sm text-gray-400 mt-0.5">{t('total')} {totalShowrooms}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {statusFilters.map((s) => (
@@ -87,7 +84,7 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
                   : `${STATUS_STYLES[s] ?? 'border-gray-200 text-gray-600'} hover:opacity-80`
               }`}
             >
-              {s ? (STATUS_LABELS[s] ?? s) : 'الكل'}
+              {s ? (t(`statusLabels.${s}` as Parameters<typeof t>[0]) ?? s) : t('filterAll')}
             </button>
           ))}
         </div>
@@ -98,12 +95,12 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
         <table className="w-full text-sm">
           <thead className="bg-[#F8FAFC] border-b border-gray-100">
             <tr>
-              <th className="text-right p-4 font-medium text-gray-500">المعرض</th>
-              <th className="text-right p-4 font-medium text-gray-500">الباقة الحالية</th>
-              <th className="text-right p-4 font-medium text-gray-500">الحالة</th>
-              <th className="text-right p-4 font-medium text-gray-500">تنتهي</th>
-              <th className="text-right p-4 font-medium text-gray-500">تغيير الباقة</th>
-              <th className="text-right p-4 font-medium text-gray-500">تغيير الحالة</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colShowroom')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colPlan')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colStatus')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colExpiry')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colChangePlan')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colChangeStatus')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -131,8 +128,8 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
                 <td className="p-4">
                   <div className="font-medium text-gray-800">{sub.plan.nameAr}</div>
                   <div className="text-xs text-gray-400">
-                    {sub.billingPeriod === 'YEARLY' ? 'سنوي' : 'شهري'} ·{' '}
-                    {Number(sub.plan.priceMonthly).toLocaleString('ar-SA')} ر.س
+                    {sub.billingPeriod === 'YEARLY' ? t('yearly') : t('monthly')} ·{' '}
+                    {Number(sub.plan.priceMonthly).toLocaleString('ar-SA')} {t('sar')}
                   </div>
                 </td>
 
@@ -140,7 +137,7 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
                 <td className="p-4">
                   <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border font-medium ${STATUS_STYLES[sub.status] ?? ''}`}>
                     {STATUS_ICONS[sub.status]}
-                    {STATUS_LABELS[sub.status] ?? sub.status}
+                    {t(`statusLabels.${sub.status}` as Parameters<typeof t>[0]) ?? sub.status}
                   </span>
                 </td>
 
@@ -180,12 +177,12 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
                         onChange={(e) => updateSub(sub.showroom.id, { status: e.target.value })}
                         className="appearance-none text-xs border border-gray-200 rounded-[8px] px-3 py-2 pr-7 bg-white focus:outline-none focus:border-[#0F3460] cursor-pointer disabled:opacity-50 min-w-[100px]"
                       >
-                        <option value="TRIAL">تجربة</option>
-                        <option value="ACTIVE">نشط</option>
-                        <option value="PAST_DUE">متأخر</option>
-                        <option value="SUSPENDED">موقوف</option>
-                        <option value="CANCELLED">ملغي</option>
-                        <option value="EXPIRED">منتهي</option>
+                        <option value="TRIAL">{t('statusOptions.TRIAL')}</option>
+                        <option value="ACTIVE">{t('statusOptions.ACTIVE')}</option>
+                        <option value="PAST_DUE">{t('statusOptions.PAST_DUE')}</option>
+                        <option value="SUSPENDED">{t('statusOptions.SUSPENDED')}</option>
+                        <option value="CANCELLED">{t('statusOptions.CANCELLED')}</option>
+                        <option value="EXPIRED">{t('statusOptions.EXPIRED')}</option>
                       </select>
                       <ChevronDown size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                     </div>
@@ -200,7 +197,7 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
             {subscriptions.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-12 text-center text-gray-400">
-                  لا توجد معارض بهذا الفلتر
+                  {t('empty')}
                 </td>
               </tr>
             )}
@@ -215,7 +212,7 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
             onClick={() => router.push(`?page=${page - 1}`)}
             className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm hover:bg-gray-50"
           >
-            السابق
+            {t('prev')}
           </button>
         )}
         {subscriptions.length === 25 && (
@@ -223,7 +220,7 @@ export default function AdminShowroomsClient({ subscriptions, plans, totalShowro
             onClick={() => router.push(`?page=${page + 1}`)}
             className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm hover:bg-gray-50"
           >
-            التالي
+            {t('next')}
           </button>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   Link2, Globe, Check, X, Copy, ExternalLink, Loader2,
   AlertCircle, CheckCircle2, Trash2, RefreshCw,
@@ -25,12 +26,13 @@ interface Props {
 
 export function SettingsClient({ slug, showroomNumber, customDomain, customDomainVerified }: Props) {
   const router = useRouter()
+  const t = useTranslations('settingsPage')
 
   return (
     <div className="max-w-3xl space-y-6" dir="rtl">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F3460]">إعدادات المعرض</h1>
-        <p className="text-gray-500 text-sm mt-1">الرابط العام والدومين المخصص</p>
+        <h1 className="text-2xl font-bold text-[#0F3460]">{t('title')}</h1>
+        <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
       </div>
 
       <SlugSection slug={slug} onUpdate={() => router.refresh()} />
@@ -46,6 +48,7 @@ export function SettingsClient({ slug, showroomNumber, customDomain, customDomai
 // ── Slug (public URL handle) ────────────────────────────────────────────────
 
 function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => void }) {
+  const t = useTranslations('settingsPage')
   const [value, setValue]   = useState(slug ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState('')
@@ -64,7 +67,7 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
     })
     const data = await res.json() as { success?: boolean; error?: string }
     setSaving(false)
-    if (!data.success) { setError(typeof data.error === 'string' ? data.error : 'حدث خطأ'); return }
+    if (!data.success) { setError(typeof data.error === 'string' ? data.error : t('errorGeneric')); return }
     setSaved(true); setTimeout(() => setSaved(false), 2500)
     onUpdate()
   }
@@ -73,11 +76,11 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
     <div className="bg-white rounded-[12px] border border-gray-100 p-6">
       <div className="flex items-center gap-2 mb-4">
         <Link2 size={18} className="text-[#0F3460]" />
-        <h2 className="font-bold text-[#0F3460]">الرابط العام للمعرض</h2>
+        <h2 className="font-bold text-[#0F3460]">{t('publicUrlHeading')}</h2>
       </div>
 
       <p className="text-sm text-gray-500 mb-4">
-        اختر اسماً مميزاً لمعرضك. سيكون رابطك العام بالشكلين:
+        {t('publicUrlHint')}
       </p>
 
       {/* URL preview */}
@@ -100,7 +103,7 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
       {slug && (
         <div className="bg-gray-50 rounded-[8px] p-3 mb-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 w-16">رابط معرضك:</span>
+            <span className="text-gray-400 w-16">{t('yourLink')}</span>
             <span className="font-mono text-[#0F3460] ltr flex-1">{origin}/{slug}</span>
             <button onClick={() => { navigator.clipboard.writeText(`${origin}/${slug}`); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
               className="text-gray-400 hover:text-[#0F3460]">
@@ -120,9 +123,9 @@ function SlugSection({ slug, onUpdate }: { slug: string | null; onUpdate: () => 
           className="bg-[#0F3460] text-white px-5 py-2 rounded-[8px] text-sm font-medium disabled:opacity-50 flex items-center gap-2"
         >
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-          حفظ
+          {t('save')}
         </button>
-        {saved && <span className="text-green-600 text-sm flex items-center gap-1"><CheckCircle2 size={14} /> تم الحفظ</span>}
+        {saved && <span className="text-green-600 text-sm flex items-center gap-1"><CheckCircle2 size={14} /> {t('saved')}</span>}
       </div>
     </div>
   )
@@ -139,6 +142,7 @@ function CustomDomainSection({
   verified: boolean
   onChange: () => void
 }) {
+  const t = useTranslations('settingsPage')
   const [value, setValue]     = useState('')
   const [saving, setSaving]   = useState(false)
   const [error, setError]     = useState('')
@@ -155,7 +159,7 @@ function CustomDomainSection({
     })
     const data = await res.json() as { success?: boolean; error?: string; dns?: DnsInstructions }
     setSaving(false)
-    if (!data.success) { setError(typeof data.error === 'string' ? data.error : 'حدث خطأ'); return }
+    if (!data.success) { setError(typeof data.error === 'string' ? data.error : t('errorGeneric')); return }
     if (data.dns) setDns(data.dns)
     onChange()
   }
@@ -165,12 +169,12 @@ function CustomDomainSection({
     const res  = await fetch('/api/v1/showroom/domain/verify', { method: 'POST' })
     const data = await res.json() as { success?: boolean; verified?: boolean; error?: string }
     setVerifying(false)
-    if (data.verified) { setVerifyMsg('✓ تم التحقق من الدومين بنجاح!'); onChange() }
-    else setVerifyMsg(typeof data.error === 'string' ? data.error : 'لم يتم التحقق بعد')
+    if (data.verified) { setVerifyMsg(t('domainVerifiedSuccess')); onChange() }
+    else setVerifyMsg(typeof data.error === 'string' ? data.error : t('domainNotVerified'))
   }
 
   async function remove() {
-    if (!confirm('إزالة الدومين المخصص؟')) return
+    if (!confirm(t('removeDomainConfirm'))) return
     await fetch('/api/v1/showroom/domain', { method: 'DELETE' })
     setDns(null); setValue('')
     onChange()
@@ -180,18 +184,18 @@ function CustomDomainSection({
     <div className="bg-white rounded-[12px] border border-gray-100 p-6">
       <div className="flex items-center gap-2 mb-4">
         <Globe size={18} className="text-[#0F3460]" />
-        <h2 className="font-bold text-[#0F3460]">دومين مخصص</h2>
+        <h2 className="font-bold text-[#0F3460]">{t('customDomain')}</h2>
         {domain && (
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
             verified ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
           }`}>
-            {verified ? '✓ موثّق' : 'بانتظار التحقق'}
+            {verified ? t('domainVerified') : t('domainPending')}
           </span>
         )}
       </div>
 
       <p className="text-sm text-gray-500 mb-4">
-        اربط دومينك الخاص (مثل <span className="font-mono ltr">mydealership.com</span>) ليصبح هو رابط معرضك بدلاً من رابط المنصة.
+        {t('publicUrlHint')} <span className="font-mono ltr">{t('domainPlaceholder')}</span>
       </p>
 
       {/* Current domain */}
@@ -205,7 +209,7 @@ function CustomDomainSection({
                 <ExternalLink size={14} />
               </a>
             )}
-            <button onClick={remove} className="text-gray-400 hover:text-red-500" title="إزالة">
+            <button onClick={remove} className="text-gray-400 hover:text-red-500" title={t('removeTitle')}>
               <Trash2 size={14} />
             </button>
           </div>
@@ -227,7 +231,7 @@ function CustomDomainSection({
             <input
               value={value}
               onChange={(e) => setValue(e.target.value.toLowerCase().trim())}
-              placeholder="mydealership.com"
+              placeholder={t('domainPlaceholder')}
               className="flex-1 border border-gray-200 rounded-[8px] px-3 py-2 text-sm ltr font-mono focus:outline-none focus:ring-1 focus:ring-[#0F3460]"
               dir="ltr"
             />
@@ -237,7 +241,7 @@ function CustomDomainSection({
               className="bg-[#0F3460] text-white px-5 py-2 rounded-[8px] text-sm font-medium disabled:opacity-50 flex items-center gap-2 shrink-0"
             >
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
-              ربط
+              {t('connectButton')}
             </button>
           </div>
           {error && <p className="text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} /> {error}</p>}
@@ -266,12 +270,14 @@ function DomainVerificationGuide({
   verifying: boolean
   verifyMsg: string
 }) {
+  const t = useTranslations('settingsPage')
+
   // Default DNS records (when dns not freshly returned, show standard guidance)
   const records: { label: string; rec: DnsRecord }[] = dns
     ? [
-        { label: 'ربط الدومين الرئيسي (Apex)', rec: dns.aRecord },
-        { label: 'ربط www', rec: dns.cnameRecord },
-        { label: 'إثبات الملكية', rec: dns.txtRecord },
+        { label: t('apexRecord'), rec: dns.aRecord },
+        { label: t('wwwRecord'), rec: dns.cnameRecord },
+        { label: t('ownershipRecord'), rec: dns.txtRecord },
       ]
     : []
 
@@ -280,9 +286,9 @@ function DomainVerificationGuide({
       <div className="flex items-start gap-2">
         <AlertCircle size={15} className="text-blue-500 mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-medium text-gray-800">أضف هذه السجلات في إعدادات DNS لدى مزوّد الدومين</p>
+          <p className="text-sm font-medium text-gray-800">{t('dnsInstructions')}</p>
           <p className="text-xs text-gray-500 mt-0.5">
-            (مثل GoDaddy، Cloudflare، Namecheap) — قد يستغرق التفعيل حتى ساعة.
+            {t('dnsHelp')}
           </p>
         </div>
       </div>
@@ -293,9 +299,9 @@ function DomainVerificationGuide({
             <div key={rec.type + rec.name} className="bg-white rounded-[6px] border border-gray-100 p-2.5">
               <div className="text-[10px] text-gray-400 mb-1">{label}</div>
               <div className="grid grid-cols-3 gap-2 text-xs font-mono ltr" dir="ltr">
-                <CopyField label="Type"  value={rec.type} />
-                <CopyField label="Name"  value={rec.name} />
-                <CopyField label="Value" value={rec.value} />
+                <CopyField label="Type"  value={rec.type} copyLabel={t('copy')} />
+                <CopyField label="Name"  value={rec.name} copyLabel={t('copy')} />
+                <CopyField label="Value" value={rec.value} copyLabel={t('copy')} />
               </div>
             </div>
           ))}
@@ -310,7 +316,7 @@ function DomainVerificationGuide({
           className="bg-[#C9A84C] text-white px-4 py-2 rounded-[8px] text-sm font-medium disabled:opacity-50 flex items-center gap-2"
         >
           {verifying ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-          تحقّق الآن
+          {t('verifyNow')}
         </button>
         {verifyMsg && (
           <span className={`text-sm ${verifyMsg.startsWith('✓') ? 'text-green-600' : 'text-amber-600'}`}>
@@ -322,7 +328,7 @@ function DomainVerificationGuide({
   )
 }
 
-function CopyField({ label, value }: { label: string; value: string }) {
+function CopyField({ label, value, copyLabel }: { label: string; value: string; copyLabel: string }) {
   const [copied, setCopied] = useState(false)
   return (
     <div>
@@ -330,7 +336,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
       <button
         onClick={() => { navigator.clipboard.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1200) }}
         className="flex items-center gap-1 bg-gray-50 hover:bg-gray-100 rounded px-2 py-1 w-full text-left transition-colors group"
-        title="نسخ"
+        title={copyLabel}
       >
         <span className="truncate flex-1">{value}</span>
         {copied ? <Check size={10} className="text-green-500 shrink-0" /> : <Copy size={10} className="text-gray-300 group-hover:text-gray-500 shrink-0" />}

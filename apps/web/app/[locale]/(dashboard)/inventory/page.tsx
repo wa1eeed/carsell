@@ -18,7 +18,7 @@ export default async function InventoryPage({
   searchParams: Record<string, string | string[] | undefined>
 }) {
   const t = await getTranslations('nav')
-  const tc = await getTranslations('actions')
+  const ti = await getTranslations('inventoryPage')
   const user = await requirePageUser()
   const prefix = locale === 'ar' ? '' : '/en'
 
@@ -54,7 +54,7 @@ export default async function InventoryPage({
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-cl-primary">{t('inventory')}</h1>
         <Link href={`${prefix}/inventory/new`} className="btn-primary">
-          <Plus size={18} /> {tc('addCar')}
+          <Plus size={18} /> {ti('addCar')}
         </Link>
       </div>
 

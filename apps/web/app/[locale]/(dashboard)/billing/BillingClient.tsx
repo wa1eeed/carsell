@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { CreditCard, CheckCircle, AlertCircle, Clock, XCircle, ArrowUpCircle, Calendar } from 'lucide-react'
 import type { SubscriptionWithPlan, PlanWithFeatures } from '@/repositories/plan.repository'
 
@@ -10,22 +11,24 @@ interface Props {
   plans: PlanWithFeatures[]
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  TRIAL:    { label: 'تجربة مجانية', color: 'text-blue-600 bg-blue-50',  icon: <Clock size={14} /> },
-  ACTIVE:   { label: 'نشط',          color: 'text-green-600 bg-green-50', icon: <CheckCircle size={14} /> },
-  PAST_DUE: { label: 'دفعة متأخرة',  color: 'text-orange-600 bg-orange-50', icon: <AlertCircle size={14} /> },
-  CANCELLED:{ label: 'ملغي',         color: 'text-red-600 bg-red-50',    icon: <XCircle size={14} /> },
-  EXPIRED:  { label: 'منتهي',        color: 'text-gray-600 bg-gray-100', icon: <XCircle size={14} /> },
-  SUSPENDED:{ label: 'موقوف',        color: 'text-red-600 bg-red-50',    icon: <AlertCircle size={14} /> },
+const STATUS_COLORS: Record<string, { color: string; icon: React.ReactNode }> = {
+  TRIAL:    { color: 'text-blue-600 bg-blue-50',      icon: <Clock size={14} /> },
+  ACTIVE:   { color: 'text-green-600 bg-green-50',    icon: <CheckCircle size={14} /> },
+  PAST_DUE: { color: 'text-orange-600 bg-orange-50',  icon: <AlertCircle size={14} /> },
+  CANCELLED:{ color: 'text-red-600 bg-red-50',        icon: <XCircle size={14} /> },
+  EXPIRED:  { color: 'text-gray-600 bg-gray-100',     icon: <XCircle size={14} /> },
+  SUSPENDED:{ color: 'text-red-600 bg-red-50',        icon: <AlertCircle size={14} /> },
 }
 
 export default function BillingClient({ subscription, plans }: Props) {
   const router = useRouter()
+  const t = useTranslations('billing')
   const [loading, setLoading] = useState(false)
   const [showUpgrade, setShowUpgrade] = useState(false)
 
   const status = subscription?.status ?? 'TRIAL'
-  const statusInfo = STATUS_LABELS[status] ?? STATUS_LABELS.TRIAL
+  const statusColorInfo = STATUS_COLORS[status] ?? STATUS_COLORS.TRIAL
+  const statusLabel = t(`statusLabels.${status}` as Parameters<typeof t>[0])
 
   async function handlePayNow() {
     setLoading(true)
@@ -56,8 +59,8 @@ export default function BillingClient({ subscription, plans }: Props) {
   if (!subscription) {
     return (
       <div className="max-w-3xl mx-auto space-y-6" dir="rtl">
-        <h1 className="text-2xl font-bold text-[#0F3460]">اختر باقتك</h1>
-        <p className="text-gray-500">ابدأ تجربتك المجانية الآن — لا بطاقة ائتمان مطلوبة</p>
+        <h1 className="text-2xl font-bold text-[#0F3460]">{t('choosePlan')}</h1>
+        <p className="text-gray-500">{t('choosePlanHint')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.filter(p => p.isPublic !== false).map((p) => (
             <button
@@ -69,14 +72,14 @@ export default function BillingClient({ subscription, plans }: Props) {
               <div className="font-bold text-[#0F3460] text-lg">{p.nameAr}</div>
               <div className="price-number text-[#C9A84C] font-mono ltr text-2xl mt-1">
                 {Number(p.priceMonthly).toFixed(0)}{' '}
-                <span className="text-gray-400 text-sm font-sans">ريال/شهر</span>
+                <span className="text-gray-400 text-sm font-sans">{t('sarPerMonth')}</span>
               </div>
               <div className="text-xs text-gray-500 mt-2">
-                {p.maxCars === null ? 'سيارات غير محدودة' : `حتى ${p.maxCars} سيارة`}
+                {p.maxCars === null ? t('unlimitedCars') : t('upToCars', { count: p.maxCars })}
               </div>
               {p.trialDays && p.trialDays > 0 && (
                 <div className="text-xs text-green-600 mt-2 font-medium">
-                  {p.trialDays} يوم تجريبي مجاني
+                  {t('trialDaysFree', { days: p.trialDays })}
                 </div>
               )}
             </button>
@@ -92,22 +95,22 @@ export default function BillingClient({ subscription, plans }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6" dir="rtl">
-      <h1 className="text-2xl font-bold text-[#0F3460]">الاشتراك والفواتير</h1>
+      <h1 className="text-2xl font-bold text-[#0F3460]">{t('subscriptionTitle')}</h1>
 
       {/* Current plan card */}
       <div className="bg-white rounded-[12px] border border-gray-100 p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-lg font-bold text-[#0F3460]">{plan.nameAr}</h2>
-            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full mt-1 ${statusInfo.color}`}>
-              {statusInfo.icon} {statusInfo.label}
+            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full mt-1 ${statusColorInfo.color}`}>
+              {statusColorInfo.icon} {statusLabel}
             </span>
           </div>
           <div className="text-right">
             <div className="price-number text-2xl font-bold text-[#C9A84C] font-mono ltr">
               {Number(price).toFixed(0)}
             </div>
-            <div className="text-gray-400 text-xs">ريال / {isYearly ? 'سنة' : 'شهر'}</div>
+            <div className="text-gray-400 text-xs">{t('sarPer')} {isYearly ? t('perYear') : t('perMonth')}</div>
           </div>
         </div>
 
@@ -116,7 +119,7 @@ export default function BillingClient({ subscription, plans }: Props) {
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
             <Calendar size={14} />
             <span>
-              {status === 'TRIAL' ? 'تنتهي التجربة المجانية في' : 'يتجدد في'}{' '}
+              {status === 'TRIAL' ? t('trialEndsOn') : t('renewsOn')}{' '}
               <span className="font-medium text-gray-700">
                 {new Date(
                   status === 'TRIAL'
@@ -131,7 +134,7 @@ export default function BillingClient({ subscription, plans }: Props) {
           <div className="flex items-center gap-2 text-sm text-blue-600 mb-4">
             <Clock size={14} />
             <span>
-              ينتهي وقت التجربة في{' '}
+              {t('trialEndingOn')}{' '}
               <span className="font-medium">{new Date(subscription.trialEndsAt).toLocaleDateString('ar-SA')}</span>
             </span>
           </div>
@@ -146,7 +149,7 @@ export default function BillingClient({ subscription, plans }: Props) {
               className="flex items-center gap-2 bg-[#C9A84C] text-white px-5 py-2.5 rounded-[8px] font-medium text-sm hover:bg-[#b8973b] disabled:opacity-50"
             >
               <CreditCard size={16} />
-              {loading ? 'جاري التحويل...' : 'ادفع الآن'}
+              {loading ? t('redirecting') : t('payNow')}
             </button>
           )}
           <button
@@ -154,7 +157,7 @@ export default function BillingClient({ subscription, plans }: Props) {
             className="flex items-center gap-2 border border-[#0F3460] text-[#0F3460] px-5 py-2.5 rounded-[8px] font-medium text-sm hover:bg-[#0F3460]/5"
           >
             <ArrowUpCircle size={16} />
-            تغيير الباقة
+            {t('changePlan')}
           </button>
         </div>
       </div>
@@ -163,7 +166,7 @@ export default function BillingClient({ subscription, plans }: Props) {
       {showUpgrade && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-[12px] p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-[#0F3460] mb-4">اختر باقة جديدة</h3>
+            <h3 className="text-lg font-bold text-[#0F3460] mb-4">{t('choosePlanModal')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {plans.map((p) => (
                 <button
@@ -178,13 +181,13 @@ export default function BillingClient({ subscription, plans }: Props) {
                   <div className="font-bold text-[#0F3460]">{p.nameAr}</div>
                   <div className="price-number text-[#C9A84C] font-mono ltr text-lg mt-1">
                     {Number(p.priceMonthly).toFixed(0)}{' '}
-                    <span className="text-gray-400 text-xs font-sans">ريال/شهر</span>
+                    <span className="text-gray-400 text-xs font-sans">{t('sarPerMonth')}</span>
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {p.maxCars === null ? 'سيارات غير محدودة' : `حتى ${p.maxCars} سيارة`}
+                    {p.maxCars === null ? t('unlimitedCars') : t('upToCars', { count: p.maxCars })}
                   </div>
                   {p.id === plan.id && (
-                    <span className="text-xs text-[#C9A84C] font-medium">الباقة الحالية</span>
+                    <span className="text-xs text-[#C9A84C] font-medium">{t('currentPlan')}</span>
                   )}
                 </button>
               ))}
@@ -193,7 +196,7 @@ export default function BillingClient({ subscription, plans }: Props) {
               onClick={() => setShowUpgrade(false)}
               className="mt-4 text-gray-400 text-sm hover:text-gray-600"
             >
-              إلغاء
+              {t('cancelModal')}
             </button>
           </div>
         </div>

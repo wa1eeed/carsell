@@ -1,18 +1,15 @@
 import { requirePageUser } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
+import { getTranslations } from 'next-intl/server'
 import { Receipt, TrendingUp, Wallet } from 'lucide-react'
 import Link from 'next/link'
 import { formatCarRef } from '@/lib/format'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'المبيعات — CarSell' }
-
-const PAYMENT_AR: Record<string, string> = {
-  CASH: 'نقدي', BANK_TRANSFER: 'تحويل', FINANCING: 'تمويل', TRADE_IN: 'استبدال', MIXED: 'مختلط',
-}
 
 export default async function SalesPage({ searchParams }: { searchParams: { page?: string } }) {
   const user = await requirePageUser()
+  const t    = await getTranslations('salesPage')
   const page = Number(searchParams.page ?? 1)
   const take = 20
 
@@ -40,15 +37,15 @@ export default async function SalesPage({ searchParams }: { searchParams: { page
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F3460]">المبيعات</h1>
-        <p className="text-gray-500 text-sm mt-1">سجل كل عمليات البيع</p>
+        <h1 className="text-2xl font-bold text-[#0F3460]">{t('title')}</h1>
+        <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <StatCard icon={Receipt}    label="عدد المبيعات"     value={String(total)} />
-        <StatCard icon={Wallet}     label="إجمالي المبيعات"  value={totalSales.toLocaleString('ar-SA')}  suffix="ريال" gold />
-        <StatCard icon={TrendingUp} label="صافي الربح"       value={totalProfit.toLocaleString('ar-SA')} suffix="ريال" gold />
+        <StatCard icon={Receipt}    label={t('count')}     value={String(total)} />
+        <StatCard icon={Wallet}     label={t('total')}     value={totalSales.toLocaleString('ar-SA')}  suffix="SAR" gold />
+        <StatCard icon={TrendingUp} label={t('netProfit')} value={totalProfit.toLocaleString('ar-SA')} suffix="SAR" gold />
       </div>
 
       {/* Table */}
@@ -56,13 +53,13 @@ export default async function SalesPage({ searchParams }: { searchParams: { page
         <table className="w-full text-sm">
           <thead className="bg-[#F8FAFC] border-b border-gray-100">
             <tr>
-              <th className="text-right p-4 font-medium text-gray-500">السيارة</th>
-              <th className="text-right p-4 font-medium text-gray-500">المشتري</th>
-              <th className="text-right p-4 font-medium text-gray-500">السعر</th>
-              <th className="text-right p-4 font-medium text-gray-500">الضريبة</th>
-              <th className="text-right p-4 font-medium text-gray-500">الربح</th>
-              <th className="text-right p-4 font-medium text-gray-500">الدفع</th>
-              <th className="text-right p-4 font-medium text-gray-500">التاريخ</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('car')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('buyer')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('price')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('tax')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('profit')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('payment')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('date')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -79,14 +76,14 @@ export default async function SalesPage({ searchParams }: { searchParams: { page
                 <td className="p-4"><span className="price-number font-mono ltr text-[#C9A84C] font-semibold">{Number(s.sellPrice).toLocaleString('ar-SA')}</span></td>
                 <td className="p-4 text-gray-500 font-mono ltr">{Number(s.vatAmount).toLocaleString('ar-SA')}</td>
                 <td className="p-4"><span className="font-mono ltr text-green-600">{Number(s.netProfit).toLocaleString('ar-SA')}</span></td>
-                <td className="p-4"><span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{PAYMENT_AR[s.paymentMethod] ?? s.paymentMethod}</span></td>
+                <td className="p-4"><span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{t(`paymentMethods.${s.paymentMethod}` as Parameters<typeof t>[0]) ?? s.paymentMethod}</span></td>
                 <td className="p-4 text-gray-400 text-xs">{s.soldAt.toLocaleDateString('ar-SA')}</td>
               </tr>
             ))}
             {sales.length === 0 && (
               <tr><td colSpan={7} className="p-12 text-center text-gray-400">
                 <Receipt size={32} className="mx-auto mb-2 text-gray-300" />
-                لا توجد مبيعات بعد — سجّل أول بيع من صفحة السيارة
+                {t('empty')}
               </td></tr>
             )}
           </tbody>
@@ -95,9 +92,9 @@ export default async function SalesPage({ searchParams }: { searchParams: { page
 
       {total > take && (
         <div className="flex justify-center gap-2">
-          {page > 1 && <Link href={`?page=${page - 1}`} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm bg-white">السابق</Link>}
-          <span className="px-4 py-2 text-sm text-gray-500">صفحة {page} من {Math.ceil(total / take)}</span>
-          {page < Math.ceil(total / take) && <Link href={`?page=${page + 1}`} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm bg-white">التالي</Link>}
+          {page > 1 && <Link href={`?page=${page - 1}`} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm bg-white">{t('prev')}</Link>}
+          <span className="px-4 py-2 text-sm text-gray-500">{t('page')} {page} {t('of')} {Math.ceil(total / take)}</span>
+          {page < Math.ceil(total / take) && <Link href={`?page=${page + 1}`} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm bg-white">{t('next')}</Link>}
         </div>
       )}
     </div>

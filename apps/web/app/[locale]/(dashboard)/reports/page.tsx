@@ -1,12 +1,13 @@
 import { requirePageUser } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
+import { getTranslations } from 'next-intl/server'
 import { BarChart3, TrendingUp, Package, Clock } from 'lucide-react'
 
 export const dynamic  = 'force-dynamic'
-export const metadata = { title: 'التقارير — CarSell' }
 
 export default async function ReportsPage() {
   const user = await requirePageUser()
+  const t    = await getTranslations('reportsPage')
   const showroomId = user.showroomId
 
   const now        = new Date()
@@ -19,19 +20,16 @@ export default async function ReportsPage() {
     prisma.sale.aggregate({ where: { showroomId, soldAt: { gte: monthStart } }, _sum: { sellPrice: true, netProfit: true, vatAmount: true }, _count: true }),
     prisma.sale.aggregate({ where: { showroomId, soldAt: { gte: yearStart  } }, _sum: { sellPrice: true, netProfit: true }, _count: true }),
     prisma.car.groupBy({ by: ['status'], where: { showroomId, deletedAt: null }, _count: true }),
-    // Top selling brands
     prisma.sale.findMany({
       where:   { showroomId },
       select:  { car: { select: { brand: { select: { nameAr: true } } } } },
       take:    200,
     }),
-    // Cars sitting > 60 days
     prisma.car.count({
       where: { showroomId, deletedAt: null, status: { in: ['FOR_SALE', 'AUCTION'] }, createdAt: { lt: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000) } },
     }),
   ])
 
-  // aggregate top brands
   const brandCounts = new Map<string, number>()
   for (const s of topModels) {
     const b = s.car.brand.nameAr
@@ -45,18 +43,18 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F3460]">التقارير والتحليلات</h1>
-        <p className="text-gray-500 text-sm mt-1">أداء معرضك في لمحة</p>
+        <h1 className="text-2xl font-bold text-[#0F3460]">{t('title')}</h1>
+        <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
       </div>
 
       {/* This month */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 mb-3">هذا الشهر</h2>
+        <h2 className="text-sm font-semibold text-gray-500 mb-3">{t('thisMonth')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Metric label="المبيعات" value={String(monthSales._count)} icon={BarChart3} />
-          <Metric label="الإيرادات" value={Number(monthSales._sum.sellPrice ?? 0).toLocaleString('ar-SA')} suffix="ريال" gold icon={TrendingUp} />
-          <Metric label="صافي الربح" value={Number(monthSales._sum.netProfit ?? 0).toLocaleString('ar-SA')} suffix="ريال" gold icon={TrendingUp} />
-          <Metric label="الضريبة المحصّلة" value={Number(monthSales._sum.vatAmount ?? 0).toLocaleString('ar-SA')} suffix="ريال" icon={BarChart3} />
+          <Metric label={t('sales')}        value={String(monthSales._count)} icon={BarChart3} />
+          <Metric label={t('revenue')}      value={Number(monthSales._sum.sellPrice ?? 0).toLocaleString('ar-SA')} suffix={t('sar')} gold icon={TrendingUp} />
+          <Metric label={t('netProfit')}    value={Number(monthSales._sum.netProfit ?? 0).toLocaleString('ar-SA')} suffix={t('sar')} gold icon={TrendingUp} />
+          <Metric label={t('taxCollected')} value={Number(monthSales._sum.vatAmount ?? 0).toLocaleString('ar-SA')} suffix={t('sar')} icon={BarChart3} />
         </div>
       </div>
 
@@ -64,9 +62,9 @@ export default async function ReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top brands */}
         <div className="bg-white rounded-[12px] border border-gray-100 p-5">
-          <h2 className="font-bold text-[#0F3460] mb-4">أكثر الماركات مبيعاً</h2>
+          <h2 className="font-bold text-[#0F3460] mb-4">{t('topBrands')}</h2>
           {topBrands.length === 0 ? (
-            <p className="text-gray-400 text-sm py-6 text-center">لا توجد مبيعات بعد</p>
+            <p className="text-gray-400 text-sm py-6 text-center">{t('noSales')}</p>
           ) : (
             <div className="space-y-3">
               {topBrands.map(([brand, count]) => (
@@ -86,19 +84,18 @@ export default async function ReportsPage() {
 
         {/* Inventory breakdown */}
         <div className="bg-white rounded-[12px] border border-gray-100 p-5">
-          <h2 className="font-bold text-[#0F3460] mb-4">حالة المخزون</h2>
+          <h2 className="font-bold text-[#0F3460] mb-4">{t('inventoryStatus')}</h2>
           <div className="grid grid-cols-2 gap-3">
-            <InventoryStat label="معروضة للبيع" value={inventoryByStatus.FOR_SALE ?? 0} color="text-green-600 bg-green-50" />
-            <InventoryStat label="في مزاد"      value={inventoryByStatus.AUCTION ?? 0}  color="text-purple-600 bg-purple-50" />
-            <InventoryStat label="مسودة"        value={inventoryByStatus.DRAFT ?? 0}    color="text-gray-600 bg-gray-100" />
-            <InventoryStat label="مباعة"        value={inventoryByStatus.SOLD ?? 0}     color="text-blue-600 bg-blue-50" />
+            <InventoryStat label={t('forSale')}  value={inventoryByStatus.FOR_SALE ?? 0} color="text-green-600 bg-green-50" />
+            <InventoryStat label={t('inAuction')} value={inventoryByStatus.AUCTION ?? 0}  color="text-purple-600 bg-purple-50" />
+            <InventoryStat label={t('draft')}    value={inventoryByStatus.DRAFT ?? 0}    color="text-gray-600 bg-gray-100" />
+            <InventoryStat label={t('sold')}     value={inventoryByStatus.SOLD ?? 0}     color="text-blue-600 bg-blue-50" />
           </div>
 
-          {/* Aging alert */}
           {agingCars > 0 && (
             <div className="mt-4 flex items-center gap-2 bg-amber-50 text-amber-700 rounded-[8px] px-3 py-2.5 text-sm">
               <Clock size={15} />
-              {agingCars} سيارة معروضة منذ أكثر من 60 يوم
+              {t('agingAlert', { count: agingCars })}
             </div>
           )}
         </div>
@@ -106,19 +103,19 @@ export default async function ReportsPage() {
 
       {/* Year summary */}
       <div className="bg-[#0F3460] rounded-[12px] p-6 text-white">
-        <h2 className="font-bold mb-4 flex items-center gap-2"><Package size={18} /> ملخص السنة</h2>
+        <h2 className="font-bold mb-4 flex items-center gap-2"><Package size={18} /> {t('yearlySummary')}</h2>
         <div className="grid grid-cols-3 gap-6">
           <div>
             <div className="text-3xl font-bold">{yearSales._count}</div>
-            <div className="text-white/60 text-sm mt-1">سيارة مباعة</div>
+            <div className="text-white/60 text-sm mt-1">{t('carsSold')}</div>
           </div>
           <div>
             <div className="price-number text-3xl font-bold text-[#C9A84C] font-mono ltr">{Number(yearSales._sum.sellPrice ?? 0).toLocaleString('ar-SA')}</div>
-            <div className="text-white/60 text-sm mt-1">إجمالي المبيعات (ريال)</div>
+            <div className="text-white/60 text-sm mt-1">{t('totalSales')}</div>
           </div>
           <div>
             <div className="price-number text-3xl font-bold text-green-400 font-mono ltr">{Number(yearSales._sum.netProfit ?? 0).toLocaleString('ar-SA')}</div>
-            <div className="text-white/60 text-sm mt-1">صافي الربح (ريال)</div>
+            <div className="text-white/60 text-sm mt-1">{t('totalProfit')}</div>
           </div>
         </div>
       </div>

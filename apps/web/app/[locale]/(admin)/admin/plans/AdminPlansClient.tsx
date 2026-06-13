@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Pencil, Trash2, Star, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Plus, Pencil, Trash2, Star } from 'lucide-react'
 import type { PlanWithFeatures, PlanFeatures } from '@/repositories/plan.repository'
 
 interface Props { plans: PlanWithFeatures[] }
@@ -19,6 +20,7 @@ const DEFAULT_FEATURES: PlanFeatures = {
 
 export default function AdminPlansClient({ plans: initialPlans }: Props) {
   const router = useRouter()
+  const t = useTranslations('adminPlans')
   const [plans, setPlans] = useState(initialPlans)
   const [editing, setEditing] = useState<PlanWithFeatures | null>(null)
   const [creating, setCreating] = useState(false)
@@ -58,7 +60,7 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
   }
 
   async function deletePlan(id: string) {
-    if (!confirm('هل أنت متأكد من حذف هذه الباقة؟')) return
+    if (!confirm(t('confirmDelete'))) return
     await fetch(`/api/v1/admin/plans/${id}`, { method: 'DELETE' })
     router.refresh()
   }
@@ -76,15 +78,26 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
     setForm((f) => ({ ...f, features: { ...f.features, [key]: value } }))
   }
 
+  const basicFields = [
+    { key: 'name',         label: t('nameEn'),            type: 'text' },
+    { key: 'nameAr',       label: t('nameAr'),            type: 'text' },
+    { key: 'slug',         label: 'Slug',                 type: 'text' },
+    { key: 'sortOrder',    label: 'Sort Order',           type: 'number' },
+    { key: 'priceMonthly', label: `${t('priceMonthly')} (${t('sar')})`, type: 'number' },
+    { key: 'priceYearly',  label: `${t('priceYearly')} (${t('sar')})`,  type: 'number' },
+    { key: 'maxCars',      label: `${t('maxCars')} (empty = ∞)`,        type: 'number' },
+    { key: 'trialDays',    label: t('trialDays'),         type: 'number' },
+  ]
+
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#0F3460]">إدارة الباقات</h1>
+        <h1 className="text-2xl font-bold text-[#0F3460]">{t('title')}</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 bg-[#C9A84C] text-white px-4 py-2 rounded-[8px] text-sm font-medium"
         >
-          <Plus size={16} /> باقة جديدة
+          <Plus size={16} /> {t('newPlan')}
         </button>
       </div>
 
@@ -93,12 +106,12 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
         <table className="w-full text-sm">
           <thead className="bg-[#F8FAFC] border-b border-gray-100">
             <tr>
-              <th className="text-right p-4 font-medium text-gray-500">الباقة</th>
-              <th className="text-right p-4 font-medium text-gray-500">شهري</th>
-              <th className="text-right p-4 font-medium text-gray-500">سنوي</th>
-              <th className="text-right p-4 font-medium text-gray-500">السيارات</th>
-              <th className="text-right p-4 font-medium text-gray-500">المميزات</th>
-              <th className="text-right p-4 font-medium text-gray-500">الحالة</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colPlan')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colMonthly')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colYearly')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colCars')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colFeatures')}</th>
+              <th className="text-right p-4 font-medium text-gray-500">{t('colStatus')}</th>
               <th className="p-4"></th>
             </tr>
           </thead>
@@ -117,26 +130,26 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
                 <td className="p-4">
                   <span className="price-number font-mono ltr text-[#C9A84C]">
                     {Number(plan.priceMonthly).toFixed(0)}
-                  </span>{' '}ريال
+                  </span>{' '}{t('sar')}
                 </td>
                 <td className="p-4">
                   <span className="price-number font-mono ltr text-[#C9A84C]">
                     {Number(plan.priceYearly).toFixed(0)}
-                  </span>{' '}ريال
+                  </span>{' '}{t('sar')}
                 </td>
                 <td className="p-4 text-gray-600">
-                  {plan.maxCars === null ? 'غير محدود' : plan.maxCars}
+                  {plan.maxCars === null ? t('unlimited') : plan.maxCars}
                 </td>
                 <td className="p-4">
                   <div className="flex gap-1 flex-wrap">
                     {plan.features.market && <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">Market</span>}
-                    {plan.features.auctions && <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">مزادات</span>}
+                    {plan.features.auctions && <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">{t('auctions')}</span>}
                     {plan.features.api && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">API</span>}
                   </div>
                 </td>
                 <td className="p-4">
                   <button onClick={() => toggleActive(plan)} className={`text-xs px-2 py-1 rounded-full font-medium ${plan.isActive ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                    {plan.isActive ? 'نشط' : 'موقوف'}
+                    {plan.isActive ? t('active') : t('inactive')}
                   </button>
                 </td>
                 <td className="p-4">
@@ -160,21 +173,11 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-[12px] p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-[#0F3460] mb-6">
-              {editing ? 'تعديل الباقة' : 'باقة جديدة'}
+              {editing ? t('editTitle') : t('newTitle')}
             </h2>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Basic fields */}
-              {[
-                { key: 'name',    label: 'الاسم (EN)', type: 'text' },
-                { key: 'nameAr',  label: 'الاسم (AR)', type: 'text' },
-                { key: 'slug',    label: 'Slug',        type: 'text' },
-                { key: 'sortOrder', label: 'الترتيب',  type: 'number' },
-                { key: 'priceMonthly', label: 'السعر الشهري (ريال)', type: 'number' },
-                { key: 'priceYearly',  label: 'السعر السنوي (ريال)', type: 'number' },
-                { key: 'maxCars',  label: 'حد السيارات (فارغ = ∞)', type: 'number' },
-                { key: 'trialDays', label: 'أيام التجربة', type: 'number' },
-              ].map(({ key, label, type }) => (
+              {basicFields.map(({ key, label, type }) => (
                 <div key={key}>
                   <label className="block text-xs text-gray-500 mb-1">{label}</label>
                   <input
@@ -190,20 +193,19 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
             {/* Descriptions */}
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">الوصف (AR)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('descAr')}</label>
                 <textarea value={form.descriptionAr ?? ''} onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))} rows={2} className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#0F3460]" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">الوصف (EN)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('descEn')}</label>
                 <textarea value={form.description ?? ''} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#0F3460]" />
               </div>
             </div>
 
             {/* Feature toggles */}
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">المميزات</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('features')}</h3>
               <div className="grid grid-cols-2 gap-3">
-                {/* Booleans */}
                 {(['market', 'auctions', 'api', 'customShowroom'] as const).map((key) => (
                   <label key={key} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -212,34 +214,34 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
                       onChange={(e) => setFeature(key, e.target.checked)}
                       className="w-4 h-4 accent-[#C9A84C]"
                     />
-                    <span className="text-sm text-gray-700">{{ market: 'Market', auctions: 'المزادات', api: 'API', customShowroom: 'صفحة مخصصة' }[key]}</span>
+                    <span className="text-sm text-gray-700">{{ market: 'Market', auctions: t('featAuctions'), api: 'API', customShowroom: t('featCustomPage') }[key]}</span>
                   </label>
                 ))}
 
                 {/* Reports */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">التقارير</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('reportsLabel')}</label>
                   <select value={form.features.reports} onChange={(e) => setFeature('reports', e.target.value as 'basic' | 'advanced' | 'full')} className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm">
-                    <option value="basic">أساسية</option>
-                    <option value="advanced">متقدمة</option>
-                    <option value="full">كاملة</option>
+                    <option value="basic">{t('reportsBasic')}</option>
+                    <option value="advanced">{t('reportsAdvanced')}</option>
+                    <option value="full">{t('reportsFull')}</option>
                   </select>
                 </div>
 
                 {/* Support */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">الدعم</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('supportLabel')}</label>
                   <select value={form.features.support} onChange={(e) => setFeature('support', e.target.value as PlanFeatures['support'])} className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm">
-                    <option value="email">بريد إلكتروني</option>
-                    <option value="chat">بريد + شات</option>
-                    <option value="priority">أولوية</option>
-                    <option value="dedicated">مدير حساب</option>
+                    <option value="email">{t('supportEmail')}</option>
+                    <option value="chat">{t('supportChat')}</option>
+                    <option value="priority">{t('supportPriority')}</option>
+                    <option value="dedicated">{t('supportDedicated')}</option>
                   </select>
                 </div>
 
                 {/* Team members */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">أعضاء الفريق (فارغ = ∞)</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('teamMembers')}</label>
                   <input
                     type="number"
                     value={form.features.teamMembers ?? ''}
@@ -260,15 +262,15 @@ export default function AdminPlansClient({ plans: initialPlans }: Props) {
                     onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.checked }))}
                     className="w-4 h-4 accent-[#C9A84C]"
                   />
-                  <span className="text-sm text-gray-700">{{ isActive: 'نشط', isPublic: 'عام', isFeatured: 'موصى بها ⭐' }[key]}</span>
+                  <span className="text-sm text-gray-700">{{ isActive: t('statusActive'), isPublic: t('statusPublic'), isFeatured: t('statusRecommended') }[key]}</span>
                 </label>
               ))}
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setCreating(false)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">إلغاء</button>
+              <button onClick={() => setCreating(false)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">{t('cancel')}</button>
               <button onClick={savePlan} disabled={saving} className="px-6 py-2 bg-[#0F3460] text-white rounded-[8px] text-sm font-medium disabled:opacity-50">
-                {saving ? 'جاري الحفظ...' : 'حفظ'}
+                {saving ? t('saving') : t('save')}
               </button>
             </div>
           </div>

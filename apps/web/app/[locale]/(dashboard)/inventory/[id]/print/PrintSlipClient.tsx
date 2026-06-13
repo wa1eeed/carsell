@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Printer, QrCode, ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { Printer, ArrowRight } from 'lucide-react'
 import QRCode from 'qrcode'
 import { formatPrice } from '@/lib/format'
 import { formatCarRef, formatShowroomId } from '@/lib/format'
@@ -43,14 +44,8 @@ interface Props {
   locale:    string
 }
 
-const CAR_TYPE_LABEL: Record<string, string> = {
-  NEW: 'جديد', USED: 'مستعمل', USED_QUALIFIED: 'معتمد',
-}
-const FUEL_LABEL: Record<string, string> = {
-  PETROL: 'بنزين', DIESEL: 'ديزل', HYBRID: 'هجين', ELECTRIC: 'كهربائي',
-}
-
 export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Props) {
+  const t = useTranslations('printSlip')
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [slipType, setSlipType]   = useState<'a4' | 'label'>('a4')
 
@@ -69,11 +64,11 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
       <div className="print:hidden bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <a href="javascript:history.back()" className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
-            <ArrowRight size={14} /> رجوع
+            <ArrowRight size={14} /> {t('back')}
           </a>
           <span className="text-gray-300">|</span>
           <h1 className="font-semibold text-gray-800 text-sm">
-            طباعة — {car.brandNameAr} {car.categoryName} {car.year}
+            {t('printTitle')} {car.brandNameAr} {car.categoryName} {car.year}
           </h1>
         </div>
 
@@ -88,7 +83,7 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
                   slipType === type ? 'bg-white text-[#0F3460] shadow-sm' : 'text-gray-500'
                 }`}
               >
-                {type === 'a4' ? 'A4 كامل' : 'بطاقة صغيرة'}
+                {type === 'a4' ? t('fullA4') : t('smallCard')}
               </button>
             ))}
           </div>
@@ -96,7 +91,7 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
             onClick={() => window.print()}
             className="flex items-center gap-2 bg-[#0F3460] text-white px-4 py-2 rounded-[8px] text-sm font-medium hover:bg-[#0d2d54]"
           >
-            <Printer size={15} /> طباعة
+            <Printer size={15} /> {t('print')}
           </button>
         </div>
       </div>
@@ -126,6 +121,7 @@ export default function PrintSlipClient({ car, showroom, publicUrl, locale }: Pr
 // ── A4 Slip ──────────────────────────────────────────────────────────────────
 
 function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'slipType'> & { qrDataUrl: string }) {
+  const t = useTranslations('printSlip')
   const price = car.sellPrice
 
   return (
@@ -178,20 +174,20 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
               car.carType === 'USED_QUALIFIED' ? 'bg-blue-100 text-blue-700' :
               'bg-gray-100 text-gray-600'
             }`}>
-              {CAR_TYPE_LABEL[car.carType] ?? car.carType}
+              {t(`conditions.${car.carType}` as Parameters<typeof t>[0]) ?? car.carType}
             </span>
           </div>
           <div className="text-left">
-            <div className="text-xs text-gray-400 mb-1">السعر</div>
+            <div className="text-xs text-gray-400 mb-1">{t('price')}</div>
             {price ? (
               <>
                 <div className="price-number text-3xl font-bold text-[#C9A84C] font-mono ltr">
                   {formatPrice(price, 'ar')}
                 </div>
-                <div className="text-sm text-gray-400">ريال سعودي</div>
+                <div className="text-sm text-gray-400">{t('sar')}</div>
               </>
             ) : (
-              <div className="text-xl font-bold text-gray-400">اتصل للسعر</div>
+              <div className="text-xl font-bold text-gray-400">{t('callForPrice')}</div>
             )}
           </div>
         </div>
@@ -201,12 +197,12 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
       <div className="px-8 py-5">
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'الكيلومترات', value: car.odometer ? `${car.odometer.toLocaleString('ar-SA')} كم` : '—' },
-            { label: 'نوع الوقود',  value: FUEL_LABEL[car.fuelType ?? ''] ?? '—' },
-            { label: 'ناقل الحركة', value: car.transmission === 'AUTOMATIC' ? 'أوتوماتيك' : car.transmission === 'MANUAL' ? 'يدوي' : '—' },
-            { label: 'اللون الخارجي', value: car.colorExt ?? '—' },
-            { label: 'اللون الداخلي', value: car.colorInt ?? '—' },
-            { label: 'حجم المحرك',  value: car.engineSize ?? '—' },
+            { label: t('kilometers'),   value: car.odometer ? `${car.odometer.toLocaleString('ar-SA')} km` : '—' },
+            { label: t('fuelType'),     value: car.fuelType ? (t(`fuels.${car.fuelType}` as Parameters<typeof t>[0]) ?? car.fuelType) : '—' },
+            { label: t('transmission'), value: car.transmission ? (t(`transmissions.${car.transmission}` as Parameters<typeof t>[0]) ?? car.transmission) : '—' },
+            { label: t('exteriorColor'), value: car.colorExt ?? '—' },
+            { label: t('interiorColor'), value: car.colorInt ?? '—' },
+            { label: t('engineSize'),   value: car.engineSize ?? '—' },
           ].map((s) => (
             <div key={s.label} className="bg-gray-50 rounded-[8px] p-3">
               <div className="text-xs text-gray-400 mb-0.5">{s.label}</div>
@@ -219,12 +215,12 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
         <div className="grid grid-cols-2 gap-4 mt-3">
           {car.vin && (
             <div className="bg-gray-50 rounded-[8px] p-3">
-              <div className="text-xs text-gray-400 mb-0.5">رقم الهيكل (VIN)</div>
+              <div className="text-xs text-gray-400 mb-0.5">{t('vin')}</div>
               <div className="vin font-mono text-sm font-semibold text-gray-800 ltr">{car.vin}</div>
             </div>
           )}
           <div className="bg-gray-50 rounded-[8px] p-3">
-            <div className="text-xs text-gray-400 mb-0.5">رقم السيارة</div>
+            <div className="text-xs text-gray-400 mb-0.5">{t('plateNumber')}</div>
             <div className="font-mono text-sm font-semibold text-[#0F3460]">{formatCarRef(car.carRefNumber)}</div>
           </div>
         </div>
@@ -232,7 +228,7 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
         {/* Notes */}
         {car.notes && (
           <div className="mt-3 p-3 bg-amber-50 rounded-[8px] border border-amber-100">
-            <div className="text-xs text-amber-600 font-medium mb-1">ملاحظات</div>
+            <div className="text-xs text-amber-600 font-medium mb-1">{t('notes')}</div>
             <div className="text-sm text-gray-700">{car.notes}</div>
           </div>
         )}
@@ -241,7 +237,7 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
       {/* QR + footer */}
       <div className="px-8 py-5 border-t border-gray-100 flex items-center justify-between">
         <div>
-          <div className="text-sm text-gray-500 mb-1">امسح الكود لمزيد من المعلومات</div>
+          <div className="text-sm text-gray-500 mb-1">{t('qrHint')}</div>
           {qrDataUrl && (
             <img src={qrDataUrl} alt="QR Code" className="w-24 h-24" />
           )}
@@ -250,7 +246,7 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
           </div>
         </div>
         <div className="text-left text-sm text-gray-400">
-          <div className="text-xs">منصة</div>
+          <div className="text-xs">{t('poweredBy')}</div>
           <div className="font-bold text-[#0F3460] text-lg">CarSell</div>
           <div className="text-xs">carsell.one</div>
         </div>
@@ -262,6 +258,7 @@ function A4Slip({ car, showroom, qrDataUrl, publicUrl, locale }: Omit<Props, 'sl
 // ── Label Slip (Small card ~10×15cm) ─────────────────────────────────────────
 
 function LabelSlip({ car, showroom, qrDataUrl }: { car: CarData; showroom: ShowroomData; qrDataUrl: string }) {
+  const t = useTranslations('printSlip')
   const price = car.sellPrice
 
   return (
@@ -288,7 +285,7 @@ function LabelSlip({ car, showroom, qrDataUrl }: { car: CarData; showroom: Showr
         <h2 className="font-bold text-[#0F3460] text-base">
           {car.brandNameAr} {car.categoryName} {car.year}
         </h2>
-        <p className="text-xs text-gray-500">{car.modelName} · {CAR_TYPE_LABEL[car.carType]}</p>
+        <p className="text-xs text-gray-500">{car.modelName} · {t(`conditions.${car.carType}` as Parameters<typeof t>[0]) ?? car.carType}</p>
 
         {/* Price */}
         {price && (
@@ -296,16 +293,16 @@ function LabelSlip({ car, showroom, qrDataUrl }: { car: CarData; showroom: Showr
             <div className="price-number text-xl font-bold text-[#C9A84C] font-mono ltr">
               {formatPrice(price, 'ar')}
             </div>
-            <div className="text-xs text-gray-500">ريال سعودي</div>
+            <div className="text-xs text-gray-500">{t('sar')}</div>
           </div>
         )}
 
         {/* Key specs */}
         <div className="mt-3 grid grid-cols-2 gap-1.5 text-xs">
-          {car.odometer && <div className="flex items-center gap-1 text-gray-600">🔢 {car.odometer.toLocaleString('ar-SA')} كم</div>}
-          {car.fuelType  && <div className="flex items-center gap-1 text-gray-600">⛽ {FUEL_LABEL[car.fuelType] ?? car.fuelType}</div>}
-          {car.colorExt  && <div className="flex items-center gap-1 text-gray-600">🎨 {car.colorExt}</div>}
-          {car.transmission && <div className="flex items-center gap-1 text-gray-600">⚙️ {car.transmission === 'AUTOMATIC' ? 'أوتوماتيك' : 'يدوي'}</div>}
+          {car.odometer    && <div className="flex items-center gap-1 text-gray-600">🔢 {car.odometer.toLocaleString('ar-SA')} km</div>}
+          {car.fuelType    && <div className="flex items-center gap-1 text-gray-600">⛽ {t(`fuels.${car.fuelType}` as Parameters<typeof t>[0]) ?? car.fuelType}</div>}
+          {car.colorExt    && <div className="flex items-center gap-1 text-gray-600">🎨 {car.colorExt}</div>}
+          {car.transmission && <div className="flex items-center gap-1 text-gray-600">⚙️ {t(`transmissions.${car.transmission}` as Parameters<typeof t>[0]) ?? car.transmission}</div>}
         </div>
 
         {car.vin && (
@@ -318,7 +315,7 @@ function LabelSlip({ car, showroom, qrDataUrl }: { car: CarData; showroom: Showr
             <img src={qrDataUrl} alt="QR" className="w-16 h-16" />
           )}
           <div className="text-left">
-            <div className="text-xs text-gray-400">رقم السيارة</div>
+            <div className="text-xs text-gray-400">{t('plateNumber')}</div>
             <div className="font-mono font-bold text-[#0F3460]">{formatCarRef(car.carRefNumber)}</div>
             {showroom.phone && <div className="text-xs text-gray-500 mt-1">{showroom.phone}</div>}
           </div>
