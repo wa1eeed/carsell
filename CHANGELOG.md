@@ -5,6 +5,16 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.6] — 2026-06-13 · SOLD Cars on Public Page + Plate Redesign
+
+### Fixed
+- **السيارات المباعة (SOLD) على صفحة المعرض العامة** — كانت `showroomPublicRepository.findCar` تستثني حالة `SOLD`، فالرابط `/{slug}/cars/{id}` لسيارة مباعة يرجع `notFound` ويظهر خطأ. الآن السيارة المباعة تظهر بشكل طبيعي مع شارة **SOLD** قطرية كبيرة فوق صورتها
+
+### Changed
+- **تصميم لوحة السيارة (`SaudiPlate`)** — استُبدل رمز العلم بشعار **النخلة والسيفين** (SVG)، والخط أصبح **Arial Bold** لكل الحروف والأرقام، وكل حرف/رقم في عمود مستقل بحيث يكون العربي فوق الإنجليزي بمحاذاة تامة
+
+---
+
 ## [1.0.5] — 2026-06-13 · Showroom-relevant Dashboard KPIs
 
 ### Changed

@@ -85,7 +85,9 @@ export const showroomPublicRepository = {
       where: {
         showroomId,
         deletedAt: null,
-        status: { in: ['FOR_SALE', 'AUCTION', 'RESERVED'] },
+        // SOLD cars stay visible on their public page (with a SOLD overlay),
+        // only DRAFT is hidden from the public.
+        status: { in: ['FOR_SALE', 'AUCTION', 'RESERVED', 'SOLD'] },
         ...(isPublicId ? { carPublicId: carId }
           : isRef      ? { carRefNumber: Number(carId) }
           :               { id: carId }),
