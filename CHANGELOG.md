@@ -5,6 +5,15 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.2] — 2026-06-13 · Inventory Links + Print Slip Fix
+
+### Fixed
+- **روابط Inventory** — كانت الروابط تستخدم `carRefNumber` (مثل `/inventory/14`) والآن تستخدم `carPublicId` (مثل `/inventory/CS26000014`) في كل من: بطاقة السيارة (CarCard)، قائمة العرض (InventoryView list view)
+- **`CarCardData` interface** — أُضيف حقل `carPublicId?: string | null` وتم تمريره من `inventory/page.tsx`
+- **ورقة السيارة (Print Slip)** — حُذف `target="_blank"` فأصبحت تفتح في نفس التاب، وزر الباك يعمل بشكل صحيح. الرابط أصبح يحمل `carPublicId` بدلاً من `carRefNumber`
+
+---
+
 ## [1.0.1] — 2026-06-13 · URL Prefix Fix + Resilient Car Detail
 
 ### Fixed
