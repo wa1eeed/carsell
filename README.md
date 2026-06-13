@@ -3,8 +3,8 @@
 **سوق السيارات في السعودية والخليج**  
 SaaS platform for car showrooms — bilingual (Arabic primary / English secondary).
 
-**Domain:** carsell.one | app.carsell.one | {slug}.carsell.one  
-**Current Version:** 0.9.0 — see [CHANGELOG.md](./CHANGELOG.md)
+**Domain:** carsell.one | app.carsell.one | carsell.one/{slug}  
+**Current Version:** 1.0.0 — see [CHANGELOG.md](./CHANGELOG.md)
 
 ---
 

@@ -5,6 +5,41 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.0] — 2026-06-13 · Car Public ID + URL Routing + UX Polish
+
+### Added
+- **Car Public ID (`carPublicId`)** — platform-wide unique human-readable ID for every car:
+  - Format: `CS` + 2-digit year + 6-digit sequence = 10 chars (e.g. `CS26000001`)
+  - Resets counter per year (`CS27000001` starts in 2027)
+  - Auto-generated on car creation; backfilled for existing cars via migration
+  - Displayed as gold badge in CarDetail (dashboard), PublicCarDetail (showroom), MarketCarDetailClient (market)
+  - `carPublicId` field on Car model with `UNIQUE` constraint and index
+  - Migration `20260613_car_public_id`: adds column + backfills ordered by `createdAt`
+
+### Changed
+- **All car URLs** now use `carPublicId` instead of UUID or carRefNumber:
+  - Market: `/market/cars/CS26000001`
+  - Showroom pretty URL: `/al-fahad/cars/CS26000001`
+  - Showroom custom domain: `showroom.com/cars/CS26000001`
+  - ShareButton, print slip QR, print slip back link — all updated
+- **Showroom car links** — `basePath` fixed to generate pretty-URL links (`/{locale}/{slug}/cars/{id}`) instead of internal `/showroom/cars/{uuid}`
+- **`getMarketCar`** + **`showroomPublicRepository.findCar`** — accept carPublicId (`CS\d{8}` pattern), carRefNumber (numeric), or UUID for backwards compat
+- **My Showroom button** (Topbar):
+  - URL now `carsell.one/{slug}` (was `{slug}.carsell.one`)
+  - Uses verified custom domain if showroom has one (`customDomain` + `customDomainVerified`)
+  - Layout fetches `customDomain` + `customDomainVerified` and computes `showroomUrl` server-side
+- **Print slip back button** — replaced `router.back()` with direct `<a href={backUrl}>` (print opens in new tab — no history to go back to); `backUrl` passed as prop from server page
+- **Print slip QR URL** — uses `carsell.one/{slug}/cars/{carPublicId}` (was `{slug}.carsell.one`)
+- **CarDetail** — added back button "رجوع إلى المخزون" at top of page
+- **Requests tabs (RESERVED, WAITING_PAYMENT, OWNERSHIP_TRANSFER)** — wrapped in `.catch()` to prevent server crash if DB migration hasn't applied new enum values yet
+- **Market nav ("كل السيارات", "مزادات")** — "All Cars" links to `?page=1` (shows catalog list), "Auctions" links to `?displayMode=AUCTION` (new filter)
+- **`listMarketCars`** — new `displayMode?: 'AUCTION'` filter (sets `status = 'AUCTION'` in where clause)
+
+### DB Migrations
+- `20260613_car_public_id` — adds `car_public_id TEXT UNIQUE` + backfill using `ROW_NUMBER()` per year
+
+---
+
 ## [0.9.0] — 2026-06-13 · Market Redesign + UX Fixes + Brand Logos
 
 ### Added
