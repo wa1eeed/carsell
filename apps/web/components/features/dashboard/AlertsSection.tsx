@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { ShieldAlert, CalendarClock, Gavel, CheckCircle2, Clock, Handshake } from 'lucide-react'
+import { ShieldAlert, CalendarClock, Gavel, CheckCircle2, Clock, Handshake, ImageOff } from 'lucide-react'
 
 interface Alerts {
   kycPending: number
@@ -9,6 +9,7 @@ interface Alerts {
   auctionEnding: number
   pendingRequests?: number
   activeDeals?: number
+  carsWithoutImages?: number
 }
 
 export function AlertsSection({ alerts }: { alerts: Alerts }) {
@@ -17,6 +18,7 @@ export function AlertsSection({ alerts }: { alerts: Alerts }) {
   const items = [
     { key: 'pendingReq', count: alerts.pendingRequests ?? 0, label: t('pendingRequestsAlert'), icon: Clock, tone: 'warning' as const },
     { key: 'activeDeals', count: alerts.activeDeals ?? 0, label: t('activeDeals'), icon: Handshake, tone: 'primary' as const },
+    { key: 'noImages', count: alerts.carsWithoutImages ?? 0, label: t('carsWithoutImages'), icon: ImageOff, tone: 'warning' as const },
     { key: 'kyc', count: alerts.kycPending, label: t('kycPending'), icon: ShieldAlert, tone: 'warning' as const },
     {
       key: 'subs',

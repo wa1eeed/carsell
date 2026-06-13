@@ -1,12 +1,18 @@
 import { prisma } from '@/lib/prisma'
 import type { AuthUser } from '@/lib/auth'
 
+export interface KpiTrend { value: number }
+
 export interface DashboardKpis {
   inventoryCount: number
   monthlySales: number
   monthlyRevenue: number
   activeUsers: number
   showroomCount: number
+  trends: {
+    monthlySales: KpiTrend
+    monthlyRevenue: KpiTrend
+  }
 }
 
 export interface MarketStats {
@@ -31,6 +37,16 @@ function startOfMonth(): Date {
   return new Date(now.getFullYear(), now.getMonth(), 1)
 }
 
+function startOfLastMonth(): Date {
+  const now = new Date()
+  return new Date(now.getFullYear(), now.getMonth() - 1, 1)
+}
+
+function pctChange(current: number, prev: number): number {
+  if (prev === 0) return current > 0 ? 100 : 0
+  return Math.round(((current - prev) / prev) * 100)
+}
+
 const isPlatformAdmin = (user: AuthUser) => user.role === 'PLATFORM_ADMIN'
 
 /**
@@ -42,28 +58,35 @@ function carScope(user: AuthUser) {
 
 export const dashboardRepository = {
   async getKpis(user: AuthUser): Promise<DashboardKpis> {
-    const monthStart = startOfMonth()
+    const monthStart     = startOfMonth()
+    const lastMonthStart = startOfLastMonth()
     const saleScope = isPlatformAdmin(user) ? {} : { showroomId: user.showroomId }
 
-    const [inventoryCount, monthlySales, revenueAgg, activeUsers, showroomCount] = await Promise.all([
+    const [inventoryCount, monthlySales, revenueAgg, prevSales, prevRevenueAgg, activeUsers, showroomCount] = await Promise.all([
       prisma.car.count({ where: carScope(user) }),
       prisma.sale.count({ where: { ...saleScope, soldAt: { gte: monthStart } } }),
-      prisma.sale.aggregate({
-        where: { ...saleScope, soldAt: { gte: monthStart } },
-        _sum: { sellPrice: true },
-      }),
+      prisma.sale.aggregate({ where: { ...saleScope, soldAt: { gte: monthStart } }, _sum: { sellPrice: true } }),
+      prisma.sale.count({ where: { ...saleScope, soldAt: { gte: lastMonthStart, lt: monthStart } } }),
+      prisma.sale.aggregate({ where: { ...saleScope, soldAt: { gte: lastMonthStart, lt: monthStart } }, _sum: { sellPrice: true } }),
       prisma.showroomUser.count({
         where: isPlatformAdmin(user) ? { isActive: true } : { showroomId: user.showroomId, isActive: true },
       }),
       isPlatformAdmin(user) ? prisma.showroom.count() : Promise.resolve(1),
     ])
 
+    const monthlyRevenue = Number(revenueAgg._sum.sellPrice ?? 0)
+    const prevRevenue    = Number(prevRevenueAgg._sum.sellPrice ?? 0)
+
     return {
       inventoryCount,
       monthlySales,
-      monthlyRevenue: Number(revenueAgg._sum.sellPrice ?? 0),
+      monthlyRevenue,
       activeUsers,
       showroomCount,
+      trends: {
+        monthlySales:   { value: pctChange(monthlySales, prevSales) },
+        monthlyRevenue: { value: pctChange(monthlyRevenue, prevRevenue) },
+      },
     }
   },
 
@@ -183,10 +206,17 @@ export const dashboardRepository = {
           : { showroomId: user.showroomId, status: { in: ['RESERVED', 'WAITING_PAYMENT', 'OWNERSHIP_TRANSFER'] } },
       }),
     ])
-    const expiringSubscriptions = isPlatformAdmin(user)
-      ? await prisma.subscription.count({ where: { status: { in: ['EXPIRED', 'SUSPENDED'] } } })
-      : 0
+    const [expiringSubscriptions, carsWithoutImages] = await Promise.all([
+      isPlatformAdmin(user)
+        ? prisma.subscription.count({ where: { status: { in: ['EXPIRED', 'SUSPENDED'] } } })
+        : Promise.resolve(0),
+      prisma.car.count({
+        where: isPlatformAdmin(user)
+          ? { deletedAt: null, status: { in: ['FOR_SALE', 'DRAFT'] }, images: { none: {} } }
+          : { showroomId: user.showroomId, deletedAt: null, status: { in: ['FOR_SALE', 'DRAFT'] }, images: { none: {} } },
+      }),
+    ])
 
-    return { kycPending, expiringSubscriptions, auctionEnding, dayAgo, pendingRequests, activeDeals }
+    return { kycPending, expiringSubscriptions, auctionEnding, dayAgo, pendingRequests, activeDeals, carsWithoutImages }
   },
 }

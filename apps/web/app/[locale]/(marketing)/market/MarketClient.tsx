@@ -27,6 +27,7 @@ type CarShowroom = {
 
 type MarketCar = {
   id: string
+  carRefNumber: number
   year: number
   carType: string
   odometer: number | null
@@ -773,7 +774,7 @@ function MarketCarCard({
 }) {
   const price      = car.sellPrice ? Number(car.sellPrice) : null
   const coverUrl   = car.images[0]?.url
-  const detailHref = `/${locale}/market/cars/${car.id}`
+  const detailHref = `/${locale}/market/cars/${car.carRefNumber}`
   const isAuction  = car.status === 'AUCTION'
   const isSoum     = car.displayMode === 'SOUM'
 

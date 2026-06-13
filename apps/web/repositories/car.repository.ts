@@ -9,6 +9,8 @@ export const carRepository = {
     const pageSize = Math.min(opts?.pageSize ?? PAGINATION.DEFAULT_PAGE_SIZE, PAGINATION.MAX_PAGE_SIZE)
     const skip     = (page - 1) * pageSize
 
+    const qNum = opts?.q && /^\d+$/.test(opts.q.trim()) ? Number(opts.q.trim()) : null
+
     const where: Prisma.CarWhereInput = {
       showroomId,
       deletedAt: null,
@@ -23,6 +25,20 @@ export const carRepository = {
               ...(opts?.maxPrice != null ? { lte: opts.maxPrice } : {}),
             },
           }
+        : {}),
+      ...(opts?.q
+        ? qNum != null
+          ? { carRefNumber: qNum }
+          : {
+              OR: [
+                { vin: { contains: opts.q, mode: 'insensitive' } },
+                { plateNumber: { contains: opts.q, mode: 'insensitive' } },
+                { brand: { nameAr: { contains: opts.q, mode: 'insensitive' } } },
+                { brand: { nameEn: { contains: opts.q, mode: 'insensitive' } } },
+                { category: { nameAr: { contains: opts.q, mode: 'insensitive' } } },
+                { category: { nameEn: { contains: opts.q, mode: 'insensitive' } } },
+              ],
+            }
         : {}),
     }
 

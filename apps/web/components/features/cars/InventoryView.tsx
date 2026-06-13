@@ -40,7 +40,7 @@ export function InventoryView({ cars }: { cars: CarCardData[] }) {
             </thead>
             <tbody>
               {cars.map((c) => (
-                <tr key={c.id} className="cursor-pointer" onClick={() => (window.location.href = `${prefix}/inventory/${c.id}`)}>
+                <tr key={c.id} className="cursor-pointer" onClick={() => (window.location.href = `${prefix}/inventory/${c.carRefNumber}`)}>
                   <td>{c.brandName} {c.categoryName}</td>
                   <td>{c.year}</td>
                   <td>{c.odometer ?? '—'}</td>

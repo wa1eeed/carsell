@@ -87,15 +87,16 @@ export async function listMarketCars(filters: MarketFilters = {}) {
       skip,
       take: pageSize,
       select: {
-        id:           true,
-        year:         true,
-        carType:      true,
-        odometer:     true,
-        fuelType:     true,
-        transmission: true,
-        sellPrice:    true,
-        status:       true,
-        displayMode:  true,
+        id:            true,
+        carRefNumber:  true,
+        year:          true,
+        carType:       true,
+        odometer:      true,
+        fuelType:      true,
+        transmission:  true,
+        sellPrice:     true,
+        status:        true,
+        displayMode:   true,
         brand:    { select: { nameAr: true, nameEn: true, logoUrl: true } },
         category: { select: { nameAr: true, nameEn: true, bodyType: true } },
         model:    { select: { name: true } },
@@ -119,9 +120,10 @@ export async function listMarketCars(filters: MarketFilters = {}) {
 }
 
 export async function getMarketCar(carId: string) {
+  const isRef = /^\d+$/.test(carId)
   return prisma.car.findFirst({
     where: {
-      id:        carId,
+      ...(isRef ? { carRefNumber: Number(carId) } : { id: carId }),
       deletedAt: null,
       status:    { in: ['FOR_SALE', 'AUCTION'] },
     },

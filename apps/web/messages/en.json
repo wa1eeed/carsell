@@ -201,7 +201,8 @@
     "expiringSubscriptions": "Expiring Subscriptions",
     "auctionEndingSoon": "Auction Ending Soon",
     "pendingRequestsAlert": "Requests unanswered for 24+ hours",
-    "activeDeals": "Active deals in progress"
+    "activeDeals": "Active deals in progress",
+    "carsWithoutImages": "Cars without images"
   },
   "publish": {
     "title": "Publish Car",

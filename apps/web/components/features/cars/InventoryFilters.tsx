@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LayoutGrid, List, Filter } from 'lucide-react'
+import { LayoutGrid, List, Filter, Search } from 'lucide-react'
 
 const STATUSES = ['FOR_SALE', 'AUCTION', 'RESERVED', 'SOLD', 'DRAFT'] as const
 
@@ -23,6 +23,18 @@ export function InventoryFilters({ view, onViewChange }: { view: 'grid' | 'list'
 
   return (
     <div className="flex flex-wrap items-center gap-3">
+      <div className="relative">
+        <Search size={15} className="absolute start-2.5 top-1/2 -translate-y-1/2 text-cl-gray-400 pointer-events-none" />
+        <input
+          className="cl-input !ps-8 !w-48"
+          type="search"
+          placeholder={tc('search')}
+          defaultValue={params.get('q') ?? ''}
+          onKeyDown={(e) => { if (e.key === 'Enter') setParam('q', (e.target as HTMLInputElement).value) }}
+          onBlur={(e) => setParam('q', e.target.value)}
+        />
+      </div>
+
       <div className="flex items-center gap-1.5 text-sm text-cl-gray-600">
         <Filter size={16} /> {tc('filter')}
       </div>

@@ -62,6 +62,7 @@ export const updateCarSchema = z.object({
 })
 
 export const carFilterSchema = z.object({
+  q:          z.string().max(50).optional(),
   brandId:    z.string().uuid().optional(),
   categoryId: z.string().uuid().optional(),
   year:       z.coerce.number().int().optional(),

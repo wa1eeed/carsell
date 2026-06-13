@@ -28,8 +28,8 @@ export default async function DashboardPage({ params }: { params: { locale: stri
       {/* 1. KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <KpiCard label={t('inventory')}     value={data.kpis.inventoryCount}  icon="car"       />
-        <KpiCard label={t('monthlySales')}  value={data.kpis.monthlySales}    icon="sales"     />
-        <KpiCard label={t('revenue')}       value={data.kpis.monthlyRevenue}  icon="revenue"   isPrice />
+        <KpiCard label={t('monthlySales')}  value={data.kpis.monthlySales}    icon="sales"     trend={data.kpis.trends.monthlySales} />
+        <KpiCard label={t('revenue')}       value={data.kpis.monthlyRevenue}  icon="revenue"   isPrice trend={data.kpis.trends.monthlyRevenue} />
         <KpiCard label={t('activeUsers')}   value={data.kpis.activeUsers}     icon="users"     />
         <KpiCard label={t('showrooms')}     value={data.kpis.showroomCount}   icon="showrooms" />
       </div>
