@@ -5,6 +5,63 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [0.9.0] — 2026-06-13 · Market Redesign + UX Fixes + Brand Logos
+
+### Added
+- **Market Homepage** (`MarketHome.tsx`) — professional marketplace landing:
+  - Sticky nav bar with sections (New / Used / Auctions / All)
+  - Hero section with quick-filter pills and CTA
+  - Brand logos carousel — click to filter by brand
+  - Body type filter bar (SUV, Sedan, Pickup, Coupe, Hatchback, Van, Convertible, Wagon)
+  - Sections: Live Auctions (with countdown timer), New Cars, Used Cars
+  - Market homepage shown when no filters active; existing search UI shown otherwise
+- **Brand Logo Upload** (`AdminCatalogClient.tsx`) — `LogoUploader` component:
+  - Upload brand logo directly from device → Cloudflare R2 via presign API
+  - Stored under `brand-logos/` prefix in R2
+  - Preview shown immediately after upload
+- **Dashboard Topbar** — two new buttons:
+  - "My Showroom" → opens `slug.carsell.one` in new tab (shown when slug exists)
+  - "CarSell Market" → opens public marketplace in new tab
+- **`getMarketHomepageData()`** in `market.repository.ts` — fetches new/used/auction/brands in parallel
+
+### Fixed
+- **Print slip back button** — replaced `javascript:history.back()` with `router.back()`
+- **Print slip QR URL** — now points to showroom landing page (`slug.carsell.one/cars/ref`) instead of market
+- **Share button** (`ShareButton.tsx`) — dashboard source now links to showroom page when slug available
+- **Requests tabs** — replaced hardcoded `/${locale}/requests` URL with `pathname`-relative navigation (was opening wrong page)
+- **CarDetail share** — passes `showroomSlug` and `carRefNumber` to ShareButton
+
+---
+
+## [0.8.0] — 2026-06-13 · Car Detail Overhaul + Pipeline + Bid Increment
+
+### Added
+- **Car Detail Page** — complete redesign (`CarDetail.tsx`):
+  - Tabs: Details, Financial, Bids (auction only), Soum Offers, Timeline, Documents, Accidents, Mojaz
+  - Hero header with cover image, status badge, car ref number
+  - Smart publish/unpublish toggle (shows "Stop Listing" with confirmation when live)
+  - BidsTab: ranked list with winning badge + auction stats grid
+  - SaumTab: negotiation history with accepted offer highlighted
+  - TimelineTab: vertical timeline with Lucide icons and human-readable labels
+- **Car Request Pipeline** — stages: `PENDING → RESERVED → WAITING_PAYMENT → OWNERSHIP_TRANSFER → COMPLETED` (+ REJECTED/CANCELLED)
+  - Auto-syncs `Car.status` when request status changes (in single `$transaction`)
+  - Creates `Customer` record automatically when request reaches RESERVED
+  - Pipeline progress bar in RequestsClient with per-stage counters
+- **Unpublish endpoint** — `POST /api/v1/cars/[id]/unpublish` reverts car to DRAFT with timeline entry
+- **Bid Increment field** — `auctionBidIncrement` on Car model; added to PublishModal and publish service
+- **carRefNumber URLs** — `/inventory/10001` and `/market/cars/10001` work alongside UUID
+- **carRefNumber badge** on inventory cards + list view links updated
+- **Search in inventory** — single search box supports: ref number (numeric), VIN, plate, brand name
+- **Bilingual print slip** — switches AR/EN based on locale; shows carRefNumber badge
+- **Dashboard KPIs** — month-over-month trend % (↑↓) for sales and revenue
+- **Dashboard alerts** — pending requests (24h+), active deals count, cars without images
+
+### DB Migrations
+- `20260613_request_stages_customer_link` — new CarRequestStatus enum values + `customerId` FK
+- `20260613_auction_bid_increment` — `auctionBidIncrement` column on `cars` table
+
+---
+
 ## [0.7.0] — 2026-06-11 · Deployment + Requests + i18n start
 
 ### Added

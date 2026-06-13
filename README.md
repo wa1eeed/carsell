@@ -3,7 +3,8 @@
 **سوق السيارات في السعودية والخليج**  
 SaaS platform for car showrooms — bilingual (Arabic primary / English secondary).
 
-**Domain:** carsell.one | app.carsell.one | {slug}.carsell.one
+**Domain:** carsell.one | app.carsell.one | {slug}.carsell.one  
+**Current Version:** 0.9.0 — see [CHANGELOG.md](./CHANGELOG.md)
 
 ---
 
@@ -118,6 +119,9 @@ Authentication: `Authorization: Bearer <jwt>`
 | `POST /webhooks/tap` | Tap payment webhook |
 | `GET/POST /cars` | List / create cars |
 | `POST /cars/:id/publish` | Publish car (fixed/soum/auction) |
+| `POST /cars/:id/unpublish` | Revert car to DRAFT |
+| `GET /cars/:id` | Car detail with bids, requests, timeline |
+| `PATCH /requests/:id` | Advance request pipeline stage |
 | `POST /sales/:carId` | Register sale + VAT calculation |
 | `GET/POST /admin/plans` | Admin: manage plans |
 | `GET/PUT /admin/settings` | Admin: platform settings + Tap keys |
