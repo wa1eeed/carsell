@@ -112,6 +112,14 @@ export const carRepository = {
     })
   },
 
+  /** Find a car by its platform-wide public ID (e.g. CS26000014) */
+  async findByPublicId(carPublicId: string, showroomId: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (prisma.car as any).findFirst({
+      where: { carPublicId, showroomId, deletedAt: null },
+    })
+  },
+
   async create(showroomId: string, createdBy: string, data: CreateCarInput & { carRefNumber?: number }) {
     const carPublicId = await generateCarPublicId()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

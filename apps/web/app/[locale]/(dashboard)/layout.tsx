@@ -17,19 +17,28 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions)
   if (!session?.user) redirect(`/${locale}/login`)
 
+  // Base fields (name + slug) — always available. Kept in a separate query so a
+  // missing customDomain column in older DBs can't null out the whole result.
   const [showroom, subscription] = await Promise.all([
     prisma.showroom.findUnique({
       where: { id: session.user.showroomId },
-      select: { name: true, slug: true, customDomain: true, customDomainVerified: true },
+      select: { name: true, slug: true },
     }).catch(() => null),
     getSubscriptionByShowroom(session.user.showroomId).catch(() => null),
   ])
 
+  // Custom domain is optional and may not exist in older DBs — fetch defensively.
+  const customDomainInfo = await prisma.showroom.findUnique({
+    where: { id: session.user.showroomId },
+    select: { customDomain: true, customDomainVerified: true },
+  }).catch(() => null)
+
   const showroomName = showroom?.name ?? 'CarSell'
-  const showroomSlug = showroom?.slug ?? null
+  // `__platform__` is the internal admin showroom — it has no public landing page
+  const showroomSlug = showroom?.slug && showroom.slug !== '__platform__' ? showroom.slug : null
   // Use verified custom domain if set, otherwise fall back to carsell.one/{slug}
-  const showroomUrl = showroom?.customDomainVerified && showroom.customDomain
-    ? `https://${showroom.customDomain}`
+  const showroomUrl = customDomainInfo?.customDomainVerified && customDomainInfo.customDomain
+    ? `https://${customDomainInfo.customDomain}`
     : showroomSlug
       ? `https://${ROOT_DOMAIN}/${showroomSlug}`
       : null

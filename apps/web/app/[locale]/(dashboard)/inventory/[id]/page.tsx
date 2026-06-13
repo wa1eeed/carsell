@@ -10,12 +10,15 @@ export const dynamic = 'force-dynamic'
 export default async function CarDetailPage({ params }: { params: { id: string; locale: string } }) {
   const user = await requirePageUser()
 
-  // Support both UUID and carRefNumber in URL
-  const isRef = /^\d+$/.test(params.id)
+  // Support carPublicId (CS26000014), carRefNumber (numeric), or UUID in URL
+  const isPublicId = /^CS\d{8}$/i.test(params.id)
+  const isRef      = !isPublicId && /^\d+$/.test(params.id)
   const [car, showroom] = await Promise.all([
-    isRef
-      ? carRepository.findByRef(Number(params.id), user.showroomId)
-      : carRepository.findById(params.id, user.showroomId),
+    isPublicId
+      ? carRepository.findByPublicId(params.id.toUpperCase(), user.showroomId)
+      : isRef
+        ? carRepository.findByRef(Number(params.id), user.showroomId)
+        : carRepository.findById(params.id, user.showroomId),
     prisma.showroom.findUnique({ where: { id: user.showroomId }, select: { slug: true } }),
   ])
   if (!car) notFound()

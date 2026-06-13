@@ -29,12 +29,18 @@ export default async function PrintSlipPage({ params }: Props) {
   const session = await getServerSession(authOptions)
   if (!session?.user) redirect(`/${params.locale}/login`)
 
-  // Support carRefNumber in URL
-  const isRef = /^\d+$/.test(params.id)
-  const baseCar = isRef
-    ? await carRepository.findByRef(Number(params.id), session.user.showroomId)
-    : await carRepository.findById(params.id, session.user.showroomId)
-  const car = isRef && baseCar ? await carRepository.findById(baseCar.id, session.user.showroomId) : baseCar as Awaited<ReturnType<typeof carRepository.findById>>
+  // Support carPublicId (CS26000014), carRefNumber (numeric), or UUID in URL
+  const isPublicId = /^CS\d{8}$/i.test(params.id)
+  const isRef      = !isPublicId && /^\d+$/.test(params.id)
+  const baseCar = isPublicId
+    ? await carRepository.findByPublicId(params.id.toUpperCase(), session.user.showroomId)
+    : isRef
+      ? await carRepository.findByRef(Number(params.id), session.user.showroomId)
+      : await carRepository.findById(params.id, session.user.showroomId)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const car = (isRef || isPublicId) && baseCar
+    ? await carRepository.findById((baseCar as any).id, session.user.showroomId)
+    : baseCar as Awaited<ReturnType<typeof carRepository.findById>>
   if (!car) notFound()
 
   const showroom = await prisma.showroom.findUnique({
