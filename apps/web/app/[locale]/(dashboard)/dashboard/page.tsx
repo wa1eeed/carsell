@@ -26,12 +26,12 @@ export default async function DashboardPage({ params }: { params: { locale: stri
       <h1 className="text-2xl font-semibold text-cl-primary">{t('title')}</h1>
 
       {/* 1. KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      {/* The "showrooms" KPI is platform-admin scope only; showroom users never see it. */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label={t('inventory')}     value={data.kpis.inventoryCount}  icon="car"       />
         <KpiCard label={t('monthlySales')}  value={data.kpis.monthlySales}    icon="sales"     trend={data.kpis.trends.monthlySales} />
         <KpiCard label={t('revenue')}       value={data.kpis.monthlyRevenue}  icon="revenue"   isPrice trend={data.kpis.trends.monthlyRevenue} />
         <KpiCard label={t('activeUsers')}   value={data.kpis.activeUsers}     icon="users"     />
-        <KpiCard label={t('showrooms')}     value={data.kpis.showroomCount}   icon="showrooms" />
       </div>
 
       {/* 2. آخر السيارات المضافة — أهم بلوك بعد الأرقام */}
