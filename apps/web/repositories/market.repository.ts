@@ -149,6 +149,49 @@ export async function getMarketCar(carId: string) {
   })
 }
 
+const CAR_SELECT = {
+  id: true, carRefNumber: true, year: true, carType: true,
+  odometer: true, fuelType: true, transmission: true, sellPrice: true,
+  status: true, displayMode: true, auctionEndsAt: true,
+  brand:    { select: { nameAr: true, nameEn: true } },
+  category: { select: { nameAr: true, nameEn: true } },
+  model:    { select: { name: true } },
+  images:   { where: { isCover: true }, take: 1, select: { url: true } },
+  showroom: { select: { name: true, city: true, slug: true } },
+} as const
+
+export async function getMarketHomepageData() {
+  const baseWhere: Prisma.CarWhereInput = { deletedAt: null, status: { in: ['FOR_SALE', 'AUCTION'] }, listedOnMarket: true }
+
+  const [newCars, usedCars, auctionCars, brands] = await Promise.all([
+    prisma.car.findMany({
+      where: { ...baseWhere, carType: 'NEW' },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      select: CAR_SELECT,
+    }),
+    prisma.car.findMany({
+      where: { ...baseWhere, carType: { in: ['USED', 'USED_QUALIFIED'] } },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      select: CAR_SELECT,
+    }),
+    prisma.car.findMany({
+      where: { ...baseWhere, status: 'AUCTION' },
+      orderBy: { auctionEndsAt: 'asc' },
+      take: 6,
+      select: CAR_SELECT,
+    }),
+    prisma.brand.findMany({
+      where:   { isActive: true },
+      orderBy: { nameAr: 'asc' },
+      select:  { id: true, nameAr: true, nameEn: true, logoUrl: true },
+    }),
+  ])
+
+  return { newCars, usedCars, auctionCars, brands }
+}
+
 export async function getMarketFiltersData() {
   const [brands, cities] = await Promise.all([
     prisma.brand.findMany({

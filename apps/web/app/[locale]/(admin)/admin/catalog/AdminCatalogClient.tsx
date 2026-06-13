@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { Plus, Pencil, Trash2, Tag, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Plus, Pencil, Trash2, Tag, RefreshCw, Upload, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
@@ -281,9 +281,8 @@ function BrandsTab() {
                 className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0F3460]" placeholder="Toyota" dir="ltr" />
             </div>
             <div className="col-span-2">
-              <label className="block text-xs text-gray-500 mb-1">رابط الشعار (اختياري)</label>
-              <input value={form.logoUrl} onChange={(e) => setForm((f) => ({ ...f, logoUrl: e.target.value }))}
-                className="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0F3460]" placeholder="https://..." dir="ltr" />
+              <label className="block text-xs text-gray-500 mb-1">شعار الماركة (اختياري)</label>
+              <LogoUploader value={form.logoUrl} onChange={(url) => setForm((f) => ({ ...f, logoUrl: url }))} />
             </div>
           </div>
           <div className="flex justify-end gap-2">
@@ -834,6 +833,63 @@ function ModelsTab() {
         onConfirm={() => { if (deleteTarget) void remove(deleteTarget); setDeleteTarget(null) }}
         onCancel={() => setDeleteTarget(null)}
       />
+    </div>
+  )
+}
+
+
+// ── LogoUploader ──────────────────────────────────────────────────────────────
+
+function LogoUploader({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const inputRef  = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(file: File) {
+    if (!file.type.startsWith('image/')) return toast.error('يجب أن يكون الملف صورة')
+    if (file.size > 2 * 1024 * 1024) return toast.error('الحجم الأقصى 2MB')
+    setUploading(true)
+    try {
+      const presignRes = await fetch('/api/v1/uploads/presign', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ category: 'image', contentType: file.type, size: file.size, prefix: 'brand-logos' }),
+      })
+      if (!presignRes.ok) throw new Error('فشل الحصول على رابط الرفع')
+      const { url, publicUrl } = await presignRes.json()
+      const put = await fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+      if (!put.ok) throw new Error('فشل رفع الملف')
+      onChange(publicUrl)
+      toast.success('تم رفع الشعار')
+    } catch {
+      toast.error('حدث خطأ أثناء الرفع')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      {value && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={value} alt="logo" className="w-12 h-12 rounded-full object-contain border border-gray-200 bg-gray-50" />
+      )}
+      <div className="flex-1">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-300 rounded-[8px] text-sm text-gray-500 hover:border-[#0F3460] hover:text-[#0F3460] transition-colors disabled:opacity-50"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          {uploading ? 'جاري الرفع...' : 'رفع شعار'}
+        </button>
+        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f) }} />
+        {value && (
+          <input value={value} readOnly dir="ltr"
+            className="mt-1.5 w-full text-[10px] text-gray-400 font-mono bg-gray-50 border border-gray-100 rounded px-2 py-1" />
+        )}
+      </div>
     </div>
   )
 }
