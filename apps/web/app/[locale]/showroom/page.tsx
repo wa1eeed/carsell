@@ -76,16 +76,21 @@ export default async function ShowroomPage({
 
   // Link strategy:
   //   - subdomain/custom-domain → links stay relative on same host
-  //   - root pretty URL (carsell.one/{slug}) → links go to /{locale}/{slug}/...
-  const onCustomHost = !!headers().get('x-showroom-slug') || !!headers().get('x-showroom-domain')
-  const basePath  = onCustomHost && !headers().get('x-showroom-domain')
-    ? `/${locale}/showroom`                       // subdomain
+  const customDomain = headers().get('x-showroom-domain')
+  // basePath determines the car detail link prefix shown in this page:
+  // - Custom domain (e.g. showroom.com): /showroom internally, links as /showroom/cars/{id}
+  // - Pretty slug (carsell.one/al-fahad): links as /{locale}/al-fahad/cars/{id}
+  // - Fallback: /showroom
+  const basePath = customDomain
+    ? `/${locale}/showroom`
     : showroom.slug
-      ? `/${locale}/${showroom.slug}`             // root pretty URL
+      ? `/${locale}/${showroom.slug}`
       : `/${locale}/showroom`
-  const linkQuery = onCustomHost ? '' : `?showroom=${encodeURIComponent(showroom.slug ?? '')}`
-  const mapped: PublicCarData[] = cars.map((c) => ({
+  const linkQuery = ''  // slug and domain-based routes don't need query params
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapped: PublicCarData[] = (cars as any[]).map((c) => ({
     id: c.id,
+    carPublicId: c.carPublicId ?? null,
     brandName: c.brand.nameAr,
     categoryName: c.category.nameAr,
     year: c.year,

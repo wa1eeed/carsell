@@ -247,7 +247,15 @@ export default function MarketCarDetailClient({ car, locale }: Props) {
                 </div>
 
                 <h1 className="text-2xl font-bold text-[#0F3460] leading-tight">{carTitle}</h1>
-                <p className="text-gray-400 text-sm mt-0.5">{car.model.name}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-gray-400 text-sm">{car.model.name}</p>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(car as any).carPublicId && (
+                    <span className="text-[10px] font-mono text-[#C9A84C] bg-[#C9A84C]/10 px-2 py-0.5 rounded-full">
+                      {(car as any).carPublicId}
+                    </span>
+                  )}
+                </div>
                 {car.showroom.city && (
                   <p className="flex items-center gap-1 text-gray-400 text-sm mt-1">
                     <MapPin size={12} /> {car.showroom.city}

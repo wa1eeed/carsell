@@ -77,8 +77,19 @@ export const showroomPublicRepository = {
   },
 
   async findCar(showroomId: string, carId: string) {
-    return prisma.car.findFirst({
-      where: { id: carId, showroomId, deletedAt: null, status: { in: ['FOR_SALE', 'AUCTION', 'RESERVED'] } },
+    // Support carPublicId (e.g. CS26000001), carRefNumber (numeric), or UUID
+    const isPublicId = /^CS\d{8}$/.test(carId)
+    const isRef = !isPublicId && /^\d+$/.test(carId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (prisma.car as any).findFirst({
+      where: {
+        showroomId,
+        deletedAt: null,
+        status: { in: ['FOR_SALE', 'AUCTION', 'RESERVED'] },
+        ...(isPublicId ? { carPublicId: carId }
+          : isRef      ? { carRefNumber: Number(carId) }
+          :               { id: carId }),
+      },
       include: {
         brand: true,
         category: true,

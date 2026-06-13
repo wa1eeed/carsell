@@ -18,6 +18,7 @@ const BODY_TYPES = [
 interface CarItem {
   id: string
   carRefNumber: number
+  carPublicId?: string | null
   year: number
   carType: string
   odometer: number | null
@@ -54,7 +55,7 @@ export default function MarketHome({ newCars, usedCars, auctionCars, brands, loc
   const prefix = ar ? '' : '/en'
 
   function carUrl(car: CarItem) {
-    return `/${locale}/market/cars/${car.carRefNumber}`
+    return `/${locale}/market/cars/${car.carPublicId ?? car.carRefNumber}`
   }
 
   return (

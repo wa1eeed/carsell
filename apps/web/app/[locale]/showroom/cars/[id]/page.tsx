@@ -59,6 +59,8 @@ export default async function ShowroomCarPage({
 
   const data: PublicCarDetailData = {
     id: car.id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    carPublicId: (car as any).carPublicId ?? null,
     brandName: car.brand.nameAr,
     categoryName: car.category.nameAr,
     modelName: car.model.name,
@@ -73,7 +75,8 @@ export default async function ShowroomCarPage({
     sellPrice: car.sellPrice ? Number(car.sellPrice) : null,
     plateNumber: car.plateNumber,
     plateType: (car.plateType as SaudiPlateType | null) ?? null,
-    images: car.images.map((i) => i.url),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    images: car.images.map((i: any) => i.url),
   }
 
   return (

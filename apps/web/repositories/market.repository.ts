@@ -84,7 +84,8 @@ export async function listMarketCars(filters: MarketFilters = {}) {
   })()
 
   const [cars, total] = await Promise.all([
-    prisma.car.findMany({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.car as any).findMany({
       where,
       orderBy,
       skip,
@@ -92,6 +93,7 @@ export async function listMarketCars(filters: MarketFilters = {}) {
       select: {
         id:            true,
         carRefNumber:  true,
+        carPublicId:   true,
         year:          true,
         carType:       true,
         odometer:      true,
@@ -123,10 +125,14 @@ export async function listMarketCars(filters: MarketFilters = {}) {
 }
 
 export async function getMarketCar(carId: string) {
-  const isRef = /^\d+$/.test(carId)
-  return prisma.car.findFirst({
+  const isPublicId = /^CS\d{8}$/.test(carId)
+  const isRef      = !isPublicId && /^\d+$/.test(carId)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (prisma.car as any).findFirst({
     where: {
-      ...(isRef ? { carRefNumber: Number(carId) } : { id: carId }),
+      ...(isPublicId ? { carPublicId: carId }
+        : isRef      ? { carRefNumber: Number(carId) }
+        :               { id: carId }),
       deletedAt: null,
       status:    { in: ['FOR_SALE', 'AUCTION'] },
     },
@@ -153,7 +159,7 @@ export async function getMarketCar(carId: string) {
 }
 
 const CAR_SELECT = {
-  id: true, carRefNumber: true, year: true, carType: true,
+  id: true, carRefNumber: true, carPublicId: true, year: true, carType: true,
   odometer: true, fuelType: true, transmission: true, sellPrice: true,
   status: true, displayMode: true, auctionEndsAt: true,
   brand:    { select: { nameAr: true, nameEn: true } },

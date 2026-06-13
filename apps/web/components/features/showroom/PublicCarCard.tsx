@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 
 export interface PublicCarData {
   id: string
+  carPublicId?: string | null
   brandName: string
   categoryName: string
   year: number
@@ -38,7 +39,9 @@ export function PublicCarCard({
   const tc = useTranslations('common')
   const locale = useLocale()
 
-  const href = `${basePath}/cars/${car.id}${linkQuery}`
+  // Prefer carPublicId in URL (human-readable), fall back to UUID
+  const carSlug = car.carPublicId ?? car.id
+  const href = `${basePath}/cars/${carSlug}${linkQuery}`
   const wa   = buildWhatsappLink(whatsapp, `مرحباً، أرغب بالاستفسار عن ${car.brandName} ${car.categoryName} ${car.year}`)
   const isSold = car.status === 'SOLD'
 

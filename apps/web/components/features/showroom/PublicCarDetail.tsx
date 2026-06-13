@@ -12,6 +12,7 @@ import { buildWhatsappLink } from '@/lib/whatsapp'
 
 export interface PublicCarDetailData {
   id: string
+  carPublicId?: string | null
   brandName: string
   categoryName: string
   modelName: string
@@ -84,7 +85,14 @@ export function PublicCarDetail({
             <h1 className="text-xl font-semibold text-cl-primary">
               {car.brandName} {car.categoryName} {car.year}
             </h1>
-            <StatusBadge status={car.status} />
+            <div className="flex flex-col items-end gap-1">
+              <StatusBadge status={car.status} />
+              {car.carPublicId && (
+                <span className="text-[10px] font-mono text-[#C9A84C] bg-[#C9A84C]/10 px-2 py-0.5 rounded-full">
+                  {car.carPublicId}
+                </span>
+              )}
+            </div>
           </div>
 
           {showPrices && car.sellPrice != null && <Price value={car.sellPrice} size="lg" />}

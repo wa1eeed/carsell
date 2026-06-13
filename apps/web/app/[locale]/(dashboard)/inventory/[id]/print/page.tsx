@@ -58,12 +58,14 @@ export default async function PrintSlipPage({ params }: Props) {
     select: { url: true },
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const carSlug = (car as any).carPublicId ?? car!.carRefNumber
   const publicUrl = showroom?.slug
-    ? `https://carsell.one/${showroom.slug}/cars/${car!.carRefNumber}`
-    : `https://carsell.one/${params.locale}/market/cars/${car!.carRefNumber}`
+    ? `https://carsell.one/${showroom.slug}/cars/${carSlug}`
+    : `https://carsell.one/${params.locale}/market/cars/${carSlug}`
 
   // Back link — direct href because print opens in a new tab (no history)
-  const backUrl = `/${params.locale}/inventory/${car!.carRefNumber}`
+  const backUrl = `/${params.locale}/inventory/${carSlug}`
 
   return (
     <PrintSlipClient
