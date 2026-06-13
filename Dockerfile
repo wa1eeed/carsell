@@ -21,7 +21,7 @@ RUN npm ci --include=dev --prefer-offline
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
 # Limit Node.js memory to avoid OOM on low-RAM VPS (adjust if you have more RAM)
-ENV NODE_OPTIONS="--max-old-space-size=1536"
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 COPY --from=deps /app/node_modules ./node_modules
 COPY apps/web/ ./
 RUN npx prisma generate
