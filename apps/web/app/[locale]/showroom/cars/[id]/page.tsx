@@ -36,7 +36,7 @@ export async function generateMetadata({
   const showroom = await resolveShowroom(searchParams)
   if (!showroom) return { title: 'CarSell' }
   const car = await showroomPublicRepository.findCar(showroom.id, params.id).catch(() => null)
-  if (!car) return { title: showroom.name }
+  if (!car) return { title: showroom.name ?? 'CarSell' }
   return {
     title: `${car.brand.nameAr} ${car.category.nameAr} ${car.year} — ${showroom.name}`,
     description: `${car.brand.nameAr} ${car.category.nameAr} ${car.year} للبيع لدى ${showroom.name}`,
@@ -54,7 +54,7 @@ export default async function ShowroomCarPage({
   const showroom = await resolveShowroom(searchParams)
   if (!showroom) notFound()
 
-  const car = await showroomPublicRepository.findCar(showroom.id, params.id)
+  const car = await showroomPublicRepository.findCar(showroom.id, params.id).catch(() => null)
   if (!car) notFound()
 
   const data: PublicCarDetailData = {
