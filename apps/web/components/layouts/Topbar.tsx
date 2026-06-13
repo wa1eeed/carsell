@@ -2,50 +2,83 @@
 
 import { signOut } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
-import { LogOut, Menu, Store, ExternalLink } from 'lucide-react'
+import { LogOut, Menu, Store, Bell, ChevronDown, ExternalLink } from 'lucide-react'
 import { LocaleSwitcher } from './LocaleSwitcher'
+import { cn } from '@/lib/utils'
 
 export function Topbar({ showroomName, onMenuClick }: { showroomName: string; onMenuClick?: () => void }) {
-  const t = useTranslations('nav')
+  const t      = useTranslations('nav')
   const locale = useLocale()
 
+  const initials = showroomName
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+
   return (
-    <header className="h-16 shrink-0 bg-white border-b border-cl-gray-200 flex items-center justify-between px-4 md:px-6">
+    <header className="h-14 shrink-0 bg-white border-b border-cl-gray-200 flex items-center justify-between px-4 md:px-6 gap-4">
+      {/* Left — hamburger + breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         {onMenuClick && (
           <button
             type="button"
             onClick={onMenuClick}
-            className="lg:hidden text-cl-gray-600 hover:text-cl-primary"
+            className="lg:hidden p-1.5 rounded-[6px] text-cl-gray-600 hover:bg-cl-gray-100 transition-colors"
             aria-label="menu"
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
         )}
-        <div className="font-medium text-cl-text-primary truncate">{showroomName}</div>
+        <div className="hidden sm:flex items-center gap-2">
+          <div className="w-6 h-6 rounded-[6px] bg-cl-primary flex items-center justify-center">
+            <span className="text-white text-[9px] font-bold">{initials}</span>
+          </div>
+          <span className="text-sm font-semibold text-cl-text-primary truncate max-w-[180px]">{showroomName}</span>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-3">
-        {/* CarSell Live — opens the public marketplace in a new tab */}
+      {/* Right — actions */}
+      <div className="flex items-center gap-1.5">
+        {/* Market link */}
         <a
           href={`/${locale}/market`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 rounded-input px-3 py-1.5 text-sm font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
-          title={t('market')}
+          className="hidden sm:flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-xs font-semibold text-cl-accent border border-cl-accent/30 hover:bg-cl-accent/5 transition-colors"
         >
-          <Store size={16} />
-          <span className="hidden sm:inline">{t('market')}</span>
-          <ExternalLink size={12} className="opacity-60" />
+          <Store size={13} />
+          {t('market')}
+          <ExternalLink size={11} className="opacity-50" />
         </a>
+
+        {/* Notification bell */}
+        <button
+          type="button"
+          className="relative p-2 rounded-[8px] text-cl-gray-600 hover:bg-cl-gray-100 transition-colors"
+          aria-label="notifications"
+        >
+          <Bell size={17} />
+          <span className="absolute top-1.5 end-1.5 w-2 h-2 rounded-full bg-cl-accent border-2 border-white" />
+        </button>
+
+        <div className="w-px h-5 bg-cl-gray-200 mx-0.5" />
+
         <LocaleSwitcher />
+
+        {/* User menu */}
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-          className="flex items-center gap-1.5 rounded-input px-3 py-1.5 text-sm text-cl-gray-600 hover:bg-cl-gray-100"
+          className={cn(
+            'flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-sm text-cl-gray-600',
+            'hover:bg-red-50 hover:text-red-600 transition-colors'
+          )}
+          title={t('logout')}
         >
-          <LogOut size={16} />
-          {t('logout')}
+          <LogOut size={15} />
+          <span className="hidden md:inline text-xs font-medium">{t('logout')}</span>
         </button>
       </div>
     </header>

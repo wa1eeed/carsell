@@ -15,14 +15,11 @@ import {
   CreditCard,
   type LucideIcon,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-interface NavItem   { href: string; labelKey: string; icon: LucideIcon }
+interface NavItem    { href: string; labelKey: string; icon: LucideIcon; badge?: number }
 interface NavSection { titleKey: string; items: NavItem[] }
 
-/**
- * Showroom sidebar — for showroom owners/staff only.
- * Super Admin has a completely separate layout (AdminShell) at admin.carsell.one
- */
 const SECTIONS: NavSection[] = [
   {
     titleKey: 'sections.platform',
@@ -65,18 +62,28 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     pathname === `${prefix}${href}` || pathname.startsWith(`${prefix}${href}/`)
 
   return (
-    <aside className="w-60 shrink-0 min-h-screen flex flex-col" style={{ background: '#0F3460' }}>
-      <div className="px-6 py-5">
-        <span className="text-xl font-semibold text-white">CarSell</span>
+    <aside
+      className="w-[240px] shrink-0 min-h-screen flex flex-col"
+      style={{ background: 'linear-gradient(180deg, #0F3460 0%, #0A2540 100%)' }}
+    >
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-[8px] bg-cl-accent flex items-center justify-center shadow-lg">
+            <Car size={16} className="text-white" />
+          </div>
+          <div>
+            <span className="text-white font-bold text-base tracking-tight">CarSell</span>
+            <p className="text-white/40 text-[10px] font-medium uppercase tracking-widest leading-none mt-0.5">Dashboard</p>
+          </div>
+        </div>
       </div>
 
-      <nav className="flex-1 px-3 py-2 space-y-6">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
         {SECTIONS.map((section) => (
           <div key={section.titleKey}>
-            <p
-              className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider"
-              style={{ color: 'rgba(248,250,252,0.45)' }}
-            >
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/30">
               {t(section.titleKey)}
             </p>
             <ul className="space-y-0.5">
@@ -88,15 +95,21 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                     <Link
                       href={`${prefix}${item.href}`}
                       onClick={onNavigate}
-                      className="flex items-center gap-3 px-3 py-2 rounded-input text-sm transition-colors"
-                      style={{
-                        background:     active ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        color:          active ? '#fff' : 'rgba(255,255,255,0.65)',
-                        borderInlineEnd: active ? '3px solid #C9A84C' : '3px solid transparent',
-                      }}
+                      className={cn(
+                        'group flex items-center gap-3 px-3 py-2.5 rounded-[8px] text-sm transition-all duration-150',
+                        active
+                          ? 'bg-white/15 text-white shadow-inner'
+                          : 'text-white/60 hover:bg-white/8 hover:text-white/90'
+                      )}
                     >
-                      <Icon size={18} />
-                      {t(item.labelKey)}
+                      <Icon
+                        size={16}
+                        className={cn('shrink-0 transition-colors', active ? 'text-cl-accent' : 'text-white/50 group-hover:text-white/80')}
+                      />
+                      <span className="flex-1 font-medium">{t(item.labelKey)}</span>
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-cl-accent shrink-0" />
+                      )}
                     </Link>
                   </li>
                 )
@@ -105,6 +118,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
           </div>
         ))}
       </nav>
+
+      {/* Bottom decoration */}
+      <div className="px-5 py-4 border-t border-white/10">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-[11px] text-white/40 font-medium">carsell.one</span>
+        </div>
+      </div>
     </aside>
   )
 }
