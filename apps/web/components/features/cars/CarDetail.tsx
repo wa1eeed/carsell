@@ -225,7 +225,7 @@ export function CarDetail({ car }: { car: CarDetailData }) {
             </button>
           )}
 
-          <a href={`${prefix}/inventory/${car.carRefNumber}/print`} target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center gap-1.5 text-sm">
+          <a href={`${prefix}/inventory/${car.carPublicId ?? car.carRefNumber}/print`} className="btn-secondary flex items-center gap-1.5 text-sm">
             <Printer size={14} /> {ar ? 'ورقة السيارة' : 'Print Slip'}
           </a>
 

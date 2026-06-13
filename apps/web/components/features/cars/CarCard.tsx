@@ -10,6 +10,7 @@ import { formatNumber, formatCarRef } from '@/lib/format'
 export interface CarCardData {
   id: string
   carRefNumber: number
+  carPublicId?: string | null
   brandName: string
   categoryName: string
   year: number
@@ -26,7 +27,7 @@ export function CarCard({ car }: { car: CarCardData }) {
   const prefix = locale === 'ar' ? '' : '/en'
 
   return (
-    <Link href={`${prefix}/inventory/${car.carRefNumber}`} className="cl-card !p-0 overflow-hidden block">
+    <Link href={`${prefix}/inventory/${car.carPublicId ?? car.carRefNumber}`} className="cl-card !p-0 overflow-hidden block">
       <div className="relative aspect-[16/10] bg-cl-gray-100 flex items-center justify-center">
         {car.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element

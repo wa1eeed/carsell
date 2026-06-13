@@ -37,6 +37,8 @@ export default async function InventoryPage({
     cars = result.cars.map((c) => ({
       id: c.id,
       carRefNumber: c.carRefNumber,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      carPublicId: (c as any).carPublicId ?? null,
       brandName: c.brand.nameAr,
       categoryName: c.category.nameAr,
       year: c.year,
