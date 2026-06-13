@@ -54,13 +54,14 @@ export function PublicCarDetail({
     <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
       {/* Gallery */}
       <div className="space-y-3">
-        <div className="aspect-[16/10] rounded-card overflow-hidden bg-cl-gray-100 flex items-center justify-center">
+        <div className="relative aspect-[16/10] rounded-card overflow-hidden bg-cl-gray-100 flex items-center justify-center">
           {car.images[active] ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={car.images[active]} alt={car.brandName} className="w-full h-full object-cover" />
           ) : (
             <ImageOff size={40} className="text-cl-gray-400" />
           )}
+          {car.status === 'SOLD' && <SoldOverlay label={safe(t, 'status.SOLD')} />}
         </div>
         {car.images.length > 1 && (
           <div className="flex gap-2 overflow-x-auto">
@@ -130,6 +131,21 @@ export function PublicCarDetail({
             <SaudiPlate letters={plate.letters} numbers={plate.numbers} type={car.plateType ?? 'PRIVATE'} size="md" />
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+/** Big diagonal SOLD ribbon across the car image */
+function SoldOverlay({ label }: { label: string }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 bg-black/35" />
+      <div
+        className="relative w-[150%] text-center bg-cl-danger text-white font-extrabold tracking-[0.25em] uppercase shadow-2xl py-2.5 text-2xl md:text-4xl"
+        style={{ transform: 'rotate(-20deg)' }}
+      >
+        {label || 'SOLD'}
       </div>
     </div>
   )
