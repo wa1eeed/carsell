@@ -5,10 +5,11 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Gauge, Calendar, Fuel, ImageOff } from 'lucide-react'
 import { Price } from '@/components/ui/Price'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { formatNumber } from '@/lib/format'
+import { formatNumber, formatCarRef } from '@/lib/format'
 
 export interface CarCardData {
   id: string
+  carRefNumber: number
   brandName: string
   categoryName: string
   year: number
@@ -25,7 +26,7 @@ export function CarCard({ car }: { car: CarCardData }) {
   const prefix = locale === 'ar' ? '' : '/en'
 
   return (
-    <Link href={`${prefix}/inventory/${car.id}`} className="cl-card !p-0 overflow-hidden block">
+    <Link href={`${prefix}/inventory/${car.carRefNumber}`} className="cl-card !p-0 overflow-hidden block">
       <div className="relative aspect-[16/10] bg-cl-gray-100 flex items-center justify-center">
         {car.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -35,6 +36,9 @@ export function CarCard({ car }: { car: CarCardData }) {
         )}
         <span className="absolute top-2 end-2">
           <StatusBadge status={car.status} />
+        </span>
+        <span className="absolute bottom-2 start-2 bg-black/50 text-white text-[10px] font-mono px-1.5 py-0.5 rounded">
+          #{formatCarRef(car.carRefNumber)}
         </span>
       </div>
 

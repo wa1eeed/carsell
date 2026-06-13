@@ -36,6 +36,7 @@ export default async function InventoryPage({
     pageSize = result.pageSize
     cars = result.cars.map((c) => ({
       id: c.id,
+      carRefNumber: c.carRefNumber,
       brandName: c.brand.nameAr,
       categoryName: c.category.nameAr,
       year: c.year,
