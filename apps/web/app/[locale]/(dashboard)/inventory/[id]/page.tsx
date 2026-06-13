@@ -22,8 +22,10 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
 
   // Always fetch full car via findById to ensure all relations are included
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fullCar = await carRepository.findById((car as any).id, user.showroomId)
-  if (!fullCar) notFound()
+  const fullCarRaw = await carRepository.findById((car as any).id, user.showroomId)
+  if (!fullCarRaw) notFound()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fullCar = fullCarRaw as any
 
   const data: CarDetailData = {
     id:              fullCar.id,
@@ -65,22 +67,22 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
     auctionOpeningPrice:  fullCar.auctionOpeningPrice  ? Number(fullCar.auctionOpeningPrice)  : null,
     auctionBuyNowPrice:   fullCar.auctionBuyNowPrice   ? Number(fullCar.auctionBuyNowPrice)   : null,
     auctionDepositAmount: fullCar.auctionDepositAmount ? Number(fullCar.auctionDepositAmount) : null,
-    auctionBidIncrement:  (fullCar as any).auctionBidIncrement  ? Number((fullCar as any).auctionBidIncrement)  : null,
-    images: fullCar.images.map((img) => ({ url: img.url, isCover: img.isCover })),
-    timeline: fullCar.timeline.map((e) => ({
+    auctionBidIncrement:  fullCar.auctionBidIncrement  ? Number(fullCar.auctionBidIncrement)  : null,
+    images: fullCar.images.map((img: any) => ({ url: img.url, isCover: img.isCover })),
+    timeline: fullCar.timeline.map((e: any) => ({
       id:        e.id,
       eventType: e.eventType,
       payload:   e.payload as Record<string, unknown>,
       userName:  e.user.name,
       createdAt: e.createdAt.toISOString(),
     })),
-    documents: fullCar.documents.map((d) => ({
+    documents: fullCar.documents.map((d: any) => ({
       id:       d.id,
       docType:  d.docType,
       fileName: d.fileName,
       fileUrl:  d.fileUrl,
     })),
-    bids: ((fullCar as any).bids ?? []).map((b: any) => ({
+    bids: (fullCar.bids ?? []).map((b: any) => ({
       id:           b.id,
       amount:       Number(b.amount),
       isWinning:    b.isWinning,
@@ -88,7 +90,7 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
       bidderNumber: null,
       createdAt:    b.createdAt.toISOString(),
     })),
-    saumOffers: ((fullCar as any).carRequests ?? []).map((r: any) => ({
+    saumOffers: (fullCar.carRequests ?? []).map((r: any) => ({
       id:          r.id,
       buyerName:   r.buyerName,
       buyerPhone:  r.buyerPhone,

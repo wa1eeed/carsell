@@ -12,9 +12,11 @@ export default async function NewSalePage({ params }: { params: { carId: string;
   const user = await requirePageUser()
   const prefix = params.locale === 'ar' ? '' : '/en'
 
-  const car = await carRepository.findById(params.carId, user.showroomId)
-  if (!car) notFound()
-  if (car.status === 'SOLD') redirect(`${prefix}/inventory/${car.id}`)
+  const carRaw = await carRepository.findById(params.carId, user.showroomId)
+  if (!carRaw) notFound()
+  if (carRaw.status === 'SOLD') redirect(`${prefix}/inventory/${carRaw.id}`)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const car = carRaw as any
 
   const showroom = await prisma.showroom.findUnique({ where: { id: user.showroomId } })
 
