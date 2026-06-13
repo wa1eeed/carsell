@@ -5,6 +5,14 @@ Format: [Semantic Versioning](https://semver.org) | [Keep a Changelog](https://k
 
 ---
 
+## [1.0.1] — 2026-06-13 · URL Prefix Fix + Resilient Car Detail
+
+### Fixed
+- **Showroom car links** — روابط السيارات في صفحة المعرض كانت تُضاف `/ar/` قبل الرابط رغم أن العربية (اللغة الافتراضية) لا تحتاج locale prefix مع إعداد `as-needed`. الروابط الآن نظيفة: `/al-fahad/cars/CS26000001` بدلاً من `/ar/al-fahad/cars/CS26000001`
+- **Showroom car detail page** (`/{slug}/cars/{id}`) — أُضيف `.catch(() => null)` على استدعاء `findCar` في كل من الـ page وفي `generateMetadata`، بحيث إذا حدث خطأ في DB (مثلاً migration لم تُنفَّذ بعد في production) تظهر صفحة 404 بدلاً من error 500
+
+---
+
 ## [1.0.0] — 2026-06-13 · Car Public ID + URL Routing + UX Polish
 
 ### Added
