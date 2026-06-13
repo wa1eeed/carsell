@@ -77,7 +77,7 @@ export const carRepository = {
           orderBy: { createdAt: 'desc' },
           include: { bidder: { select: { name: true } } },
         },
-        carRequests: {
+        requests: {
           where:   { type: 'SOUM_OFFER' },
           orderBy: { createdAt: 'desc' },
           select: {

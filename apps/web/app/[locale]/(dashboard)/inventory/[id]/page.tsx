@@ -90,7 +90,7 @@ export default async function CarDetailPage({ params }: { params: { id: string; 
       bidderNumber: null,
       createdAt:    b.createdAt.toISOString(),
     })),
-    saumOffers: (fullCar.carRequests ?? []).map((r: any) => ({
+    saumOffers: (fullCar.requests ?? []).map((r: any) => ({
       id:          r.id,
       buyerName:   r.buyerName,
       buyerPhone:  r.buyerPhone,
