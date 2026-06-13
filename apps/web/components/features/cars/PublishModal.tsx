@@ -210,6 +210,7 @@ function AuctionForm({
   const [startDate, setStartDate] = useState('')
   const [durationHours, setDurationHours] = useState<number>(24)
   const [buyNowPrice, setBuyNowPrice] = useState('')
+  const [bidIncrement, setBidIncrement] = useState('')
 
   return (
     <form
@@ -223,6 +224,7 @@ function AuctionForm({
           startDate: new Date(startDate).toISOString(),
           durationHours,
           buyNowPrice: buyNowPrice ? Number(buyNowPrice) : undefined,
+          bidIncrement: bidIncrement ? Number(bidIncrement) : undefined,
         })
       }}
       className="space-y-4"
@@ -269,6 +271,9 @@ function AuctionForm({
       </Field>
       <Field label={t('buyNowPrice')}>
         <input className="cl-input price-number" inputMode="numeric" value={buyNowPrice} onChange={(e) => setBuyNowPrice(e.target.value.replace(/\D/g, ''))} />
+      </Field>
+      <Field label={t('bidIncrement')}>
+        <input className="cl-input price-number" inputMode="numeric" placeholder="100" value={bidIncrement} onChange={(e) => setBidIncrement(e.target.value.replace(/\D/g, ''))} />
       </Field>
       <Actions tc={tc} saving={saving} onBack={onBack} />
     </form>

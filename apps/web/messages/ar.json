@@ -212,6 +212,7 @@
     "minAcceptedPrice": "الحد الأدنى للقبول (سري)",
     "openingPrice": "سعر الافتتاح",
     "buyNowPrice": "سعر الشراء الفوري",
+    "bidIncrement": "الحد الأدنى للمزايدة",
     "deposit": "العربون",
     "startDate": "تاريخ البدء",
     "duration": "مدة المزاد",

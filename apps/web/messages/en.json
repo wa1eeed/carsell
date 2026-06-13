@@ -212,6 +212,7 @@
     "minAcceptedPrice": "Minimum Accepted Price (Secret)",
     "openingPrice": "Opening Price",
     "buyNowPrice": "Buy Now Price",
+    "bidIncrement": "Minimum Bid Increment",
     "deposit": "Deposit",
     "startDate": "Start Date",
     "duration": "Duration",
